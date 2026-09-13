@@ -274,7 +274,7 @@
 		background: var(--glass-bg);
 		-webkit-backdrop-filter: blur(var(--glass-blur));
 		backdrop-filter: blur(var(--glass-blur));
-		border: 1px solid var(--glass-border);
+		border: var(--border-width) solid var(--glass-border);
 		color: var(--color-text);
 		display: inline-flex;
 		align-items: center;

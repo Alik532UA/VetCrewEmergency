@@ -540,7 +540,7 @@
 		/* Same band as the custom bar — over the page, under the log button. */
 		z-index: 1500;
 		background: var(--color-bg-card);
-		border-left: 1px solid var(--color-border);
+		border-left: var(--border-width) solid var(--color-border);
 		box-shadow: -8px 0 24px rgba(0, 0, 0, 0.28);
 		cursor: pointer;
 		overflow: hidden;
@@ -599,8 +599,8 @@
 
 	.minimap__viewport {
 		background: color-mix(in srgb, var(--color-primary), transparent 85%);
-		border-top: 1px solid var(--color-primary);
-		border-bottom: 1px solid var(--color-primary);
+		border-top: var(--border-width) solid var(--color-primary);
+		border-bottom: var(--border-width) solid var(--color-primary);
 	}
 
 	@media print {

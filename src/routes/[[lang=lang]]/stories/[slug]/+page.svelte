@@ -75,7 +75,7 @@
 
 	.pending {
 		padding: 1rem 1.25rem;
-		border: 1px dashed var(--color-border);
+		border: var(--border-width) dashed var(--color-border);
 		border-radius: var(--radius-md);
 		color: var(--color-text-muted);
 	}
@@ -114,7 +114,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.6rem 1.1rem;
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		border-radius: var(--radius-full);
 		color: inherit;
 		font-weight: 600;

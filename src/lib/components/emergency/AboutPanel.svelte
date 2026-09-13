@@ -112,7 +112,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		padding: 0.6rem 1.2rem;
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		border-radius: var(--radius-full);
 		color: inherit;
 		font-weight: 600;

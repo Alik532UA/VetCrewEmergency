@@ -459,7 +459,7 @@
 		z-index: 10;
 		background: var(--color-bg-card);
 		color: var(--color-accent);
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		width: 44px;
 		height: 44px;
 		display: flex;

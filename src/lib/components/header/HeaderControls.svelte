@@ -247,7 +247,7 @@
 	 */
 	.header__controls :global(.dropdown__menu) {
 		background: var(--control-surface-hover);
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 	}
 
 	/*

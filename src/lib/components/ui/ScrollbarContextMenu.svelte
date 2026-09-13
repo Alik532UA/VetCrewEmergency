@@ -193,7 +193,7 @@
 		padding: 12px 8px;
 		border-radius: var(--radius-md);
 		background: var(--color-bg-card);
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		box-shadow: var(--shadow-lg);
 	}
 

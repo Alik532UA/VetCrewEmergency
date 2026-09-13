@@ -66,7 +66,7 @@
 		width: 3.75rem;
 		height: 3.75rem;
 		margin-bottom: 0.35rem;
-		border: 1px solid var(--color-accent);
+		border: var(--border-width) solid var(--color-accent);
 		border-radius: 50%;
 		color: var(--color-accent);
 	}

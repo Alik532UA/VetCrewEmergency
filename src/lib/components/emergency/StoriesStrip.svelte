@@ -43,7 +43,7 @@
 		gap: 0.35rem;
 		width: clamp(15rem, 13.5rem + 1.5vw, 16.5rem);
 		padding: 0.65rem 0.65rem 0.85rem;
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		border-radius: var(--radius-lg);
 		background: var(--color-bg-card);
 		color: inherit;

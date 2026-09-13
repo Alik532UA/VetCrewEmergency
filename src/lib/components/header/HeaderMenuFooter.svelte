@@ -59,7 +59,7 @@
 			/* Pushed to the foot of the panel, which is otherwise empty below the links. */
 			margin-top: auto;
 			padding-top: var(--space-xl);
-			border-top: 1px solid var(--color-border);
+			border-top: var(--border-width) solid var(--color-border);
 		}
 
 		/* Stacked, full width. Side by side they were two short pills adrift in a wide

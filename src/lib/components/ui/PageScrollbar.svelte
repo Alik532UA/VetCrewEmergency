@@ -35,6 +35,33 @@
 	/** Last pointer position, not yet applied. */
 	let pendingY = 0;
 	let frame = 0;
+
+	/**
+	 * Стала часу, з якою СТОРІНКА наздоганяє повзунок, ms.
+	 *
+	 * Повзунок лишається під курсором один до одного — керування від цього не
+	 * страждає. А ось сторінка за ним більше не телепортується: на довгій сторінці
+	 * передатне число смуги сягає 7 px сторінки на 1 px тяги, тож кожен рух руки
+	 * кидав екран на сотні пікселів за кадр.
+	 *
+	 * 120 ms — це ~360 ms до повної зупинки: досить, щоб рух читався як ковзання,
+	 * і замало, щоб смуга здавалася ватяною.
+	 */
+	const FOLLOW_TAU = 120;
+
+	/** Куди сторінка їде. Повзунок там уже стоїть. */
+	let scrollTarget = 0;
+	let followFrame = 0;
+	let followAt = 0;
+	/** Скільки ми самі проскролили останнім кадром — щоб помітити чужий скрол. */
+	let followApplied = 0;
+	/**
+	 * Сторінка ще доїжджає після відпускання.
+	 *
+	 * Повзунок увесь цей час лишається там, куди його притягли: інакше на відпусканні
+	 * він стрибнув би назад до сторінки й поповз уперед разом з нею.
+	 */
+	let settling = $state(false);
 	/**
 	 * The thumb's position while dragging — straight from the cursor.
 	 *
@@ -115,7 +142,7 @@
 	);
 
 	const thumbTop = $derived.by(() => {
-		if (dragging) return dragThumbTop;
+		if (dragging || settling) return dragThumbTop;
 		const maxScroll = pageHeight - viewportHeight;
 		if (maxScroll <= 0) return 0;
 		return (scrollY / maxScroll) * (viewportHeight - thumbHeight);
@@ -158,15 +185,14 @@
 		};
 	});
 
-	/** The timer and the frame must not outlive the component. */
-	$effect(() => () => hold.stop());
+	/** The timer and the frames must not outlive the component. */
+	$effect(() => () => {
+		hold.stop();
+		stopFollow();
+	});
 
 	/**
-	 * Scroll so the thumb lands under the cursor.
-	 *
-	 * behavior: 'instant', not 'auto'. 'auto' means "read CSS scroll-behavior", which is
-	 * smooth here — every pointer move would start an animation and they would chase
-	 * each other.
+	 * Aim the page at where the thumb now is. The page gets there in `follow`.
 	 */
 	function applyScroll() {
 		frame = 0;
@@ -175,10 +201,70 @@
 		const wanted = pendingY - trackTop - grabOffset;
 		const clamped = Math.min(Math.max(wanted, 0), maxThumbTop);
 		dragThumbTop = clamped;
-		window.scrollTo({
-			top: (clamped / maxThumbTop) * (pageHeight - viewportHeight),
-			behavior: 'instant'
-		});
+		scrollTarget = (clamped / maxThumbTop) * (pageHeight - viewportHeight);
+
+		// Під reduce ковзання не буває — лише результат.
+		if (reducedMotion.current) {
+			stopFollow();
+			window.scrollTo({ top: scrollTarget, behavior: 'instant' });
+			return;
+		}
+
+		if (!followFrame) {
+			followAt = performance.now();
+			followApplied = window.scrollY;
+			settling = true;
+			followFrame = requestAnimationFrame(follow);
+		}
+	}
+
+	/**
+	 * One frame of the page catching up with the thumb.
+	 *
+	 * behavior: 'instant', not 'auto'. 'auto' means "read CSS scroll-behavior", which is
+	 * smooth here — every frame would start an animation and they would chase each
+	 * other (SCROLLBAR-v8 § 9.2).
+	 */
+	function follow(now: number) {
+		followFrame = 0;
+
+		// Чужий скрол (коліщатко, клавіатура, якір) під час доїзду. Двоє водіїв на
+		// одну сторінку смикали б її кожен до свого — поступаємося.
+		if (Math.abs(window.scrollY - followApplied) > 2) {
+			settling = false;
+			return;
+		}
+
+		// Обмежено: вкладка, що повернулася з фону, дає один кадр завдовжки в
+		// секунди, і сторінка доїхала б миттю саме там, де на це дивляться.
+		const dt = Math.min(now - followAt, 100);
+		followAt = now;
+
+		const current = window.scrollY;
+		const remaining = scrollTarget - current;
+
+		if (Math.abs(remaining) < 0.5) {
+			window.scrollTo({ top: scrollTarget, behavior: 'instant' });
+			followApplied = scrollTarget;
+			settling = false;
+			return;
+		}
+
+		// Експонента від ЧАСУ, а не частка кадру: інакше на 120 Гц сторінка доїжджає
+		// вдвічі швидше, ніж на 60 — той самий рух руки дає різне відчуття на різних
+		// екранах.
+		const next = current + remaining * (1 - Math.exp(-dt / FOLLOW_TAU));
+		window.scrollTo({ top: next, behavior: 'instant' });
+		followApplied = window.scrollY;
+		followFrame = requestAnimationFrame(follow);
+	}
+
+	function stopFollow() {
+		if (followFrame) {
+			cancelAnimationFrame(followFrame);
+			followFrame = 0;
+		}
+		settling = false;
 	}
 
 	/** Pointer moves arrive more often than frames — the extra ones are dropped. */

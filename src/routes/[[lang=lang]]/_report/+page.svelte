@@ -135,7 +135,7 @@
 	.form input,
 	.form textarea {
 		padding: 0.7rem 0.9rem;
-		border: 1px solid var(--color-field-border);
+		border: var(--border-width) solid var(--color-field-border);
 		border-radius: var(--radius-md);
 		background: var(--color-bg-surface);
 		color: inherit;

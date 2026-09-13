@@ -51,7 +51,7 @@
 		width: 100%;
 		max-width: 8.5rem;
 		aspect-ratio: 1;
-		border: 1px solid var(--color-border);
+		border: var(--border-width) solid var(--color-border);
 		border-radius: 50%;
 		background: var(--gradient-hero);
 		font-size: 2.75rem;

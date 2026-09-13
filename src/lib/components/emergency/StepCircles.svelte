@@ -80,7 +80,7 @@
 		width: 4.25rem;
 		height: 4.25rem;
 		margin-bottom: 0.4rem;
-		border: 1px solid var(--color-accent);
+		border: var(--border-width) solid var(--color-accent);
 		border-radius: 50%;
 		color: var(--color-accent);
 	}

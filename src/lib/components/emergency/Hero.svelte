@@ -200,7 +200,9 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.9rem 1.4rem;
-		border: 1px solid var(--color-secondary);
+		/* Товща за решту сайту: це головна дія сторінки, і поруч із суцільною
+		   кнопкою гарячої лінії обведена мусить важити стільки ж. */
+		border: var(--border-width-strong) solid var(--color-secondary);
 		border-radius: var(--radius-lg);
 		background: transparent;
 		color: inherit;

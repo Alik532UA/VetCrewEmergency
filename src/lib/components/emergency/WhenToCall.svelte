@@ -89,7 +89,8 @@
 		flex-direction: column;
 		gap: 0.6rem;
 		padding: 1.4rem;
-		border: 1px solid color-mix(in srgb, var(--case-accent) 32%, var(--color-border));
+		border: var(--border-width) solid
+			color-mix(in srgb, var(--case-accent) 32%, var(--color-border));
 		border-radius: var(--radius-lg);
 		background: var(--color-bg-surface);
 		color: var(--case-accent);

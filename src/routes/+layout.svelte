@@ -526,7 +526,7 @@
 		-webkit-backdrop-filter: blur(var(--glass-blur));
 		backdrop-filter: blur(var(--glass-blur));
 		color: var(--color-accent);
-		border: 1px solid var(--color-accent);
+		border: var(--border-width) solid var(--color-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;

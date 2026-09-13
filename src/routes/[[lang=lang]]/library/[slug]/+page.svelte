@@ -201,7 +201,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.6rem 1.1rem;
-		border: 1px solid currentColor;
+		border: var(--border-width) solid currentColor;
 		border-radius: var(--radius-full);
 		color: inherit;
 		font-weight: 600;

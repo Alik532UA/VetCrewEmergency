@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { devices, expect, test, type Page } from '@playwright/test';
 
 /**
  * The four scrollbar modes (SCROLLBAR-v8 § 11).
@@ -81,6 +81,23 @@ test.describe('the scrollbar modes', () => {
 		await page.mouse.down();
 		await page.mouse.move(x, 500, { steps: 10 });
 		await page.mouse.up();
+
+		// The page glides to the thumb rather than teleporting under it, so it is still
+		// arriving when the button comes up (SCROLLBAR-v8 § 9.2). Wait for it to stop
+		// before reading — polling for "> 200" alone would pass on the first frame of
+		// the glide and say nothing about where the drag actually ended.
+		let previous = Number.NaN;
+		await expect
+			.poll(
+				async () => {
+					const y = await page.evaluate(() => window.scrollY);
+					const still = y === previous;
+					previous = y;
+					return still;
+				},
+				{ timeout: 3000, intervals: [100] }
+			)
+			.toBe(true);
 
 		const scrolled = await page.evaluate(() => window.scrollY);
 		expect(scrolled, 'the drag moved nothing').toBeGreaterThan(200);
@@ -274,5 +291,94 @@ test.describe('the scrollbar menu', () => {
 			return r.top >= 0 && r.left >= 0 && r.bottom <= window.innerHeight;
 		});
 		expect(fits, 'the menu opened partly off screen').toBe(true);
+	});
+});
+
+/**
+ * Хто саме магнітить (SNAP § 1).
+ *
+ * Магнітів два, і вони НЕ взаємозамінні: `scroll-snap-type` у CSS не знає, чим
+ * сторінку зрушили, і доводить однаково тачпад, тягу смуги й PageDown. Доводчик у
+ * JS дивиться на саму подію, тож бере лише коліщатко. Звідси розподіл — CSS лише
+ * там, де подій `wheel` не буває взагалі.
+ *
+ * Перевіряється саме `defaultPrevented`: доводчик забирає жест собі рівно одним
+ * способом — `preventDefault` на події. Дивитися на `scrollY` тут не можна, бо
+ * синтетична подія нативного скролу не робить, і будь-яка цифра була б вигаданою.
+ */
+test.describe('магніт бере лише те, що йому належить', () => {
+	test.beforeEach(async ({ page }) => {
+		await page.setViewportSize(WIDE);
+		await page.goto('/');
+	});
+
+	/** Проганяє жест і каже, які його події доводчик забрав собі. */
+	const gesture = (page: Page, deltas: number[], gapMs: number) =>
+		page.evaluate(
+			async ({ deltas, gapMs }) => {
+				const taken: boolean[] = [];
+				for (const deltaY of deltas) {
+					const ev = new WheelEvent('wheel', {
+						deltaY,
+						deltaX: 0,
+						deltaMode: 0,
+						bubbles: true,
+						cancelable: true
+					});
+					window.dispatchEvent(ev);
+					taken.push(ev.defaultPrevented);
+					await new Promise((r) => setTimeout(r, gapMs));
+				}
+				return taken;
+			},
+			{ deltas, gapMs }
+		);
+
+	test('на десктопі магнітить лише JS, і лише коліщатко', async ({ page }) => {
+		await expect(page.locator('html')).toHaveClass(/has-snap-scroll/);
+
+		// Магніт CSS тут мовчить — інакше він доводив би і тачпад, і тягу смуги.
+		expect(
+			await page.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType),
+			'CSS-магніт увімкнений там, де є тачпад'
+		).toBe('none');
+
+		// Щабель коліщатка: ціле, велике, без горизонталі, з паузою.
+		expect(await gesture(page, [120], 300), 'доводчик не взяв щабель коліщатка').toEqual([true]);
+
+		// Швидке прокручування — теж коліщатко, і теж його.
+		expect(await gesture(page, [120, 120, 120], 40)).toEqual([true, true, true]);
+	});
+
+	test('жест тачпада лишається у людини від початку й до кінця', async ({ page }) => {
+		await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+
+		// Справжній ривок двома пальцями: розгін із нуля, дробові дельти на початку,
+		// великі ЦІЛІ на піку — саме ті, що від щабля коліщатка не відрізнити.
+		const taken = await gesture(page, [2.5, 6, 11.5, 24, 48, 96, 120, 100, 60, 24, 8, 2], 16);
+
+		expect(
+			taken.some(Boolean),
+			`доводчик перехопив жест тачпада: ${taken.map((t) => (t ? 1 : 0)).join('')}`
+		).toBe(false);
+	});
+
+	test('на сенсорному екрані магнітить CSS, бо wheel там не буває', async ({ browser }) => {
+		const context = await browser.newContext({
+			...devices['Pixel 7'],
+			// Явно, а не з пресета: саме ця пара вмикає блок у base.css.
+			hasTouch: true,
+			isMobile: true
+		});
+		const touch = await context.newPage();
+		await touch.goto('/');
+		await expect(touch.locator('html')).toHaveClass(/has-snap-scroll/);
+
+		expect(
+			await touch.evaluate(() => getComputedStyle(document.documentElement).scrollSnapType),
+			'на сенсорному екрані не лишилося жодного магніту'
+		).not.toBe('none');
+
+		await context.close();
 	});
 });

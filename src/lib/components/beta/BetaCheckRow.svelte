@@ -72,7 +72,7 @@
 	.row__boundary {
 		margin-left: var(--space-xs);
 		padding: 0 var(--space-xs);
-		border: 1px solid var(--color-primary-on-surface);
+		border: var(--border-width) solid var(--color-primary-on-surface);
 		border-radius: var(--radius-sm);
 		font-size: 0.7rem;
 		letter-spacing: 0;
