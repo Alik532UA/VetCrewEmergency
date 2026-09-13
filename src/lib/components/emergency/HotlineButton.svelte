@@ -88,7 +88,7 @@
 	   протифазою (`Hero.svelte`). */
 	.hotline--beacon {
 		--beacon-glow: var(--beacon-red);
-		animation: beacon 2.4s steps(1, end) infinite;
+		animation: beacon 3.2s steps(1, end) infinite;
 	}
 
 	/* Та сама висота, що в пунктів смуги й трьох перемикачів поруч: 44 пікселі.
