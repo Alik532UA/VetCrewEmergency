@@ -45,8 +45,8 @@
 		gap: 0.75rem;
 		padding: 0.9rem 1.4rem;
 		border-radius: var(--radius-lg);
-		background: var(--color-primary);
-		color: var(--color-text-on-accent);
+		background: var(--color-secondary);
+		color: var(--color-text-on-secondary);
 		text-decoration: none;
 		font-family: var(--font-accent);
 	}

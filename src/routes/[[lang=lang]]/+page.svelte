@@ -255,7 +255,7 @@
 	}
 
 	.hero__accent {
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 	}
 
 	.hero__tagline {
@@ -344,15 +344,15 @@
 		gap: 0.4rem;
 		margin-top: 1rem;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 
 	.band__cta {
 		padding: 0.85rem 1.5rem;
 		border-radius: var(--radius-full);
-		background: var(--color-primary);
-		color: var(--color-text-on-accent);
+		background: var(--color-secondary);
+		color: var(--color-text-on-secondary);
 	}
 
 	.cards {
@@ -420,7 +420,7 @@
 		gap: 0.35rem;
 		margin-top: auto;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 

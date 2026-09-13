@@ -86,7 +86,7 @@
 		gap: 0.35rem;
 		margin-top: 1rem;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 

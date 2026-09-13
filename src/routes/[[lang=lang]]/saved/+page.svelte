@@ -86,7 +86,7 @@
 		gap: 0.4rem;
 		margin-top: 0.75rem;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 
@@ -129,7 +129,7 @@
 		gap: 0.35rem;
 		margin-top: auto;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 </style>

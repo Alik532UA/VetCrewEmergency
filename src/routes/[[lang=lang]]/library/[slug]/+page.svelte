@@ -144,8 +144,8 @@
 	}
 
 	.save--on {
-		border-color: var(--color-primary);
-		color: var(--color-primary);
+		border-color: var(--color-primary-on-surface);
+		color: var(--color-primary-on-surface);
 	}
 
 	.block {
@@ -167,7 +167,7 @@
 		gap: 0.35rem;
 		margin-top: 0.5rem;
 		font-weight: 600;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		text-decoration: none;
 	}
 
@@ -188,8 +188,8 @@
 		margin-top: 2.5rem;
 		padding: 1.5rem;
 		border-radius: var(--radius-lg);
-		background: var(--color-primary);
-		color: var(--color-text-on-accent);
+		background: var(--color-secondary);
+		color: var(--color-text-on-secondary);
 	}
 
 	.red h2 {

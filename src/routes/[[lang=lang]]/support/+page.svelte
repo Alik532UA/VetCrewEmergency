@@ -81,8 +81,8 @@
 		gap: 0.4rem;
 		padding: 0.85rem 1.5rem;
 		border-radius: var(--radius-full);
-		background: var(--color-primary);
-		color: var(--color-text-on-accent);
+		background: var(--color-secondary);
+		color: var(--color-text-on-secondary);
 		font-weight: 700;
 	}
 

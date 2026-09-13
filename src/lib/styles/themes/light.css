@@ -7,43 +7,43 @@
 	color-scheme: only light;
 
 	/* Palette */
-	--color-primary: #3f6b28; /* 6.28:1 with white */
-	--color-primary-light: #4a7a30; /* 5.10:1 with white */
-	--color-primary-dark: #4a7a2e;
+	--color-primary: #e8efe6; /* 6.28:1 with white */
+	--color-primary-light: #f2f7f0; /* 5.10:1 with white */
+	--color-primary-dark: #2f5136;
 
 	/* The brand colour in its *text* role.
 	   --color-primary is chosen to work as a surface, and in several themes that makes
 	   it too light to read as text on this theme's own cards. Same hue, dark enough to
 	   clear 4.5:1; where the primary already clears it, this is the primary. */
-	--color-primary-on-surface: #3f6b28; /* 6.28:1 on white */
-	--color-secondary: #ffb327;
-	--color-secondary-light: #ffc04a;
+	--color-primary-on-surface: #2f5136; /* 6.28:1 on white */
+	--color-secondary: #c02c2c;
+	--color-secondary-light: #d64545;
 
 	/* Backgrounds */
-	--color-bg: #f2f5ec;
+	--color-bg: #f6f8f5;
 	--bg-image: url('../../assets/backgrounds/bg-light-green-v01.webp');
 	/* Laid over --bg-image so the photograph reads as a background rather than as
 	   something to look at. Half-transparent, in this theme's own colour: the image is
 	   shared furniture, the tint is what makes it belong to the palette. */
 	--bg-tint: rgb(242 245 236 / 0.5);
-	--color-bg-surface: #e4ebd8;
-	--color-bg-warm: #f9fff4;
+	--color-bg-surface: #ffffff;
+	--color-bg-warm: #f0f4ee;
 	--color-bg-card: #ffffff;
-	--color-bg-card-hover: #f9fff4;
+	--color-bg-card-hover: #eef3ec;
 
 	/* Text */
-	--color-text: #262626;
-	--color-text-muted: #4a5a3a;
-	--color-text-on-accent: #ffffff;
-	--color-text-on-secondary: #262626;
+	--color-text: #17251b;
+	--color-text-muted: #4d5f52;
+	--color-text-on-accent: #17251b;
+	--color-text-on-secondary: #ffffff;
 
 	/* Border & UI */
-	--color-border: transparent;
+	--color-border: #cfdbcd;
 	--header-bg: color-mix(in srgb, var(--color-bg-card) 88%, transparent);
 	--header-border: transparent;
 	--footer-bg: #598f3a;
-	--footer-wave: #598f3a;
-	--gradient-hero: linear-gradient(135deg, #598f3a, #93bf4c);
+	--footer-wave: #e8efe6;
+	--gradient-hero: linear-gradient(135deg, #e8efe6, #f6f8f5);
 
 	/* Components */
 
@@ -54,8 +54,8 @@
 	   Its own surface, because neither of the obvious answers works in all four themes:
 	   the card colour is a dark grey that vanishes into a dark panel, and the primary is
 	   the hero colour itself in two of them. Paired with a foreground chosen for it. */
-	--color-hero-btn: #ffffff;
-	--color-text-on-hero-btn: #3f6b28; /* 6.28:1 */
+	--color-hero-btn: #c02c2c;
+	--color-text-on-hero-btn: #ffffff; /* 6.28:1 */
 
 	/* UI Alpha & Overlays */
 	--color-overlay: rgba(89, 143, 58, 0.2);
@@ -82,10 +82,10 @@
 	/* Links. See winter.css for the reasoning: the global `a` rule means a link can land
 	   on any surface, and #4a7a2e was 4.17:1 on --color-bg-surface. #3f6b28: 5.13:1 at
 	   worst. */
-	--color-link: var(--color-primary-on-surface);
+	--color-link: #2f5136;
 	/* A measured step darker, because --color-primary is now the same colour as the link
 	   and hover would not show. 7.31:1 at worst. */
-	--color-link-hover: #2f5220;
+	--color-link-hover: #1d3623;
 	--footer-text: #ffffff;
 	--footer-link: var(--color-secondary-light);
 	--footer-link-hover: #ffffff;
