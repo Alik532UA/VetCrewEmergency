@@ -1,0 +1,75 @@
+[data-style='minimal'] {
+	/* Typography - Monospace for that Linux feel */
+	--font-main:
+		ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
+	--font-accent: var(--font-main);
+
+	/* Shape - Strict 0px radius */
+	--radius-lg: 0px;
+	--radius-md: 0px;
+	--radius-sm: 0px;
+	--radius-full: 0px;
+	/* Round-ish controls - the header's three pickers, the two side links, the
+	   favourites button in the bar. A superellipse rather than a circle, which is
+	   what the sibling project uses at the same size. Square, like every other corner here - the skin's whole point. */
+	--radius-control: 0px;
+
+	/* Shadows - No shadows in minimal style */
+	--shadow-sm: none;
+	--shadow-md: none;
+	--shadow-lg: none;
+	--shadow-xl: none;
+}
+
+/* Minimal specific overrides - Layout & Display */
+[data-style='minimal'] .btn {
+	background: var(--color-text);
+	color: var(--color-bg) !important;
+	text-transform: uppercase;
+	font-weight: 800;
+	letter-spacing: 2px;
+	transition: none;
+}
+
+[data-style='minimal'] .btn:hover {
+	opacity: 0.8;
+	transform: none;
+}
+
+/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
+   without it this ties with the component's own rule at equal specificity, and a
+   tie is settled by bundler order, which differs between dev and a build. */
+:root[data-style='minimal'] .animal-card {
+	background: var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+}
+
+[data-style='minimal'] .badge {
+	background: var(--color-text) !important;
+	color: var(--color-bg) !important;
+}
+
+/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
+   without it this ties with the component's own rule at equal specificity, and a
+   tie is settled by bundler order, which differs between dev and a build. */
+:root[data-style='minimal'] .adoption-status-banner {
+	border-radius: 0;
+}
+
+/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
+   without it this ties with the component's own rule at equal specificity, and a
+   tie is settled by bundler order, which differs between dev and a build. */
+:root[data-style='minimal'] .filter-bar {
+	box-shadow: none;
+	background: var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+}
+
+[data-style='minimal'] .hero {
+	background: var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+}

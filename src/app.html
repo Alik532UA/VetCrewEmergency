@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="%lang%">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<meta name="color-scheme" content="light dark" />
+		<!--
+			Stated rather than left to the browser's guess.
+
+			With no icon declared, every page asked the server for /favicon.ico and got a
+			404 — visible in the console, counted against the build by Lighthouse, and a
+			blank square in the tab. %sveltekit.assets% because a project site lives under
+			/<repo>/ and a bare /favicon.svg would look for it at the domain root.
+		-->
+		<link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+		/>
+		<!--
+			These rules hide the page's native scrollbar, and they live here rather than
+			in a stylesheet on purpose (SCROLLBAR-v8 § 8.3).
+
+			The class below is added before anything paints, but a class on its own does
+			nothing — the rule acting on it has to be in effect by the same moment. In a
+			production build the CSS is a render-blocking <link> and it is; the dev server
+			injects bundled CSS through JavaScript, so at first paint the class would be
+			set with no rule behind it and the native bar would appear and then vanish.
+			Static markup in the head cannot arrive late in either environment.
+
+			scrollbar-gutter goes back to auto here as well: reserving the width of a bar
+			that is not drawn is exactly the gap a custom overlay exists to avoid.
+		-->
+		<style>
+			html.has-custom-scrollbar {
+				scrollbar-width: none;
+				scrollbar-gutter: auto;
+			}
+
+			html.has-custom-scrollbar::-webkit-scrollbar {
+				display: none;
+			}
+		</style>
+		%sveltekit.head%
+		<script>
+			// First frame, before hydration. Both attributes matter, and both lists and
+			// defaults must stay in sync with src/lib/services/settings.svelte.ts.
+			//
+			// data-theme carries the palette: a value that is not a real theme leaves the
+			// first frame with no colours at all.
+			//
+			// data-style carries the shape tokens. Every --radius-* lives under
+			// [data-style], so without it border-radius: var(--radius-md) is invalid and
+			// every card, button and input renders square until hydration finishes.
+			(function () {
+				const THEMES = ['dark', 'light'];
+				const STYLES = ['modern', 'minimal', 'playful'];
+				// Темні за ТЛОМ, а не за назвою. Тем дві, і темна з них одна.
+				const DARK = 'dark';
+				const DARK_SCHEMES = ['dark'];
+				const LIGHT = 'light-green';
+				const root = document.documentElement;
+
+				// The owner's choice, not the system's. See settings.svelte.ts for why this
+				// ignores prefers-color-scheme, and keep the two in step: a mismatch here
+				// changes the palette once on hydration, which is the flicker this script
+				// exists to prevent.
+				let theme = LIGHT;
+				let style = 'playful';
+
+				try {
+					const savedTheme = localStorage.getItem('vetcrewemergency_theme');
+					const savedStyle = localStorage.getItem('vetcrewemergency_style');
+
+					theme = THEMES.includes(savedTheme) ? savedTheme : LIGHT;
+					if (STYLES.includes(savedStyle)) style = savedStyle;
+				} catch {
+					// Storage can be unavailable (private mode, blocked cookies). The defaults
+					// above still give a complete first frame, which is the whole point.
+				}
+
+				root.setAttribute('data-theme', theme);
+				root.setAttribute('data-style', style);
+
+				// Anything that is only correct once scripting has run hides behind this.
+				// Set here rather than during hydration, because the point is to be true
+				// on the first frame; and absent without JS, so nothing stays hidden
+				// waiting for a script that is never coming.
+				root.setAttribute('data-js', '');
+
+				// Hide the native bar before the first frame, or it shows and then
+				// disappears once the components mount — the same flicker the theme lines
+				// above exist to prevent.
+				//
+				// DUPLICATED CONDITIONS: these must agree with
+				// src/lib/services/scrollbar.svelte.ts, which a script in the document head
+				// cannot import. src/lib/services/scrollbar-canon.test.ts fails if they drift.
+				try {
+					const sb = localStorage.getItem('vetcrewemergency_scrollbarMode') || 'custom';
+					const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+					const wide = window.matchMedia('(min-width: 1100px)').matches;
+					if (fine && (sb === 'custom' || ((sb === 'minimap' || sb === 'minimap-full') && wide))) {
+						root.classList.add('has-custom-scrollbar');
+					}
+				} catch {
+					// Same reasoning as above: without storage the native bar stays, which
+					// is a working page rather than a broken one.
+				}
+
+				const meta = document.querySelector('meta[name="color-scheme"]');
+				// `only light` для світлих тем, а не `light dark`. Android Chrome із
+				// темною темою САМОГО браузера перемальовує в темні кольори кожну
+				// сторінку, яку вважає світлою й без власної темної теми (Auto Dark
+				// Theme); `only` — документована відмова. Заміряно на пристрої в
+				// сусідньому `teatralo4ka.odesa.ua` 7 вересня 2026: зі старим
+				// значенням світлі теми виходили перефарбованими, з `only light` —
+				// ні. Правило UI-UX-v9 `UIUX-ONLY-LIGHT`.
+				if (meta) {
+					meta.setAttribute('content', DARK_SCHEMES.indexOf(theme) !== -1 ? 'dark' : 'only light');
+				}
+			})();
+		</script>
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

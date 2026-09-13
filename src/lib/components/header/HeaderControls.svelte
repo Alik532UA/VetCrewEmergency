@@ -1,0 +1,340 @@
+<script lang="ts">
+	import { withBase, localePath } from '$lib/utils/withBase';
+	import { page } from '$app/state';
+	import { base } from '$app/paths';
+	import { acceptsShortcut } from '$lib/services/keyboard';
+	import { t } from '$lib/i18n';
+	import { splitLocale } from '$lib/i18n/locales';
+	import { settings, type Locale, type SiteStyle, type Theme } from '$lib/services/settings.svelte';
+	import { LOCALE_OPTIONS, STYLE_OPTIONS, THEME_OPTIONS } from './menuOptions';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
+
+	/**
+	 * The box a flag occupies, stated on the element as well as in CSS.
+	 *
+	 * The same two numbers as `.header__flag` below, and they have to be: the attributes
+	 * reserve the space before any stylesheet arrives, the CSS keeps it once one has.
+	 * Without them the row reflows on first paint — small, but it is the header, so it
+	 * happens on every page. The flags are SVGs of differing natural size, hence a fixed
+	 * pair rather than the file's own dimensions: `object-fit: cover` crops to this box.
+	 */
+	const FLAG_WIDTH = 20;
+	const FLAG_HEIGHT = 14;
+
+	/**
+	 * Theme, style and language — the three things the header lets a visitor change.
+	 *
+	 * Together in one component because they are one row and one behaviour: only one of
+	 * the three may be open at a time, and that rule needs a single piece of state to
+	 * live in.
+	 */
+	let openMenu = $state<'theme' | 'style' | 'lang' | null>(null);
+
+	/*
+	 * Close on any outside click. In an $effect so the listener leaves with the component
+	 * instead of outliving it.
+	 *
+	 * This is also why the header no longer resets these when its mobile menu closes:
+	 * whatever closed that menu was itself a click, so it reaches this listener too.
+	 */
+	$effect(() => {
+		const close = () => (openMenu = null);
+		window.addEventListener('click', close);
+		return () => window.removeEventListener('click', close);
+	});
+
+	/**
+	 * Hotkeys: `T` theme, `L` language menu, `Esc` close (HOTKEYS-v8 § 1.1).
+	 *
+	 * Here rather than in the layout because both need `openMenu`, which this component
+	 * owns; a second owner elsewhere would eventually disagree with the buttons.
+	 *
+	 * `T` cycles but `L` opens the MENU, and that is not taste: the theme is client-side
+	 * and instant, while switching language is NAVIGATION (`localeHref` is an `href`), so
+	 * "next language" would mean up to three page loads to reach the wanted one.
+	 *
+	 * Both letters are announced on the button they drive, via `keyshortcuts` below
+	 * (§ 5). `V` and `R` live in `ServiceGestures.svelte` and stay unannounced — they
+	 * are service gestures, not something to offer a visitor.
+	 */
+	function handleShortcut(event: KeyboardEvent) {
+		if (!acceptsShortcut(event)) return;
+
+		// One `else return` rather than a `preventDefault` per branch: that way the key is
+		// only ever swallowed once something has happened (HOTKEYS-v8 § 2.4). `Escape` with
+		// nothing open falls through here, which is what lets it keep its usual meaning.
+		if (event.code === 'Escape' && openMenu !== null) openMenu = null;
+		else if (event.code === 'KeyT') settings.toggleTheme();
+		else if (event.code === 'KeyL') openMenu = openMenu === 'lang' ? null : 'lang';
+		else return;
+
+		event.preventDefault();
+	}
+
+	/**
+	 * The same page in another language. Built from the current pathname so the reader
+	 * keeps their place instead of being dropped on the home page.
+	 */
+	function localeHref(locale: Locale): string {
+		const pathname =
+			base && page.url.pathname.startsWith(base)
+				? page.url.pathname.slice(base.length)
+				: page.url.pathname;
+
+		return localePath(splitLocale(pathname).path, locale);
+	}
+</script>
+
+<svelte:window onkeydown={handleShortcut} />
+
+<div class="header__controls">
+	<DropdownMenu
+		label={t('a11y.toggleTheme')}
+		keyshortcuts="T"
+		testId="theme"
+		items={THEME_OPTIONS.map((theme) => ({
+			id: theme.id,
+			label: t(theme.labelKey),
+			active: settings.theme === theme.id
+		}))}
+		open={openMenu === 'theme'}
+		onToggle={(next) => (openMenu = next ? 'theme' : null)}
+		onselect={(id) => {
+			settings.setTheme(id as Theme);
+			openMenu = null;
+		}}
+		onPreview={(id) => settings.previewTheme(id as Theme | null)}
+	>
+		{#snippet trigger()}
+			<Icon
+				name={THEME_OPTIONS.find((x) => x.id === settings.theme)?.icon ?? 'moon'}
+				size="1.2rem"
+			/>
+		{/snippet}
+		{#snippet itemVisual(item)}
+			<Icon name={THEME_OPTIONS.find((x) => x.id === item.id)?.icon ?? 'moon'} size="1.1rem" />
+		{/snippet}
+	</DropdownMenu>
+
+	<DropdownMenu
+		label={t('a11y.toggleStyle')}
+		testId="style"
+		items={STYLE_OPTIONS.map((style) => ({
+			id: style.id,
+			label: t(style.labelKey),
+			active: settings.style === style.id
+		}))}
+		open={openMenu === 'style'}
+		onToggle={(next) => (openMenu = next ? 'style' : null)}
+		onselect={(id) => {
+			settings.setStyle(id as SiteStyle);
+			openMenu = null;
+		}}
+	>
+		{#snippet trigger()}
+			<Icon
+				name={STYLE_OPTIONS.find((x) => x.id === settings.style)?.icon ?? 'sparkles'}
+				size="1.2rem"
+			/>
+		{/snippet}
+		{#snippet itemVisual(item)}
+			<Icon name={STYLE_OPTIONS.find((x) => x.id === item.id)?.icon ?? 'sparkles'} size="1.1rem" />
+		{/snippet}
+	</DropdownMenu>
+
+	<DropdownMenu
+		label={t('a11y.toggleLanguage')}
+		keyshortcuts="L"
+		testId="lang"
+		items={LOCALE_OPTIONS.map((locale) => ({
+			id: locale.id,
+			label: locale.label,
+			href: localeHref(locale.id),
+			hreflang: locale.id,
+			active: settings.locale === locale.id
+		}))}
+		open={openMenu === 'lang'}
+		onToggle={(next) => (openMenu = next ? 'lang' : null)}
+		onselect={(id) => {
+			settings.setLocale(id as Locale);
+			openMenu = null;
+		}}
+	>
+		{#snippet trigger()}
+			<span class="header__lang">
+				{#if LOCALE_OPTIONS.find((l) => l.id === settings.locale)?.flags[0]}
+					<img
+						src={withBase(LOCALE_OPTIONS.find((l) => l.id === settings.locale)!.flags[0])}
+						alt=""
+						class="header__flag"
+						width={FLAG_WIDTH}
+						height={FLAG_HEIGHT}
+					/>
+				{/if}
+				<span class="header__lang-code">{settings.locale.toUpperCase()}</span>
+			</span>
+		{/snippet}
+		{#snippet itemVisual(item)}
+			<span class="header__flags">
+				{#each LOCALE_OPTIONS.find((l) => l.id === item.id)?.flags ?? [] as flag (flag)}
+					<img
+						src={withBase(flag)}
+						alt=""
+						class="header__flag"
+						width={FLAG_WIDTH}
+						height={FLAG_HEIGHT}
+					/>
+				{/each}
+			</span>
+		{/snippet}
+	</DropdownMenu>
+</div>
+
+<style>
+	/*
+	 * The three triggers take the same surface as every other control on the site.
+	 *
+	 * DropdownMenu gives them --glass-bg, which is translucent: over the header's
+	 * blurred bar that reads as a button, and over the mobile panel's flat card colour
+	 * it lands on almost the same value and they look like three bare glyphs. One rule
+	 * for both places rather than a panel-only override, so there is nothing for the
+	 * bundler to break a tie over (SVELTE-UI § 3.6).
+	 *
+	 * `.header__controls :global(.dropdown__trigger)` is (0,3,0) once Svelte adds its
+	 * scoping class, against (0,2,0) for the component's own rule — it wins outright,
+	 * not by being later.
+	 */
+	.header__controls :global(.dropdown__trigger) {
+		background: var(--control-surface);
+		border-color: transparent;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+
+	.header__controls :global(.dropdown__trigger:hover) {
+		background: var(--control-surface-hover);
+	}
+
+	/*
+	 * And the panel that opens from them, for the same reason and in the same place.
+	 *
+	 * DropdownMenu paints itself --color-bg-card, which IS the header's colour on a wide
+	 * screen: the menu opened over the bar and read as part of it rather than as a thing
+	 * on top. In the mobile panel it had the same problem against the same value, and
+	 * carried a fix of its own in HeaderNav — two rules for one intent, which is how the
+	 * two places drift apart. There is exactly one dropdown in this project, and it lives
+	 * here, so the rule lives here too.
+	 *
+	 * --control-surface-hover is the card colour stepped toward the text by a fixed
+	 * amount, so the separation is identical in all four themes and can only ever be the
+	 * same hue.
+	 */
+	.header__controls :global(.dropdown__menu) {
+		background: var(--control-surface-hover);
+		border: 1px solid var(--color-border);
+	}
+
+	.header__controls {
+		display: flex;
+		align-items: center;
+		gap: var(--space-xs);
+		flex-shrink: 0;
+		align-self: center;
+		margin-bottom: 4px;
+	}
+
+	.header__lang {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.header__flags {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		flex-shrink: 0;
+	}
+
+	.header__flag {
+		width: 20px;
+		height: 14px;
+		object-fit: cover;
+		border-radius: 2px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+		display: block;
+	}
+
+	.header__lang-code {
+		font-size: 0.85rem;
+		font-weight: 800;
+		font-family: var(--font-accent);
+		letter-spacing: 0.04em;
+		line-height: 1;
+	}
+
+	/*
+	 * ПУНКТ ТЕМИ ПОКАЗУЄ СВОЮ ТЕМУ, а не поточну (THEME-SWITCHER § 4).
+	 *
+	 * Тло — `--color-bg-surface` тієї теми, тобто те, з чого зроблене саме це
+	 * меню, а НЕ тло сторінки: тла сторінки не видно майже ніде, воно під
+	 * фотографічним фоном, і кнопка, пофарбована ним, показує колір, якого
+	 * відвідувач у тій темі не бачив жодного разу.
+	 *
+	 * Колір-ідентичність — смуга ліворуч у `--color-primary`. Саме primary, а не
+	 * `--color-bg-card`: у світло-зеленої та зимової той `#ffffff`, тобто смуга
+	 * була б невидима рівно там, де потрібна найбільше.
+	 *
+	 * Наведення не міняє тло: заливка кольором-ідентичністю провалює контраст
+	 * (`#3f6b28` не дає читабельної пари ні з білим, ні з чорним). Замість неї
+	 * рамка тим самим кольором — пара «текст на поверхні» лишається недоторканою.
+	 *
+	 * ## Прив'язка до самого меню, а не перелік ключів
+	 *
+	 * Доти тут стояв `:is()` із чотирма ключами тем, бо в списку не було
+	 * локатора, а `data-menu-key` є на пунктах УСІХ трьох меню — без такого
+	 * перелічування правило зачепило б і мову зі стилем. Локатор тепер є
+	 * (`-menu`, як велить TESTID-AND-NAMING-v9 § типів), і селектор став
+	 * простим та однозначним.
+	 *
+	 * Контраст «текст на поверхні» (WCAG AA): 9,08:1 (dark), 12,9:1
+	 * (light-green), 12,6:1 (winter), 8,95:1 (orange-purple).
+	 */
+	:global([data-testid='theme-menu'] .dropdown__item) {
+		border-left: 4px solid var(--sw-id);
+	}
+
+	:global([data-testid='theme-menu'] .dropdown__item:hover),
+	:global([data-testid='theme-menu'] .dropdown__item:focus-visible) {
+		box-shadow: inset 0 0 0 2px var(--sw-id);
+	}
+
+	/* Обраний лишається СВОЇХ кольорів — інакше обрана тема єдина перестала б
+	   показувати себе. Вибір позначає суцільна рамка, а не заливка. */
+	:global([data-testid='theme-menu'] .dropdown__item--active) {
+		box-shadow: inset 0 0 0 3px var(--sw-id);
+	}
+
+	/* #2a3d1d, а не поверхня #242424: автор попросив оливкову — ту, якою темна
+	   тема виглядає на ділі, а не нейтрально-сіру. */
+	:global([data-testid='theme-menu'] .dropdown__item[data-menu-key='dark']) {
+		--sw-id: #93bf4c;
+		background: #2a3d1d;
+		color: #e5e5e5;
+	}
+
+	:global([data-testid='theme-menu'] .dropdown__item[data-menu-key='light']) {
+		--sw-id: #3f6b28;
+		background: #e4ebd8;
+		color: #262626;
+	}
+
+	/* #4a2e7a, а не поверхня #261742: та майже чорна, і фіолетового в ній не
+	   видно — те саме зауваження, що й до темної. */
+	:global([data-testid='theme-menu'] .dropdown__item[data-menu-key='orange-purple']) {
+		--sw-id: #ff8c00;
+		background: #4a2e7a;
+		color: #f0e6ff;
+	}
+</style>

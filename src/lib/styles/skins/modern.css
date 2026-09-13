@@ -1,0 +1,35 @@
+[data-style='modern'] {
+	/* Typography */
+	--font-main: 'Inter', sans-serif;
+	--font-accent: 'Outfit', sans-serif;
+
+	/* Shape */
+	--radius-2xl: 40px;
+	--radius-xl: 32px;
+	--radius-lg: 24px;
+	--radius-md: 12px;
+	--radius-sm: 8px;
+	--radius-full: 9999px;
+	/* Round-ish controls - the header's three pickers, the two side links, the
+	   favourites button in the bar. A superellipse rather than a circle, which is
+	   what the sibling project uses at the same size. Crisper than playful, still unmistakably not a circle. */
+	--radius-control: 16px;
+
+	/* Shadows are inherited from the theme to match palette intensity */
+}
+
+[data-style='modern'] .btn {
+	box-shadow: var(--shadow-md);
+}
+
+:root[data-style='modern'] .hero__title {
+	font-size: 4rem;
+}
+
+/* `:root` for the same reason as in playful.css: without it this ties with the
+   component's own hover at (0,3,0) and loses in the build, so the card picked up the
+   component's `scale(1.02)` on top of this lift. */
+:root[data-style='modern'] .animal-card:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--shadow-lg);
+}

@@ -1,0 +1,413 @@
+/* Fonts are linked from app.html, not @import-ed here: an @import inside a bundled
+   stylesheet is fetched only after that stylesheet parses, adding a round trip
+   in front of first paint. */
+
+/* 1. Base Styles (Global defaults & reset) */
+@import './lib/styles/base.css';
+
+/* 2. Themes (Colors - VetCrewGames style) */
+@import './lib/styles/themes/dark.css';
+@import './lib/styles/themes/light.css';
+
+/* 3. UI Skins (Shapes & Typography - Linux-style architecture) */
+@import './lib/styles/skins/modern.css';
+@import './lib/styles/skins/minimal.css';
+@import './lib/styles/skins/playful.css';
+
+/* Global Component Overrides */
+:root {
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	--shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	--shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-sm);
+	padding: 14px 32px;
+	font-size: 1rem;
+	font-weight: 700;
+	font-family: var(--font-accent);
+	border-radius: var(--radius-md);
+	transition: all var(--transition-spring);
+	text-decoration: none;
+	cursor: pointer;
+	border: none;
+	position: relative;
+	overflow: hidden;
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+}
+
+.btn::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: white;
+	opacity: 0;
+	transition: opacity var(--transition-fast);
+}
+
+.btn:active::after {
+	opacity: 0.1;
+}
+
+.btn:active {
+	transform: scale(0.96);
+}
+
+.btn--primary {
+	/* Solid, not 50% translucent. Blending the accent into whatever sits behind it
+	   washed it out to a pale green, and white on that measured 2.3:1. The glass
+	   treatment stays on cards and the header, where no small text sits on an accent. */
+	background: var(--color-primary);
+	color: var(--color-text-on-accent);
+	box-shadow: 0 4px 14px 0 color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.btn--primary:hover {
+	background: var(--color-primary-light);
+	color: var(--color-text-on-accent);
+	box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 23%, transparent);
+}
+
+.btn--secondary {
+	background: var(--glass-bg);
+	/* Not --color-primary: half-transparent card colour is near-white, and the winter
+	   primary on it measured 2.89:1. */
+	color: var(--color-primary-on-surface);
+	border: none;
+}
+
+.btn--secondary:hover {
+	background: var(--color-primary);
+	/* Not white: this is the foreground each theme already declares for its primary,
+	   and three of the four themes need a dark one. */
+	color: var(--color-text-on-accent);
+}
+
+/*
+ * A button standing on the coloured section a page opens with.
+ *
+ * .btn--secondary is half-transparent card colour and takes on whatever is behind it —
+ * on that section the label measured 2.54:1. This is a choice made where the button is
+ * written rather than inferred from where it sits, so the same button somewhere else
+ * does not silently change meaning.
+ *
+ * Only for that section. Its surface is measured against --cat-hero, and on a panel
+ * that is the card colour the same value is white on white; those take .btn--primary,
+ * whose pairing every theme already declares against the card.
+ */
+.btn--hero {
+	background: var(--color-hero-btn);
+	color: var(--color-text-on-hero-btn);
+}
+
+.btn--hero:hover {
+	background: var(--color-hero-btn);
+	color: var(--color-text-on-hero-btn);
+	filter: brightness(1.08);
+}
+
+.btn--white {
+	background: white;
+	color: var(--color-primary-on-surface);
+	box-shadow: var(--shadow-md);
+}
+
+.btn--white:hover {
+	background: #f8f8f8;
+	box-shadow: var(--shadow-lg);
+}
+
+.btn--outline-white {
+	background: rgba(255, 255, 255, 0.4);
+	color: white;
+	border: none;
+}
+
+.btn--outline-white:hover {
+	background: white;
+	color: var(--color-primary-on-surface);
+}
+
+.btn--accent {
+	/* The amber secondary is a light surface: white on it is 1.79:1, so this pairing
+	   needs its own dark foreground rather than the accent one. */
+	background: var(--color-secondary);
+	color: var(--color-text-on-secondary);
+}
+
+.btn--accent:hover {
+	background: var(--color-secondary-light);
+}
+
+.btn--lg {
+	padding: 18px 40px;
+	font-size: 1.125rem;
+}
+
+.btn--sm {
+	padding: 8px 20px;
+	font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+}
+
+@keyframes pulse-soft {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.05);
+	}
+}
+
+.grid {
+	display: grid;
+	gap: var(--space-lg);
+}
+
+.grid--4 {
+	/*
+	 * minmax(0, …) rather than a bare 1fr, which is minmax(auto, 1fr) and therefore
+	 * a floor: a column cannot get narrower than its content's min-content width.
+	 *
+	 * Nothing is wrong today — measured, the grid shrinks to 72px — because the
+	 * cards carry nothing unbreakable. The zero is there for the day one does: a
+	 * German or Dutch breed name long enough to outgrow its column would push the
+	 * whole page sideways, and the symptom would appear on a phone rather than in a
+	 * build (FLUID-SIZING-v8 § 1).
+	 */
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+	.grid--4 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 768px) {
+	.grid--4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.section__title {
+		font-size: 2.5rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.grid--4 {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Badges */
+.badge {
+	padding: 6px 14px;
+	border-radius: var(--radius-full);
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.badge--cat {
+	background: var(--color-primary);
+	color: var(--color-text-on-accent);
+}
+
+/* The same pairing as .btn--accent above, for the same reason: a secondary surface
+   takes the secondary's own foreground. With the accent one this was 1.79:1 on the
+   default theme's amber and 1.71:1 on Vibrant's purple. */
+.badge--dog {
+	background: var(--color-secondary);
+	color: var(--color-text-on-secondary);
+}
+
+.text-danger {
+	color: var(--color-error) !important;
+}
+
+/*
+ * The hearts that fly to the favourites counter (src/lib/utils/flyToFavorites.ts).
+ *
+ * Global because the layer is appended to <body> by a plain function, so no component's
+ * scope reaches it. Fixed and pointer-events: none so it can neither move the page nor
+ * take a click; the particles carry their own transform, hence top/left at zero.
+ */
+.fly-to-favorites {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	pointer-events: none;
+}
+
+.fly-to-favorites__heart {
+	position: fixed;
+	top: 0;
+	left: 0;
+	/* The transform positions it from its own centre rather than its corner, so the
+	   first frame starts on the button and the last lands on the counter. */
+	margin: -0.5em 0 0 -0.5em;
+	/* Big enough to be a shape rather than a speck at arm's length from the screen. */
+	font-size: 1.7rem;
+	line-height: 1;
+	/*
+	 * The theme's own accent, not a fixed red.
+	 *
+	 * --color-error is the colour of the filled heart on a card, and borrowing it here
+	 * put a red trail across the winter and orange-purple palettes that belonged to
+	 * neither. The accent is what "this site" looks like in whichever theme is on, and
+	 * it is also the colour of the counter the hearts are flying to.
+	 */
+	color: var(--color-primary);
+	/*
+	 * A halo, because the accent is not guaranteed to differ from what it flies over.
+	 *
+	 * In the default theme --cat-hero IS --color-primary — the same #3f6b28 — so hearts
+	 * crossing the hero band disappeared into it completely. Measured against each
+	 * theme's hero: 1.00 here, 5.49 dark, 4.59 vibrant, 3.17 winter. Only one of the four
+	 * needed it, and one is enough.
+	 *
+	 * Light ring first, soft dark drop under it: the accent is a mid-tone in every theme,
+	 * so a pale outline separates it from a dark ground and the shadow does the rest on a
+	 * light one. Red used to make this a non-question and is what the theme colour cost.
+	 */
+	text-shadow:
+		0 0 4px rgb(255 255 255 / 0.85),
+		0 1px 5px rgb(0 0 0 / 0.3);
+	will-change: transform, opacity;
+}
+
+/*
+ * The shape a round-ish control has: a superellipse, not a circle.
+ *
+ * Global because four components draw one — the header's three pickers, the two side
+ * links in the footer, the same two in the mobile menu, and the favourites button in
+ * the bar. Two declarations repeated five times is five places to forget, and
+ * SVELTE-UI § 3.5 says a rule several components share belongs in a global file rather
+ * than copied into each of their scopes.
+ *
+ * `corner-shape` is the real curve and only Chromium draws it so far. Everywhere else
+ * the radius alone leaves a rounded square, which is what the sibling project uses and
+ * is the whole point of the change — so the fallback is the requested shape, not a
+ * degraded one. The radius is per skin: `minimal` means square corners and says 0.
+ */
+.control-shape {
+	border-radius: var(--radius-control);
+	/* The curve itself is one number, and it lives in base.css so it can be found and
+	   turned. See the block named THE DIAL there. */
+	corner-shape: superellipse(var(--corner-superellipse));
+}
+
+/*
+ * The frosted panel: background, blur, edge and shadow. Padding is NOT here — every
+ * user of this class sets its own, and the three that existed disagreed about it.
+ *
+ * Global for the reason spelled out above .control-shape: three components draw one —
+ * the form and the sidebar of /apply, and the two cards of the about section on the
+ * home page. Two of them carried their own copy of the declaration and the third
+ * carried none, so its two cards had no glass at all: the class was there, the rule
+ * stayed behind in the file the component was split out of, and Svelte scoping does
+ * not reach across that line (SVELTE-UI § 3.5). Neither the compiler nor svelte-check
+ * says a word about it — the class simply matches nothing.
+ */
+.glass-card {
+	background: var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur));
+	backdrop-filter: blur(var(--glass-blur));
+	border: none;
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-xl);
+}
+
+/* Accessibility: Skip Link */
+.skip-link {
+	position: absolute;
+	top: -100px;
+	left: 0;
+	background: var(--color-primary);
+	color: white;
+	padding: var(--space-md) var(--space-lg);
+	z-index: 9999;
+	text-decoration: none;
+	font-weight: 700;
+	transition: top var(--transition-normal);
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
+/* Accessibility: Focus Indicators */
+:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 3px;
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/*
+ * Close buttons turn a quarter (UI-ELEMENTS-v8 § 1.3).
+ *
+ * Keyed on the locator, not on a class: there is no single close-button class here and
+ * there cannot be — the toast's is a corner glyph, the next one will have its own size
+ * and place. A list of classes forgets the eighth; `{scope}-close-btn` is already
+ * required of every one of them, so this reads as "every close button by the canon".
+ *
+ * `:has(svg)` is not decoration. The same locator correctly belongs to a TEXT button
+ * that closes something ("Done", "Back"), and turning a word on its side is nonsense.
+ * The glyph inside is what makes it a glyph button.
+ *
+ * The transition is the whole effect: a cross has four-fold symmetry, so after 90° it
+ * looks exactly as it did. Only the movement is visible, and anything that drops the
+ * transition makes the button look broken while the rule is applied perfectly.
+ */
+[data-testid$='-close-btn'] {
+	transition:
+		transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+		background-color 0.25s ease,
+		color 0.25s ease,
+		opacity 0.25s ease;
+}
+
+[data-testid$='-close-btn']:has(svg):hover {
+	transform: rotate(90deg) scale(1.08);
+}
+
+[data-testid$='-close-btn']:has(svg):active {
+	transform: rotate(90deg) scale(0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-testid$='-close-btn'],
+	[data-testid$='-close-btn']:has(svg):hover,
+	[data-testid$='-close-btn']:has(svg):active {
+		transition: none;
+		transform: none;
+	}
+}

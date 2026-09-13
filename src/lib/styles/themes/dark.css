@@ -1,0 +1,92 @@
+:root,
+[data-theme='dark'] {
+	/* What the browser draws its own controls with: scrollbars, form fields, the date
+	   picker, autofill. Declared in CSS and not only in the `color-scheme` meta tag,
+	   because CSS wins over the tag — a page that says nothing here takes the used
+	   scheme from the visitor's system preference and can end up drawing dark native
+	   controls on a light page. UI-UX-v9 § 1.2, `UIUX-ONLY-LIGHT`. */
+	color-scheme: dark;
+
+	/* Palette */
+	--color-primary: #93bf4c;
+	--color-primary-light: #a4d45c;
+	--color-primary-dark: #598f3a;
+
+	/* The brand colour in its *text* role.
+	   --color-primary is chosen to work as a surface, and in several themes that makes
+	   it too light to read as text on this theme's own cards. Same hue, dark enough to
+	   clear 4.5:1; where the primary already clears it, this is the primary. */
+	--color-primary-on-surface: #93bf4c; /* 8.12:1 on --color-bg, 6.69:1 on --color-bg-card */
+	--color-secondary: #ffb327;
+	--color-secondary-light: #ffc04a;
+
+	/* Backgrounds */
+	--color-bg: #1a1a1a;
+	--bg-image: url('../../assets/backgrounds/bg-dark-v01.webp');
+	/* Laid over --bg-image so the photograph reads as a background rather than as
+	   something to look at. Half-transparent, in this theme's own colour: the image is
+	   shared furniture, the tint is what makes it belong to the palette. */
+	--bg-tint: rgb(18 24 15 / 0.5);
+	--color-bg-surface: #242424;
+	--color-bg-warm: #132510;
+	--color-bg-card: #2a2a2a;
+	--color-bg-card-hover: #3a3a3a;
+
+	/* Text */
+	--color-text: #e5e5e5;
+	--color-text-muted: #a0a0a0;
+	--color-text-on-accent: #13371b;
+	--color-text-on-secondary: #13371b;
+
+	/* Border & UI */
+	--color-border: transparent;
+	--header-bg: color-mix(in srgb, var(--color-bg-card) 88%, transparent);
+	--header-border: transparent;
+	--footer-bg: #132510;
+	--footer-wave: #132510;
+	--gradient-hero: linear-gradient(135deg, #2a3d1d, #132510);
+
+	/* Components */
+
+	/* A button standing on the coloured section a page opens with.
+	   Measured against --cat-hero and nothing else: the same value on a white card is a
+	   white button, which is how the empty-favourites buttons disappeared. Panels that
+	   are the card colour take .btn--primary instead.
+	   Its own surface, because neither of the obvious answers works in all four themes:
+	   the card colour is a dark grey that vanishes into a dark panel, and the primary is
+	   the hero colour itself in two of them. Paired with a foreground chosen for it. */
+	--color-hero-btn: #93bf4c;
+	--color-text-on-hero-btn: #13371b; /* 6.16:1 */
+
+	/* UI Alpha & Overlays */
+	--color-overlay: rgba(0, 0, 0, 0.4);
+	--color-overlay-light: rgba(255, 255, 255, 0.1);
+	--color-border-alpha: rgba(255, 255, 255, 0.15);
+	--color-field-border: rgba(255, 255, 255, 0.22);
+
+	/* Shadows */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+	--shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
+	--shadow-xl: 0 20px 32px rgba(0, 0, 0, 0.8);
+
+	/* Specific colors */
+	--color-success: #93bf4c;
+	--color-error: #ff6b6b;
+
+	/* Hero Shapes */
+	--hero-shape-color-1: var(--color-primary-light);
+	--hero-shape-color-2: var(--color-primary-dark);
+	--hero-shape-opacity: 0.12;
+
+	/* Links.
+	   Through --color-primary-on-surface rather than --color-primary directly: the two are
+	   the same colour in this theme, and naming the text-role token keeps them that way if
+	   the surface-role one is ever lightened. 5.31:1 at worst (on --color-bg-card-hover). */
+	--color-stat: #ffb327;
+	--color-link: var(--color-primary-on-surface);
+	--color-link-hover: var(--color-primary-light);
+	--footer-text: #e5e5e5;
+	--footer-link: var(--color-primary);
+	--footer-link-hover: var(--color-primary-light);
+}

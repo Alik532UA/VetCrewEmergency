@@ -1,0 +1,216 @@
+:root {
+	/* Spacing */
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 32px;
+	--space-2xl: 48px;
+	--space-3xl: 64px;
+	--space-4xl: 96px;
+
+	/* Transitions */
+	--transition-fast: 0.15s ease;
+	--transition-normal: 0.3s ease;
+	--transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Modern Glassmorphism System.
+	   No var() fallbacks here on purpose: --color-bg-card is declared by every theme,
+	   and a fallback would hide a typo in exactly the theme being developed in. */
+	/*
+	 * A control at rest inside a panel — a search field, an unselected filter chip.
+	 *
+	 * Derived from the panel it sits in rather than declared per theme, because that is
+	 * what went wrong: the themes each named a colour by hand and the gap between panel
+	 * and control came out different in all four. White on white in winter, near-white
+	 * on white in light-green, and a dark green field inside a grey panel in dark, which
+	 * read as a different component altogether. Mixing 8% of the text colour into the
+	 * panel steps the same distance in every theme and can only ever be the same hue.
+	 */
+	--control-surface: color-mix(in srgb, var(--color-bg-card) 92%, var(--color-text) 8%);
+	--control-surface-hover: color-mix(in srgb, var(--color-bg-card) 84%, var(--color-text) 16%);
+
+	--glass-bg: color-mix(in srgb, var(--color-bg-card) 50%, transparent);
+	--glass-border: transparent;
+	--glass-blur: 16px;
+	--active-tab-bg: var(--color-primary);
+
+	/*
+	 * ── THE DIAL FOR HOW ROUND A CONTROL'S CORNERS ARE ──────────────────────────
+	 *
+	 * Change this one number and every round-ish button follows: the header's three
+	 * pickers, the two side links, the favourites hearts, the back-to-top, the carousel
+	 * arrows. Nothing else needs touching.
+	 *
+	 *   1     a circle — the corner is a plain arc, the roundest it goes
+	 *   1.4   here: gentler than a squircle, clearly not a circle
+	 *   2     `squircle` — flatter sides, and the corner turns more abruptly
+	 *   4+    heading for a square
+	 *   <1    heading the other way, toward a cut-off corner (bevel at 0)
+	 *
+	 * Those are not from the spec text, they are what the browser reports back:
+	 * `superellipse(1)` computes to `round` and `superellipse(2)` to `squircle`, so
+	 * bigger means squarer and smaller means rounder. Was 2, which read as too sharp.
+	 *
+	 * Only Chromium draws this so far. Everywhere else the corner is whatever
+	 * --radius-control gives it, which is a generously rounded square either way — so
+	 * this dial changes the character of the curve, not whether there is one.
+	 */
+	--corner-superellipse: 1.4;
+
+	/* What the section title is written in. These are the values for a title standing on
+	   the page; the playful skin puts it on a coloured plate, and skins/playful.css is
+	   where the themes that need another answer there give one. Declared at the root
+	   rather than only under that skin, so the rule that reads them never has to carry a
+	   var() fallback — which would hide the day one of them stops being declared. */
+	--plate-title: var(--color-text-on-secondary);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+html {
+	scroll-behavior: smooth;
+	-webkit-font-smoothing: antialiased;
+
+	/*
+	 * No grey flash behind a tap.
+	 *
+	 * WebKit and Chromium paint a translucent box over whatever was touched, and on
+	 * anything with rounded corners it is a rectangle over a pill. Declared once here
+	 * because the property inherits, so every control gets it rather than the handful
+	 * someone remembers.
+	 *
+	 * It removes only that flash. Focus rings are a different property and stay, and
+	 * every button here already answers a press with :active — nothing loses its
+	 * feedback, only the rectangle goes.
+	 */
+	-webkit-tap-highlight-color: transparent;
+
+	/*
+	 * SCROLLBAR-v8 § 1: the native bar, repainted. Not replaced.
+	 *
+	 * A custom bar is worth its cost only if the project needs one of three things the
+	 * native bar cannot do — not take up width, sit under an overlay, or change
+	 * thickness at runtime. None of them applies here, and § 1 says to stop there.
+	 * Recorded in PROJECT-CONTEXT.md § 4.13.
+	 *
+	 * Standard properties, understood by Firefox and by Chromium 121+. They inherit,
+	 * so one declaration covers the page and every block with its own scrolling —
+	 * dropdowns, the mobile menu, the carousel.
+	 */
+	--scrollbar-thumb: color-mix(in srgb, var(--color-primary), transparent 45%);
+	--scrollbar-track: color-mix(in srgb, var(--color-bg-card), transparent 40%);
+
+	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+	scrollbar-width: auto;
+
+	/* The width the bar takes is reserved whether or not it is there. Without this a
+	   short page and a long one are offset from each other, and moving between tabs
+	   shifts the whole page sideways — which is requirement 1 of § 1, solved natively
+	   instead of by building a bar. */
+	scrollbar-gutter: stable;
+}
+
+a {
+	color: var(--color-link);
+	text-decoration: none;
+	transition: color var(--transition-fast);
+}
+
+a:hover {
+	color: var(--color-link-hover);
+}
+
+body {
+	font-family: var(--font-main);
+	background-color: var(--color-bg);
+	color: var(--color-text);
+	line-height: 1.6;
+	overflow-x: hidden;
+}
+
+/*
+ * ПЛАВНА ЗМІНА ТЕМИ — і під курсором, і по-справжньому (THEME-SWITCHER § 5).
+ *
+ * Клас вішає контролер (`services/settings.svelte.ts`): `previewTheme` — поки
+ * курсор на пункті теми, `setTheme` — на час самої зміни. Без нього чотири теми
+ * перемикалися стрибком, і на прев'ю це видно найгірше: курсор веде по меню, а
+ * сторінка клацає кольорами.
+ *
+ * ## Чому `*`, а не перелік поверхонь
+ *
+ * Тему тримають ТОКЕНИ, і їх читають сотні правил у десятках компонентів —
+ * картки тварин, значки, облямівки. Перелічити «головні поверхні» означало б
+ * плавно міняти тло сторінки й стрибком — усе, що на ній лежить.
+ *
+ * Ціна обмежена свідомо: правило живе лише поки курсор на пункті теми або доки
+ * триває зміна (контролер знімає клас таймером), перелічує рівно пʼять
+ * властивостей кольору й виключає `canvas`.
+ */
+html.theme-shifting,
+html.theme-shifting body,
+html.theme-shifting *:not(canvas) {
+	transition:
+		background-color 0.56s ease,
+		color 0.56s ease,
+		border-color 0.56s ease,
+		fill 0.56s ease,
+		stroke 0.56s ease;
+}
+
+/* Вимикає перехід, але НЕ саму зміну теми: побачити тему — це інформація, а не
+   рух (ACCESSIBILITY-v9 § 7). */
+@media (prefers-reduced-motion: reduce) {
+	html.theme-shifting,
+	html.theme-shifting body,
+	html.theme-shifting *:not(canvas) {
+		transition: none;
+	}
+}
+
+.container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 var(--space-lg);
+}
+
+.container--narrow {
+	max-width: 800px;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-accent);
+	font-weight: 800;
+	line-height: 1.2;
+}
+
+/* Sections */
+.section {
+	padding: var(--space-2xl) 0;
+}
+
+.section__title {
+	font-size: 2.5rem;
+	text-align: center;
+	margin-bottom: var(--space-md);
+}
+
+.section__subtitle {
+	text-align: center;
+	color: var(--color-text-muted);
+	font-size: 1.125rem;
+	max-width: 600px;
+	margin: 0 auto var(--space-3xl);
+}

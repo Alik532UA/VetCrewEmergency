@@ -1,0 +1,58 @@
+# Залежності
+node_modules/
+.pnp
+.pnp.js
+
+# Збірка та вихідні файли
+/.svelte-kit/
+/build/
+/dist/
+.output/
+.vercel/
+.netlify/
+.wrangler/
+
+# Логи
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Системні файли
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Змінні оточення (Environment Variables)
+.env
+.env.local
+.env.*
+!.env.example
+!.env.test
+
+# Артефакти Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Тимчасові файли Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Специфічні папки проєкту
+gitignore/
+.private/
+read_for_AI/
+.read_for_AI/
+.temp
+# Lighthouse CI writes its reports here on every run.
+.lighthouseci/
+
+# Робочі копії інструментів, не вихідний код. Паралельна сесія кладе сюди
+# git-worktree з ПОВНОЮ копією проєкту разом із `tsconfig.json`; eslint тут
+# читає ігнори саме з цього файлу (`includeIgnoreFile`), тож без цього рядка
+# `eslint .` розбирав би чужу копію як свою. Заміряно 26.08 у `Slovko`, де
+# такого рядка не було: один файл із worktree дав `Parsing error`, і гейт став
+# червоний на коді, якого в проєкті немає.
+.claude/

@@ -1,0 +1,92 @@
+[data-theme='light'] {
+	/* `only light`, not `light`: the keyword is the documented opt-out of Android
+	   Chrome's Auto Dark Theme, which repaints any page it considers light and without
+	   a dark theme of its own. Measured on a device in `teatralo4ka.odesa.ua` on
+	   2026-09-07 — the meta tag alone did not stop it, because CSS decides the used
+	   scheme and the tag does not. UI-UX-v9 § 1.2, `UIUX-ONLY-LIGHT`. */
+	color-scheme: only light;
+
+	/* Palette */
+	--color-primary: #3f6b28; /* 6.28:1 with white */
+	--color-primary-light: #4a7a30; /* 5.10:1 with white */
+	--color-primary-dark: #4a7a2e;
+
+	/* The brand colour in its *text* role.
+	   --color-primary is chosen to work as a surface, and in several themes that makes
+	   it too light to read as text on this theme's own cards. Same hue, dark enough to
+	   clear 4.5:1; where the primary already clears it, this is the primary. */
+	--color-primary-on-surface: #3f6b28; /* 6.28:1 on white */
+	--color-secondary: #ffb327;
+	--color-secondary-light: #ffc04a;
+
+	/* Backgrounds */
+	--color-bg: #f2f5ec;
+	--bg-image: url('../../assets/backgrounds/bg-light-green-v01.webp');
+	/* Laid over --bg-image so the photograph reads as a background rather than as
+	   something to look at. Half-transparent, in this theme's own colour: the image is
+	   shared furniture, the tint is what makes it belong to the palette. */
+	--bg-tint: rgb(242 245 236 / 0.5);
+	--color-bg-surface: #e4ebd8;
+	--color-bg-warm: #f9fff4;
+	--color-bg-card: #ffffff;
+	--color-bg-card-hover: #f9fff4;
+
+	/* Text */
+	--color-text: #262626;
+	--color-text-muted: #4a5a3a;
+	--color-text-on-accent: #ffffff;
+	--color-text-on-secondary: #262626;
+
+	/* Border & UI */
+	--color-border: transparent;
+	--header-bg: color-mix(in srgb, var(--color-bg-card) 88%, transparent);
+	--header-border: transparent;
+	--footer-bg: #598f3a;
+	--footer-wave: #598f3a;
+	--gradient-hero: linear-gradient(135deg, #598f3a, #93bf4c);
+
+	/* Components */
+
+	/* A button standing on the coloured section a page opens with.
+	   Measured against --cat-hero and nothing else: the same value on a white card is a
+	   white button, which is how the empty-favourites buttons disappeared. Panels that
+	   are the card colour take .btn--primary instead.
+	   Its own surface, because neither of the obvious answers works in all four themes:
+	   the card colour is a dark grey that vanishes into a dark panel, and the primary is
+	   the hero colour itself in two of them. Paired with a foreground chosen for it. */
+	--color-hero-btn: #ffffff;
+	--color-text-on-hero-btn: #3f6b28; /* 6.28:1 */
+
+	/* UI Alpha & Overlays */
+	--color-overlay: rgba(89, 143, 58, 0.2);
+	--color-overlay-light: rgba(255, 255, 255, 0.6);
+	--color-border-alpha: rgba(0, 0, 0, 0.05);
+	--color-field-border: rgba(0, 0, 0, 0.18);
+
+	/* Shadows */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+	--shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.15);
+	--shadow-xl: 0 20px 32px rgba(0, 0, 0, 0.2);
+
+	/* Specific colors */
+	--color-success: #3f6b28; /* 6.28:1 with white */
+	--color-error: #d44;
+	--color-stat: #13371b;
+
+	/* Hero Shapes */
+	--hero-shape-color-1: var(--color-primary);
+	--hero-shape-color-2: var(--color-secondary);
+	--hero-shape-opacity: 0.08;
+
+	/* Links. See winter.css for the reasoning: the global `a` rule means a link can land
+	   on any surface, and #4a7a2e was 4.17:1 on --color-bg-surface. #3f6b28: 5.13:1 at
+	   worst. */
+	--color-link: var(--color-primary-on-surface);
+	/* A measured step darker, because --color-primary is now the same colour as the link
+	   and hover would not show. 7.31:1 at worst. */
+	--color-link-hover: #2f5220;
+	--footer-text: #ffffff;
+	--footer-link: var(--color-secondary-light);
+	--footer-link-hover: #ffffff;
+}

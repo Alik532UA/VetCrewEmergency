@@ -1,0 +1,244 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - run: npm ci
+
+      # Every gate below the first carries `if: ${{ !cancelled() }}`
+      # (CI-CD-AND-TOOLS-v8 § 1.8). Without it GitHub stops at the first red step,
+      # and one failing line reads as "one problem" when it means "one problem plus
+      # four unknowns" — `audit` going red used to leave types, translations, lint
+      # and 322 unit tests unrun and unreported.
+      #
+      # `!cancelled()`, not `always()`: after `cancel-in-progress` or a manual stop
+      # there is nothing to learn, only runner minutes to burn. And no
+      # `continue-on-error` anywhere — that makes the job GREEN with a red gate,
+      # which is the opposite of this rule, not a softer version of it.
+      #
+      # The steps with a side effect (`upload-pages-artifact`, `deploy-pages`) do NOT
+      # get it: deploying after a failed gate is the thing the gates exist to stop.
+      - run: npm audit --omit=dev --audit-level=high
+      - if: ${{ !cancelled() }}
+        run: npm run check
+      - if: ${{ !cancelled() }}
+        run: npm run check:i18n
+      # Два кроки, а не `npm run lint`, і це § 1.8 на рівень нижче за кроки.
+      #
+      # Скрипт `lint` — це `prettier --check . && eslint .`, тож prettier падає
+      # першим і ESLint не запускається ВЗАГАЛІ. Саме так і вийшло: один файл із
+      # чотирирядковим `expect()`, який уміщається в 100 колонок, дав червоний крок,
+      # у логу якого про ESLint не було жодного слова. Той самий «одна проблема плюс
+      # N невідомостей», лише всередині одного npm-скрипта, де умова кроку не
+      # допомагає.
+      #
+      # `npm run lint` лишається для локального прогону — там послідовність зручна.
+      - if: ${{ !cancelled() }}
+        run: npm run lint:format
+      - if: ${{ !cancelled() }}
+        run: npm run lint:code
+
+      # BEFORE `npm test`, and that order is the whole point: this step answers
+      # "does the runner still pick up every check file", and the summary of the
+      # next step is worth reading only once it has. Narrowing the vitest glob by
+      # one directory drops seventeen files and still prints a green
+      # "Test Files 25 passed (25)" — see scripts/check-test-discovery.js.
+      - if: ${{ !cancelled() }}
+        run: npm run check:discovery
+      - if: ${{ !cancelled() }}
+        run: npm test
+
+      # The browsers do not arrive with `npm ci`, and downloading them is the longest
+      # step in this job. Keyed on the lockfile, because that is what decides which
+      # version of Playwright is asking for them.
+      - name: Cache Playwright browsers
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      # Without this step Playwright fails with "Executable doesn't exist".
+      - if: ${{ !cancelled() }}
+        run: npx playwright install --with-deps chromium
+
+      # BEFORE the deploy build, and that order is load-bearing.
+      #
+      # `playwright.config.ts` starts its own server with `npm run build && npm run
+      # preview`, and that build lands in the same `build/` — with none of the env
+      # below, so `BASE_PATH` is empty and `SITE_ORIGIN` falls back to its default.
+      # Run after the deploy build, it silently REPLACED it: `check:build` had
+      # already passed over the right pages, `upload-pages-artifact` then shipped the
+      # wrong ones, and every canonical and every `<loc>` in the sitemap pointed at
+      # https://alik532ua.github.io/ — the neighbouring site's root, not this one.
+      # 229 pages advertised as 404s, and no gate in this file could see it: each one
+      # measured a directory that was correct at the time it looked.
+      #
+      # The old note here said this run is "unaffected by the one above", which was
+      # true and beside the point — the direction that mattered was the other one.
+      # `src/ci.test.ts` now holds the invariant instead of the comment: nothing that
+      # writes `build/` may sit between the deploy build and the upload.
+      - if: ${{ !cancelled() }}
+        run: npm run test:e2e
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      # Where the site says it lives, and the one line here that moves with the DNS.
+      #
+      # `CUSTOM_DOMAIN` set means the site is served from the root of its own domain:
+      # the base path is empty and the origin is that domain. Left empty, both fall back
+      # to being derived from the repository — a project site under
+      # https://<owner>.github.io/<repo>/, a user site at the origin root.
+      #
+      # Neither value is discoverable at runtime, which is why the switch lives here and
+      # not in DNS alone. `BASE_PATH` is compiled into every asset URL in the output and
+      # `SITE_ORIGIN` into every canonical, og:url, hreflang and sitemap <loc>. Point the
+      # domain at Pages without changing this and the deploy is green over a site that
+      # asks for its CSS at /VetCrewEmergency/ and tells every crawler its home page is on
+      # alik532ua.github.io. The DNS record and this line are one change in two places —
+      # PROJECT-CONTEXT.md § 4.40.
+      #
+      # There is no CNAME file, in `static/` or anywhere else, and that is not an
+      # omission: published from a workflow, GitHub ignores a CNAME file and reads the
+      # domain from the repository's Pages settings instead. A file here would be a
+      # second source of truth that nothing reads, and that would drift the first time
+      # the domain changed.
+      #
+      # In the fallback branch the owner is lower-cased and the repository name is NOT,
+      # and the asymmetry is the point: a URL's host is case-insensitive, its path is not
+      # (RFC 3986 § 3.2.2, § 6.2.2.1). GitHub returns `repository_owner` as the owner
+      # typed it — `Alik532UA` — so every canonical, og:url and sitemap <loc> would carry
+      # a capitalised host: not a 404, just the site advertising itself under a spelling
+      # that appears in no link anywhere. Lower-casing the repo name instead would be a
+      # real 404 the day a repository has a capital in it.
+      #
+      # The user-site comparison is case-insensitive for the same reason — the repo of
+      # a user site is named after the host.
+      - name: Resolve base path and origin
+        id: site
+        if: ${{ !cancelled() }}
+        env:
+          # The domain configured in Settings → Pages. Empty falls back to the
+          # repository-derived address.
+          CUSTOM_DOMAIN:
+        run: |
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            echo "base=" >> "$GITHUB_OUTPUT"
+            echo "origin=https://$CUSTOM_DOMAIN" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          owner=$(printf '%s' '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
+          repo='${{ github.event.repository.name }}'
+          if [ "$(printf '%s' "$repo" | tr '[:upper:]' '[:lower:]')" = "$owner.github.io" ]; then
+            echo "base=" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/$repo" >> "$GITHUB_OUTPUT"
+          fi
+          echo "origin=https://$owner.github.io" >> "$GITHUB_OUTPUT"
+
+      # The last step that writes `build/`. Everything after it reads that directory,
+      # and the artefact upload ships it.
+      - id: build
+        if: ${{ !cancelled() }}
+        run: npm run build
+        env:
+          BASE_PATH: ${{ steps.site.outputs.base }}
+          SITE_ORIGIN: ${{ steps.site.outputs.origin }}
+
+      # The four gates below read `build/`, so they carry the build's outcome as well
+      # as `!cancelled()`. `!cancelled()` alone would be worse than nothing here: a
+      # failed build leaves the PREVIOUS contents of `build/` — the one Playwright
+      # made without a base path — and each of these would then measure that and
+      # could pass. A green gate over a stale directory is the § 1.6 defect, reached
+      # by way of § 1.8.
+      #
+      # The same base the build used. The checker turns sitemap and canonical URLs
+      # back into file paths, and the build directory IS the base — without this it
+      # measures against the wrong root and every page looks missing at once.
+      - if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run check:build
+        env:
+          BASE_PATH: ${{ steps.site.outputs.base }}
+
+      # PERFORMANCE-v8 § 10.1. Measured from the generated pages, not from the
+      # `entry` folder the canon names: in this SvelteKit version that folder holds
+      # 2 KB and the application lives in the chunks beside it, so the reference
+      # script would report "2 KB of 150" forever.
+      - if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npm run check:bundle
+
+      # The only machine check of "a build artefact is not committed"
+      # (VERSIONING-v8 § 1.4). It costs a second and it is the difference between
+      # noticing a generated file on the first push and finding it months later in
+      # every diff, having been re-committed by everyone who ever ran a build.
+      - name: The build leaves tracked files alone
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: git diff --exit-code
+
+      # Version pinned on purpose. `npx @lhci/cli` without one resolves to whatever is
+      # latest at the moment the job runs — which is `latest` in a version field, the
+      # thing DEPENDENCIES-v8 § 2.3 forbids, only harder to see because it is not in
+      # package.json. The thresholds here are score thresholds, so a Lighthouse that
+      # scores differently turns the deploy red without a line of this repo changing.
+      #
+      # Not a devDependency, and that is a decision rather than an oversight: it brings
+      # 321 transitive packages (express, inquirer 6, isomorphic-fetch) into every
+      # install of a project whose whole runtime is two packages, for a tool that runs
+      # once per deploy and never touches the bundle. § 1.1 counts those 321 as 321
+      # risks. Recorded in PROJECT-CONTEXT.md § 4.24; bumped as its own commit.
+      #
+      # `--config` is explicit rather than left to discovery: lhci looks for a list of
+      # filenames in order, and a `lighthouserc.json` left behind beside the `.cjs` one
+      # would win silently on some versions and not others.
+      # BASE_PATH, and it is load-bearing twice: `lighthouserc.cjs` builds its URLs from
+      # it, and the preview server it starts reads it to serve the build under the same
+      # base the build was made for. Without it the server comes up at the root while
+      # the URLs carry the base, and every page is scored as a 404.
+      #
+      # This step used to hand lhci `staticDistDir` instead, which serves the build at
+      # the SERVER ROOT. That survived only while SvelteKit emitted relative asset
+      # paths; once they became base-absolute (PROJECT-CONTEXT § 4.38) all 60 URLs on a
+      # page 404'd and Lighthouse scored seven documents with no CSS, no JS and no
+      # images — at a HIGHER performance score, because nothing was left to download.
+      - name: Lighthouse Audit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: npx @lhci/cli@0.15.1 autorun --config=./lighthouserc.cjs
+        env:
+          BASE_PATH: ${{ steps.site.outputs.base }}
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
