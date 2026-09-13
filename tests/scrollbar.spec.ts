@@ -350,6 +350,32 @@ test.describe('магніт бере лише те, що йому належит
 		expect(await gesture(page, [120, 120, 120], 40)).toEqual([true, true, true]);
 	});
 
+	test('на внутрішніх сторінках магніту немає взагалі', async ({ page }) => {
+		// Головна зібрана з розділів, решта — суцільний текст: доводчик там притягував
+		// до країв статті, тобто відбирав звичайний скрол заради зупинок, яких читач
+		// не просив.
+		//
+		// Перевіряється і локалізований шлях: сайт живе під базовим шляхом, і перша
+		// ручна перевірка цього правила міряла 404-сторінку, де скрипт не виконується
+		// взагалі — «магніту немає» там було правдою з іншої причини. `page.goto`
+		// нижче йде через baseURL і 404 дав би падіння на самому `goto`.
+		for (const path of ['/library', '/stories', '/about', '/en/library']) {
+			const response = await page.goto(path);
+			expect(response?.status(), `${path} не відкрилася`).toBeLessThan(400);
+
+			const taken = await gesture(page, [120], 0);
+			expect(taken, `доводчик магнітить на ${path}`).toEqual([false]);
+		}
+	});
+
+	test('головна магнітить у кожній мові', async ({ page }) => {
+		for (const path of ['/', '/en']) {
+			const response = await page.goto(path);
+			expect(response?.status(), `${path} не відкрилася`).toBeLessThan(400);
+			expect(await gesture(page, [120], 0), `на ${path} магніту немає`).toEqual([true]);
+		}
+	});
+
 	test('жест тачпада лишається у людини від початку й до кінця', async ({ page }) => {
 		await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
