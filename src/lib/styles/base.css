@@ -152,6 +152,21 @@ html.has-snap-scroll {
 	scroll-snap-type: y proximity;
 }
 
+/*
+ * Поки їде доводчик (`utils/snapScroll.ts`) — магніт браузера мовчить.
+ *
+ * `scroll-snap-type` діє й на ПРОГРАМНИЙ скрол: браузер сам доводить сторінку до
+ * своєї найближчої точки посеред чужої анімації. Два доводчики на одну сторінку
+ * штовхають її кожен по-своєму, і в кінці кожного переходу це видно як ривок.
+ *
+ * Клас знімає лише сам магніт і лише на ті ~900 ms. Точку обидва рахують ту саму
+ * (`scroll-margin-top: 72px` тут проти `- 72` там), тож коли клас іде, сторінка
+ * вже стоїть там, куди магніт її тягнув би — вертати його нема куди.
+ */
+html.has-snap-scroll.is-snap-animating {
+	scroll-snap-type: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	html.has-snap-scroll {
 		scroll-snap-type: none;
