@@ -65,7 +65,7 @@ export const uk = {
 	'library.subtitle':
 		'Практичні поради від вузькопрофільних фахівців із багаторічним досвідом роботи з дикою фауною.',
 	'library.action': 'Як діяти',
-	'library.all': 'Вся бібліотека',
+	'library.all': 'Детальніше',
 	'library.answer': 'Коротко',
 	'library.intervene': 'Чи потрібно втручатися?',
 	'library.whenHelp': 'Коли потрібна допомога?',

@@ -65,7 +65,7 @@ export const en = {
 	'library.subtitle':
 		'Practical advice from specialists with years of experience in wildlife care.',
 	'library.action': 'What to do',
-	'library.all': 'The whole library',
+	'library.all': 'Learn more',
 	'library.answer': 'In short',
 	'library.intervene': 'Should you step in?',
 	'library.whenHelp': 'When is help needed?',

@@ -51,8 +51,11 @@
 	<ul class="features">
 		{#each features as f (f.title)}
 			<li class="feature">
-				<span class="feature__icon" aria-hidden="true"><Icon name={f.icon} size="1.35rem" /></span>
-				<h3 class="feature__title">{t(f.title)}</h3>
+				<div class="feature__head">
+					<span class="feature__icon" aria-hidden="true"><Icon name={f.icon} size="1.35rem" /></span
+					>
+					<h3 class="feature__title">{t(f.title)}</h3>
+				</div>
 				<p class="feature__text">{t(f.text)}</p>
 			</li>
 		{/each}
@@ -132,13 +135,21 @@
 		list-style: none;
 	}
 
+	.feature__head {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.35rem;
+	}
+
 	.feature__icon {
 		display: inline-flex;
+		flex-shrink: 0;
 		color: var(--color-accent);
 	}
 
 	.feature__title {
-		margin: 0.35rem 0 0.25rem;
+		margin: 0;
 		font-size: 0.95rem;
 		color: var(--color-accent);
 	}

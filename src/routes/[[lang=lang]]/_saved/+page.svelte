@@ -42,8 +42,10 @@
 		<ul class="cards" data-testid="saved-list">
 			{#each saved as a (a.slug)}
 				<li class="card">
-					<span class="card__emoji" aria-hidden="true">{a.emoji}</span>
-					<h2>{a.title[lang]}</h2>
+					<div class="card__head">
+						<span class="card__emoji" aria-hidden="true">{a.emoji}</span>
+						<h2>{a.title[lang]}</h2>
+					</div>
 					<p>{a.teaser[lang]}</p>
 					<a class="card__link" href={localePath(`/library/${a.slug}`, lang)}>
 						{t('library.action')}
@@ -114,6 +116,12 @@
 		background: var(--color-bg-surface);
 	}
 
+	.card__head {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
 	.card h2 {
 		margin: 0;
 		font-size: 1.05rem;
@@ -133,6 +141,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		margin-top: auto;
+		margin-left: auto;
 		font-weight: 600;
 		color: var(--color-accent);
 		text-decoration: none;

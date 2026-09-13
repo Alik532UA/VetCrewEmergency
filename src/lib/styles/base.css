@@ -141,9 +141,11 @@ body {
 }
 
 /*
- * Магнітний скрол по контейнерах (CSS Scroll Snap).
+ * МАГНІТНИЙ СКРОЛ (CSS Scroll Snap).
  *
  * Притягує скрол до початку кожного контейнера/розділу сторінки.
+ * Для миші — чітке перемикання контейнер за контейнером (mandatory + always).
+ * Для тачпада та сенсорних пристроїв — вільне плавне ковзання (proximity + normal).
  * Вмикається класом `has-snap-scroll` на <html>, вимикається в меню смуги.
  */
 html.has-snap-scroll {
@@ -168,6 +170,19 @@ html.has-snap-scroll .footer {
 	scroll-snap-align: start;
 	scroll-snap-stop: normal;
 	scroll-margin-top: 72px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+	html.has-snap-scroll {
+		scroll-snap-type: y proximity;
+	}
+
+	html.has-snap-scroll .hero,
+	html.has-snap-scroll .band,
+	html.has-snap-scroll .page,
+	html.has-snap-scroll .footer {
+		scroll-snap-stop: normal;
+	}
 }
 
 /*

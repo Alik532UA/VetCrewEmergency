@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { MediaQuery } from 'svelte/reactivity';
 import { storage } from '$lib/services/storage';
 import { logService } from '$lib/services/logService.svelte';
+import { initSnapScrollController } from '$lib/utils/snapScroll';
 
 /**
  * Which bar draws the page's scroll position (SCROLLBAR-v8).
@@ -98,6 +99,10 @@ class ScrollbarState {
 			this.snapScroll = false;
 		} else if (snapped === 'true') {
 			this.snapScroll = true;
+		}
+
+		if (browser) {
+			initSnapScrollController();
 		}
 	}
 

@@ -40,8 +40,10 @@
 	</div>
 
 	<div class="support__shop">
-		<span class="support__shop-icon" aria-hidden="true"><Icon name="paw" size="1.5rem" /></span>
-		<h3 class="support__shop-title">{t('support.shop.title')}</h3>
+		<div class="support__shop-head">
+			<span class="support__shop-icon" aria-hidden="true"><Icon name="paw" size="1.5rem" /></span>
+			<h3 class="support__shop-title">{t('support.shop.title')}</h3>
+		</div>
 		<p class="support__shop-tagline">{t('support.shop.subtitle')}</p>
 		<p class="support__text">{t('support.shop.text')}</p>
 		<a
@@ -125,13 +127,21 @@
 		color: var(--color-text-muted);
 	}
 
+	.support__shop-head {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-bottom: 0.35rem;
+	}
+
 	.support__shop-icon {
 		display: inline-flex;
+		flex-shrink: 0;
 		color: var(--color-accent);
 	}
 
 	.support__shop-title {
-		margin: 0.4rem 0 0.2rem;
+		margin: 0;
 		font-size: 1.1rem;
 	}
 

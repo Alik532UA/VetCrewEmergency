@@ -40,9 +40,9 @@
 			background-color var(--transition-fast);
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
-		width: 17rem;
-		padding: 0.75rem 0.75rem 1.1rem;
+		gap: 0.35rem;
+		width: clamp(15rem, 13.5rem + 1.5vw, 16.5rem);
+		padding: 0.65rem 0.65rem 0.85rem;
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		background: var(--color-bg-card);
@@ -73,22 +73,25 @@
 	.story__shot {
 		display: grid;
 		place-items: center;
-		margin-bottom: 0.6rem;
-		aspect-ratio: 16 / 10;
+		margin-bottom: 0.35rem;
+		aspect-ratio: 16 / 9;
 		border-radius: var(--radius-md);
 		background: var(--gradient-hero);
-		font-size: 2.5rem;
+		font-size: 2.25rem;
 	}
 
 	.story h3 {
 		margin: 0;
-		padding: 0 0.5rem;
-		font-size: 1.05rem;
+		padding: 0 0.4rem;
+		font-size: clamp(0.92rem, 0.86rem + 0.1vw, 1rem);
+		line-height: 1.25;
 	}
 
 	.story p {
 		margin: 0;
-		padding: 0 0.5rem;
+		padding: 0 0.4rem;
+		font-size: clamp(0.78rem, 0.72rem + 0.15vw, 0.86rem);
+		line-height: 1.38;
 		color: var(--color-text-muted);
 	}
 
@@ -97,7 +100,8 @@
 		align-items: center;
 		gap: 0.35rem;
 		margin-top: auto;
-		padding: 0.5rem 0.5rem 0;
+		margin-left: auto;
+		padding: 0.4rem 0.4rem 0;
 		font-weight: 600;
 		color: var(--color-accent);
 	}

@@ -233,6 +233,11 @@
 		color: var(--color-text-muted);
 	}
 
+	#stories.band .panel {
+		padding-top: clamp(1rem, 2vw, 1.5rem);
+		padding-bottom: clamp(1rem, 2vw, 1.5rem);
+	}
+
 	/*
 	 * `position: relative` тут не про координати, а про те, хто отримує курсор.
 	 *
@@ -251,10 +256,12 @@
 	.band__all {
 		position: relative;
 		z-index: 1;
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		gap: 0.4rem;
 		margin-top: 1rem;
+		margin-left: auto;
+		width: fit-content;
 		font-weight: 600;
 		color: var(--color-accent);
 		text-decoration: none;
@@ -318,6 +325,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		margin-top: auto;
+		margin-left: auto;
 		font-weight: 600;
 		color: var(--color-accent);
 		text-decoration: none;

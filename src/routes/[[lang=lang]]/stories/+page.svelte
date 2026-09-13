@@ -18,8 +18,10 @@
 	<ul class="cards" data-testid="stories-list">
 		{#each STORIES as s (s.slug)}
 			<li class="card">
-				<span class="card__emoji" aria-hidden="true">{s.emoji}</span>
-				<h2>{s.title[lang]}</h2>
+				<div class="card__head">
+					<span class="card__emoji" aria-hidden="true">{s.emoji}</span>
+					<h2>{s.title[lang]}</h2>
+				</div>
 				<p>{s.summary[lang]}</p>
 				<a class="card__link" href={localePath(`/stories/${s.slug}`, lang)}>
 					{t('stories.more')}
@@ -68,6 +70,12 @@
 		background: var(--color-bg-surface);
 	}
 
+	.card__head {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
 	.card h2 {
 		margin: 0;
 		font-size: 1.05rem;
@@ -87,6 +95,7 @@
 		align-items: center;
 		gap: 0.35rem;
 		margin-top: auto;
+		margin-left: auto;
 		font-weight: 600;
 		color: var(--color-accent);
 		text-decoration: none;
