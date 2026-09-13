@@ -17,14 +17,23 @@
 		/** Власний локатор кнопки, коли пункт чеклиста вказує саме на неї. */
 		testid?: string;
 		compact?: boolean;
+		/**
+		 * Червоний проблисковий маячок.
+		 *
+		 * Прапорцем, а не завжди: номер стоїть ще й у шапці та підвалі, а кнопка,
+		 * що блимає в кожному рядку сторінки, — це вже не акцент, а тривога, від
+		 * якої ховають вкладку. Світить лише пара на першому екрані.
+		 */
+		beacon?: boolean;
 	}
 
-	let { testid, compact = false }: Props = $props();
+	let { testid, compact = false, beacon = false }: Props = $props();
 </script>
 
 <a
 	class="hotline"
 	class:hotline--compact={compact}
+	class:hotline--beacon={beacon}
 	href="tel:{HOTLINE.tel}"
 	data-testid={testid ?? 'hotline-btn'}
 >
@@ -73,6 +82,13 @@
 	 */
 	.hotline:hover {
 		background: var(--color-secondary-light);
+	}
+
+	/* Червоний вогонь пари. Синій — на кнопці «повідомити», і він іде з
+	   протифазою (`Hero.svelte`). */
+	.hotline--beacon {
+		--beacon-glow: var(--beacon-red);
+		animation: beacon 2.4s steps(1, end) infinite;
 	}
 
 	/* Та сама висота, що в пунктів смуги й трьох перемикачів поруч: 44 пікселі.

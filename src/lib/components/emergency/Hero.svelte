@@ -55,7 +55,7 @@
 			<p class="hero__lead">{t('hero.text')}</p>
 
 			<div class="hero__actions">
-				<HotlineButton testid="hero-hotline-btn" />
+				<HotlineButton testid="hero-hotline-btn" beacon />
 				<!-- Веде в Telegram, а не на сторінку сайту: форми поки не буде (див.
 				 REPORT_URL у config.ts). -->
 				<a
@@ -200,24 +200,36 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.9rem 1.4rem;
-		/* Товща за решту сайту: це головна дія сторінки, і поруч із суцільною
-		   кнопкою гарячої лінії обведена мусить важити стільки ж. */
-		border: var(--border-width-strong) solid var(--color-secondary);
 		border-radius: var(--radius-lg);
-		background: transparent;
-		color: inherit;
+		/*
+		 * Суцільний синій без рамки.
+		 *
+		 * Обведена кнопка поруч із суцільною читалася другорядною при будь-якій
+		 * товщині рамки — пробували 1, 3, 5 і 10 пікселів. Вага приходить від
+		 * заливки, не від лінії: дві суцільні кнопки різного кольору нарешті
+		 * кажуть «подзвонити АБО написати», а не «головне і додаткове».
+		 */
+		background: var(--color-tertiary);
+		color: var(--color-text-on-tertiary);
 		text-decoration: none;
-		transition:
-			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+		transition: background-color var(--transition-fast);
 	}
 
-	/* Наведення видно: обводка світлішає, усередину лягає тонка червона заливка.
-	   Не суцільний червоний — тоді обведена кнопка стала б другою суцільною, і пара
-	   втратила б різницю між «подзвонити» і «написати». */
 	.hero__report:hover {
-		border-color: var(--color-secondary-light);
-		background: color-mix(in srgb, var(--color-secondary) 16%, transparent);
+		background: var(--color-tertiary-light);
+	}
+
+	/*
+	 * Синій вогонь пари, у протифазі до червоного на кнопці поруч.
+	 *
+	 * `-1.2s` — рівно півциклу від'ємної затримки: анімація починається вже
+	 * розпочатою, тож жодна з двох кнопок не стоїть темною зайвий такт після
+	 * завантаження, і черги спалахів одразу йдуть по черзі, а не разом.
+	 */
+	.hero__report {
+		--beacon-glow: var(--beacon-blue);
+		animation: beacon 2.4s steps(1, end) infinite;
+		animation-delay: -1.2s;
 	}
 
 	.hero__report span {
@@ -226,8 +238,10 @@
 		line-height: 1.25;
 	}
 
+	/* Приглушено прозорістю, а не `--color-text-muted`: той токен розрахований на
+	   тло сторінки, і на суцільному синьому давав 2.4:1. */
 	.hero__report small {
-		color: var(--color-text-muted);
+		opacity: 0.85;
 	}
 
 	.hero__pending,

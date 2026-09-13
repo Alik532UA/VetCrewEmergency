@@ -224,22 +224,24 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.9rem 1.4rem;
-		/* Товща за решту сайту: це головна дія сторінки, і поруч із суцільною
-		   кнопкою гарячої лінії обведена мусить важити стільки ж. */
-		border: var(--border-width-strong) solid var(--color-secondary);
 		border-radius: var(--radius-lg);
-		background: transparent;
-		color: inherit;
+		/*
+		 * Суцільний синій без рамки.
+		 *
+		 * Обведена кнопка поруч із суцільною читалася другорядною при будь-якій
+		 * товщині рамки — пробували 1, 3, 5 і 10 пікселів. Вага приходить від
+		 * заливки, не від лінії: дві суцільні кнопки різного кольору нарешті
+		 * кажуть «подзвонити АБО написати», а не «головне і додаткове».
+		 */
+		background: var(--color-tertiary);
+		color: var(--color-text-on-tertiary);
 		text-decoration: none;
 		font-family: var(--font-accent);
-		transition:
-			background-color var(--transition-fast),
-			border-color var(--transition-fast);
+		transition: background-color var(--transition-fast);
 	}
 
 	.footer__report:hover {
-		border-color: var(--color-secondary-light);
-		background: color-mix(in srgb, var(--color-secondary) 16%, transparent);
+		background: var(--color-tertiary-light);
 	}
 
 	.footer__report span {
@@ -248,8 +250,10 @@
 		line-height: 1.25;
 	}
 
+	/* Приглушено прозорістю, а не `--color-text-muted`: той токен розрахований на
+	   тло сторінки, і на суцільному синьому давав 2.4:1. */
 	.footer__report small {
-		color: var(--color-text-muted);
+		opacity: 0.85;
 	}
 
 	.footer__bottom {
