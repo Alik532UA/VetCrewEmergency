@@ -2,6 +2,7 @@
 	import { t } from '$lib/i18n';
 	import { localePath } from '$lib/utils/withBase';
 	import { findArticle } from '$lib/data/library';
+	import { REPORT_URL } from '$lib/config';
 	import { settings } from '$lib/services/settings.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import PageMeta from '$lib/components/PageMeta.svelte';
@@ -19,7 +20,6 @@
 	const lang = $derived(settings.locale);
 	const a = $derived(data.article);
 	const related = $derived(a.related.map(findArticle).filter((x) => x !== undefined));
-	const saved = $derived(settings.favorites.includes(a.slug));
 
 	const blocks = $derived([
 		{ key: 'library.intervene' as const, text: a.blocks.intervene[lang] },
@@ -41,17 +41,6 @@
 		<span class="answer__label">{t('library.answer')}</span>
 		{a.answer[lang]}
 	</p>
-
-	<button
-		type="button"
-		class="save"
-		class:save--on={saved}
-		onclick={() => settings.toggleFavorite(a.slug)}
-		data-testid="article-save-btn"
-	>
-		<Icon name={saved ? 'heart-filled' : 'heart'} size="1rem" />
-		{saved ? t('library.unsave') : t('library.save')}
-	</button>
 
 	{#each blocks as block (block.key)}
 		<section class="block">
@@ -92,7 +81,13 @@
 		<p>{t('red.text')}</p>
 		<div class="red__actions">
 			<HotlineButton compact />
-			<a class="red__cta" href={localePath('/report', lang)} data-testid="article-report-btn">
+			<a
+				class="red__cta"
+				href={REPORT_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+				data-testid="article-report-btn"
+			>
 				{t('red.cta')}
 				<Icon name="arrow-right" size="1rem" />
 			</a>
@@ -130,24 +125,6 @@
 		font-size: 1.1rem;
 	}
 
-	.save {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		padding: 0.5rem 0.9rem;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-full);
-		background: none;
-		color: inherit;
-		font: inherit;
-		cursor: pointer;
-	}
-
-	.save--on {
-		border-color: var(--color-primary-on-surface);
-		color: var(--color-primary-on-surface);
-	}
-
 	.block {
 		margin-top: 1.75rem;
 	}
@@ -167,8 +144,13 @@
 		gap: 0.35rem;
 		margin-top: 0.5rem;
 		font-weight: 600;
-		color: var(--color-primary-on-surface);
+		color: var(--color-accent);
 		text-decoration: none;
+	}
+	/* Той самий підпис наведення, що й у решти акцентних посилань сайту. */
+	.link:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
 	}
 
 	.related {
@@ -182,6 +164,10 @@
 
 	.related a {
 		color: inherit;
+	}
+	.related a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
 	}
 
 	.red {
@@ -208,6 +194,9 @@
 	}
 
 	.red__cta {
+		transition:
+			background-color var(--transition-fast),
+			color var(--transition-fast);
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
@@ -217,5 +206,12 @@
 		color: inherit;
 		font-weight: 600;
 		text-decoration: none;
+	}
+	/* Обведення тут іде по currentColor на суцільному червоному, тож наведення
+	   міняє не колір, а заповнення: біла пілюля з червоним написом. Це та сама
+	   інверсія, якою відповідають кнопки на кольоровій смузі. */
+	.red__cta:hover {
+		background: var(--color-text-on-secondary);
+		color: var(--color-secondary);
 	}
 </style>

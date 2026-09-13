@@ -346,28 +346,26 @@ test.describe('the application page', () => {
 });
 
 test.describe('the header meets the page', () => {
-	/** The colour of the section a page opens with — what the tab has to land in. */
+	/** The colour of the section a page opens with. */
 	const bandColour = (page: import('@playwright/test').Page) =>
 		page.evaluate(() => getComputedStyle(document.querySelector('.main > *')!).backgroundColor);
 
-	const waveColour = (page: import('@playwright/test').Page) =>
-		page.evaluate(() => getComputedStyle(document.querySelector('.header__wave path')!).fill);
-
-	// Every page, not only the ones that happen to open with a hero. This is the whole
-	// point of painting the band in the layout: the header draws its tab everywhere.
-	//
-	// The home page is on this list and stays on it. It was taken off once, to let the
-	// theme's background photograph show through the carousel; the band is what is wanted
-	// there, and the photograph is still the ground for the rest of the page.
+	/*
+	 * The tab half of this check is gone with the tab (2026-09-13).
+	 *
+	 * It compared the wave's fill to the band it sat in, because the two were one shape
+	 * in one colour. There is no wave any more — the current section is marked with a
+	 * flat rule under the label — so the only half left is that the opening section has
+	 * a colour of its own at all, which is what `--color-band` is for.
+	 */
 	for (const path of ['/', '/favorites', '/adopt/cat', '/adopt/dog', '/apply']) {
-		test(`the active tab lands in a band of its own colour on ${path}`, async ({ page }) => {
+		test(`the opening section has a colour of its own on ${path}`, async ({ page }) => {
 			await page.goto(path);
 			await page.waitForLoadState('networkidle');
 
-			const [band, wave] = await Promise.all([bandColour(page), waveColour(page)]);
+			const band = await bandColour(page);
 			expect(band, 'the opening section has no colour of its own').toMatch(/^rgba?\(/);
 			expect(band, 'the opening section is transparent').not.toBe('rgba(0, 0, 0, 0)');
-			expect(wave, `the tab is drawn in ${wave} over a band of ${band}`).toBe(band);
 		});
 	}
 
@@ -475,8 +473,8 @@ test.describe('the header meets the page', () => {
 				parseFloat(getComputedStyle(document.querySelector('.header')!, '::after').opacity)
 			);
 
-		// At the top the tab and the band are one shape in one colour, and a shadow
-		// across that join is a line drawn through the middle of it.
+		// At the top the bar has no background of its own — the hero photograph runs
+		// under it — and a shadow cast by nothing visible is a line from nowhere.
 		expect(await opacity()).toBe(0);
 
 		await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' }));
@@ -1178,22 +1176,6 @@ test.describe('the header navigation', () => {
 		expect(items.find((i) => i.testId === 'nav-adopt-dog-link')?.icon).toBe('lucide-dog');
 		expect(items.find((i) => i.testId === 'nav-favorites-link')?.icon).toBe('lucide-heart');
 	});
-
-	test('the active tab still measures itself around the wider item', async ({ page }) => {
-		await page.setViewportSize({ width: 1400, height: 900 });
-		await page.goto('/adopt/cat');
-		await page.waitForLoadState('networkidle');
-
-		// The wave is drawn to the width of the active item, which the icon just changed.
-		// Measured from the DOM rather than assumed, so this follows on its own — but a
-		// tab narrower than its own label is the visible symptom if it ever stops.
-		const { tab, label } = await page.evaluate(() => ({
-			tab: document.querySelector('.header__wave')!.getBoundingClientRect().width,
-			label: document.querySelector('.header__link--active')!.getBoundingClientRect().width
-		}));
-
-		expect(tab, 'the tab is narrower than the item it sits behind').toBeGreaterThanOrEqual(label);
-	});
 });
 
 test.describe('buttons standing on a panel', () => {
@@ -1416,9 +1398,9 @@ test.describe('the shape of a control', () => {
 
 	test('the Vibrant theme is a leaf', async ({ page }) => {
 		await page.goto('/adopt/cat');
-		await page.getByTestId('theme-toggle-btn').click();
+		await page.getByTestId('settings-toggle-btn').click();
 
-		const icon = page.locator('[data-testid="theme-option-orange-purple-btn"] svg').first();
+		const icon = page.locator('[data-testid="settings-option-theme-dark-btn"] svg').first();
 		await expect(icon).toHaveClass(/lucide-leaf/);
 	});
 });

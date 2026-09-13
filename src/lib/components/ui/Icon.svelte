@@ -7,6 +7,18 @@
 		Siren,
 		Stethoscope,
 		ShieldCheck,
+		Hand,
+		Package,
+		VolumeX,
+		Ambulance,
+		TreePine,
+		CircleCheck,
+		ChevronRight,
+		Microscope,
+		Users,
+		FlaskConical,
+		Bird,
+		HeartPulse,
 		Cat,
 		Dog,
 		Heart,
@@ -21,6 +33,9 @@
 		Sparkles,
 		Square,
 		Palette,
+		Settings,
+		Send,
+		ShoppingBasket,
 		Home,
 		Snowflake,
 		Eye,
@@ -94,6 +109,16 @@
 			<Square {size} class={className} {strokeWidth} />
 		{:else if name === 'playful'}
 			<Palette {size} class={className} {strokeWidth} />
+		{:else if name === 'settings'}
+			<Settings {size} class={className} {strokeWidth} />
+			<!-- Паперовий літачок — знак самого Telegram. Lucide не возить брендових
+				 значків узагалі, тож це `Send`: та сама фігура, намальована в тій самій
+				 сітці, що й решта значків сайту. Растровий логотип із підвалу тут не
+				 годиться — у кнопці 1.25rem він би розмився. -->
+		{:else if name === 'telegram'}
+			<Send {size} class={className} {strokeWidth} />
+		{:else if name === 'basket'}
+			<ShoppingBasket {size} class={className} {strokeWidth} />
 		{:else if name === 'home'}
 			<Home {size} class={className} {strokeWidth} />
 		{:else if name === 'winter'}
@@ -142,6 +167,30 @@
 			<Stethoscope {size} class={className} {strokeWidth} />
 		{:else if name === 'shield'}
 			<ShieldCheck {size} class={className} {strokeWidth} />
+		{:else if name === 'hand'}
+			<Hand {size} class={className} {strokeWidth} />
+		{:else if name === 'box'}
+			<Package {size} class={className} {strokeWidth} />
+		{:else if name === 'quiet'}
+			<VolumeX {size} class={className} {strokeWidth} />
+		{:else if name === 'ambulance'}
+			<Ambulance {size} class={className} {strokeWidth} />
+		{:else if name === 'tree'}
+			<TreePine {size} class={className} {strokeWidth} />
+		{:else if name === 'check'}
+			<CircleCheck {size} class={className} {strokeWidth} />
+		{:else if name === 'chevron-right'}
+			<ChevronRight {size} class={className} {strokeWidth} />
+		{:else if name === 'microscope'}
+			<Microscope {size} class={className} {strokeWidth} />
+		{:else if name === 'team'}
+			<Users {size} class={className} {strokeWidth} />
+		{:else if name === 'science'}
+			<FlaskConical {size} class={className} {strokeWidth} />
+		{:else if name === 'bird'}
+			<Bird {size} class={className} {strokeWidth} />
+		{:else if name === 'pulse'}
+			<HeartPulse {size} class={className} {strokeWidth} />
 		{/if}
 	{/key}
 </span>

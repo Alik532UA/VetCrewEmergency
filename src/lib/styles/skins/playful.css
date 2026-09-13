@@ -21,11 +21,6 @@
 }
 
 /* Playful specific overrides */
-:root[data-style='playful'] .hero__title {
-	font-size: 4.5rem;
-	letter-spacing: -2px;
-}
-
 [data-style='playful'] .btn {
 	box-shadow: var(--shadow-md);
 	border: none !important;
@@ -175,14 +170,6 @@
 
 [data-style='playful'] .badge {
 	transform: skew(-10deg);
-}
-
-[data-style='playful'] .hero__emoji {
-	transition: transform 0.3s var(--transition-spring);
-}
-
-[data-style='playful'] .hero__emoji:hover {
-	transform: scale(1.2) rotate(10deg);
 }
 
 @keyframes bounce {

@@ -88,7 +88,13 @@
 		gap: 0.35rem;
 		margin-top: auto;
 		font-weight: 600;
-		color: var(--color-primary-on-surface);
+		color: var(--color-accent);
 		text-decoration: none;
+	}
+
+	/* Той самий підпис наведення, що й у решти акцентних посилань сайту. */
+	.card__link:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
 	}
 </style>

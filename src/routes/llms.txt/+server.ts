@@ -31,17 +31,9 @@ const BLURB: Record<string, { title: string; text: string }> = {
 		title: 'About us',
 		text: 'The team, the veterinary hospital, the lifetime care centre, and the contacts.'
 	},
-	'/report': {
-		title: 'Report an animal',
-		text: 'A form that composes an email with the location and the details. Urgent cases go by phone, not by form.'
-	},
 	'/support': {
 		title: 'Support us',
 		text: 'Donations and the shop. Both links are still to be supplied.'
-	},
-	'/saved': {
-		title: 'Saved advice',
-		text: 'Articles the visitor marked, kept in their own browser — there is no account and nothing is sent anywhere.'
 	}
 };
 

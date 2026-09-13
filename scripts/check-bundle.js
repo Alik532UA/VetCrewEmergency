@@ -68,19 +68,19 @@ if (!existsSync(BUILD_DIR)) {
 }
 
 /**
- * The registry's own slugs, read from the directory that owns them rather than
+ * The library guides' own slugs, read from the directory that owns them rather than
  * copied here: a second list is a second thing to update, and forgetting shows up
  * as a green run.
  */
-const ANIMALS_DIR = 'src/lib/data/animals';
-const slugs = existsSync(ANIMALS_DIR)
-	? readdirSync(ANIMALS_DIR)
-			.filter((f) => f.endsWith('.ts'))
-			.map((f) => f.replace(/^(cat|dog)_/, '').replace(/\.ts$/, ''))
+const LIBRARY_DIR = 'src/lib/data/library';
+const slugs = existsSync(LIBRARY_DIR)
+	? readdirSync(LIBRARY_DIR)
+			.filter((f) => f.endsWith('.ts') && f !== 'index.ts' && f !== 'types.ts')
+			.map((f) => f.replace(/\.ts$/, ''))
 	: [];
 
 if (slugs.length === 0) {
-	console.error(`No animal data files under ${ANIMALS_DIR} — the code/data split cannot be made.`);
+	console.error(`No library data files under ${LIBRARY_DIR} — the code/data split cannot be made.`);
 	process.exit(1);
 }
 

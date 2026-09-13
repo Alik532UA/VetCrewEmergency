@@ -142,6 +142,17 @@
 			 зворотний зв'язок про стан — сам тумблер, і панель, що зникла раніше,
 			 ніж він доїхав, лишає без відповіді на «то ввімкнулося чи ні». -->
 			<div class="scrollbar-menu scrollbar-menu--hold">
+				<label class="scrollbar-hold" data-testid="scrollbar-snap-label">
+					<span>{t('scrollbar.snap')}</span>
+					<input
+						type="checkbox"
+						class="scrollbar-hold__input"
+						checked={scrollbar.snapScroll}
+						onchange={() => scrollbar.setSnapScroll(!scrollbar.snapScroll)}
+						data-testid="scrollbar-snap-toggle"
+					/>
+					<span class="scrollbar-hold__slider"></span>
+				</label>
 				<label class="scrollbar-hold" data-testid="scrollbar-hold-label">
 					<span>{t('scrollbar.hold')}</span>
 					<input
@@ -214,9 +225,11 @@
 		background: var(--color-bg-card-hover);
 	}
 
+	/* Акцент, як і глобальне кільце фокуса в app.css: --color-primary на
+	   --color-bg-card-hover дає 1.2:1 у темній темі, тобто кільця не видно. */
 	.scrollbar-menu__item:focus-visible {
 		background: var(--color-bg-card-hover);
-		outline: 2px solid var(--color-primary);
+		outline: 2px solid var(--color-accent);
 		outline-offset: -2px;
 	}
 
@@ -286,8 +299,10 @@
 		transition: transform var(--transition-fast);
 	}
 
+	/* Увімкнений тумблер мусить бути видно: --color-primary на поверхні картки — це
+	   1.3:1, тобто «увімкнено» й «вимкнено» різнилися майже нічим. */
 	.scrollbar-hold__input:checked + .scrollbar-hold__slider {
-		background: var(--color-primary);
+		background: var(--color-accent);
 	}
 
 	.scrollbar-hold__input:checked + .scrollbar-hold__slider::before {

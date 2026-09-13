@@ -38,13 +38,13 @@
 - **i18n:** власна реалізація в `src/lib/i18n`, не `svelte-i18n`. Паритет ключів
   тримає `npm run check:i18n`.
 - **Маршрути:** мовний префікс — опційний параметр `[[lang=lang]]`.
-  Розділи: `adopt/cat`, `adopt/dog`, `adopt/{cat,dog}/[slug]`, `apply`,
-  `apply/form`, `favorites`. `robots.txt` і `sitemap.xml` — теж маршрути.
-  Поза індексом — `apply/form` і `beta-test-checklists`: перелік у `HIDDEN_ROUTES`
+  Розділи: `library`, `library/[slug]`, `stories`, `stories/[slug]`, `about`,
+  `support`. `robots.txt` і `sitemap.xml` — теж маршрути.
+  Поза індексом — `beta-test-checklists`: перелік у `HIDDEN_ROUTES`
   (`src/lib/config.ts`), звідти макет, sitemap і `robots.txt` (PROJECT-CONTEXT § 4.22).
 - **Стилі:** глобальні в `app.css`, базові в `src/lib/styles/base.css`,
   скіни й теми — `src/lib/styles/skins/` і `src/lib/styles/themes/`.
-- **Дані тварин:** TypeScript-файли в `src/lib/data/animals/`.
+- **Дані:** статті бібліотеки в `src/lib/data/library/`, історії порятунку в `src/lib/data/stories.ts`.
 
 ## Локальні пастки
 
@@ -83,8 +83,8 @@
 - **Доступність (WCAG 2.2 AA):** семантичний HTML, клавіатурна доступність,
   `aria-label` для кнопок-піктограм, підтримка `prefers-reduced-motion`,
   skip-link у `+layout.svelte`. Автоперевірка — `tests/a11y.spec.ts`.
-- **Тести:** Vitest під `src/`, Playwright — **дванадцять** файлів у `tests/`
-  (`a11y`, `beta-checklist`, `favorites`, `fluid-sizing`, `i18n`, `journey`, `scrollbar`,
+- **Тести:** Vitest під `src/`, Playwright — **одинадцять** файлів у `tests/`
+  (`a11y`, `beta-checklist`, `fluid-sizing`, `i18n`, `journey`, `scrollbar`,
   `skin-overrides`, `testids`, `toast`, `touch-targets`, `ui`). Playwright спершу робить
   `build`, тобто перевіряє **зібраний** сайт.
 - **Вердикт `npm run lint` — це код виходу, а не рядок у виводі.** Скрипт це
@@ -101,7 +101,7 @@
 ```
 npm run check        # svelte-check, має бути 0 помилок
 npm run lint         # prettier --check + eslint, має бути 0 помилок
-npm run check:discovery # чи раннери досі беруть усі 47 + 12 файлів перевірок
+npm run check:discovery # чи раннери досі беруть усі 48 + 11 файлів перевірок
 npm test             # юніт-інваріанти (Vitest)
 npm run check:i18n   # паритет ключів у чотирьох мовах
 npm run build        # збірка

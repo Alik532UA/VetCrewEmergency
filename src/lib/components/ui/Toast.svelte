@@ -137,7 +137,7 @@
 		position: fixed;
 		z-index: 200;
 		width: max-content;
-		max-width: min(520px, calc(100vw - 2 * var(--space-md)));
+		max-width: min(580px, calc(100vw - 2 * var(--space-md)));
 	}
 
 	.toast {
@@ -170,7 +170,7 @@
 	.toast__icon {
 		display: flex;
 		flex-shrink: 0;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 	}
 
 	.toast__message {
@@ -198,13 +198,13 @@
 		border-radius: var(--radius-sm);
 		font: inherit;
 		font-weight: 700;
-		color: var(--color-primary);
+		color: var(--color-primary-on-surface);
 		cursor: pointer;
 		transition: background var(--transition-fast);
 	}
 
 	.toast__action:hover {
-		background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+		background: color-mix(in srgb, var(--color-primary-on-surface) 14%, transparent);
 	}
 
 	.toast__close {

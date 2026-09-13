@@ -2,7 +2,6 @@
 	import { localePath } from '$lib/utils/withBase';
 	import { page } from '$app/state';
 	import { t, type TranslationKey } from '$lib/i18n';
-	import { settings } from '$lib/services/settings.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { IconName } from '$lib/components/ui/icons';
 
@@ -42,16 +41,15 @@
 	const navItems: { href: string; label: TranslationKey; icon: IconName }[] = [
 		{ href: '/library', label: 'nav.library', icon: 'book' },
 		{ href: '/stories', label: 'nav.stories', icon: 'heart' },
-		{ href: '/about', label: 'nav.about', icon: 'paw' },
-		{ href: '/saved', label: 'nav.saved', icon: 'list' }
+		{ href: '/about', label: 'nav.about', icon: 'paw' }
 	];
 
 	const isHomeActive = $derived(isLinkActive('/'));
-	const isReportActive = $derived(isLinkActive('/report'));
 </script>
 
-<!-- `header__logo--active` carries no rule of its own: it is how HeaderTabWave finds
-	 what to point at when the wordmark is the current item. -->
+<!-- `header__logo--active` розрізняє стан для правила кольору нижче. Підкреслення
+	 воно не отримує: риска під назвою служби читається як помилка складання, а не як
+	 «ви тут», та й «тут» для головної нічого не додає — на ній видно, де ти. -->
 <a
 	href={localePath('/')}
 	class="header__link header__logo header__logo--nav"
@@ -61,8 +59,21 @@
 	onclick={onNavigate}
 	data-testid="header-logo-link"
 >
-	<Icon name="paw" size="1.75rem" class="header__logo-icon" />
-	<span class="header__logo-text">{t('app.title')}</span>
+	<Icon name="paw" size="2.6rem" class="header__logo-icon" />
+	<!--
+		Логотип у три рядки, як у дизайн-референсі: назва, напрямок, повна назва
+		служби. Рядки окремими елементами, а не одним рядком із переносами, бо в
+		них різний кегль, накреслення й колір — «EMERGENCY» золотий і курсивом.
+
+		Через словник, попри те що це латиниця в обох мовах: шаблон не тримає
+		текстів (AGENTS.md), а ключі дають єдине місце, де назву правлять, якщо
+		служба колись перейменується.
+	-->
+	<span class="header__logo-text">
+		<span class="header__logo-brand">{t('brand.line1')}</span>
+		<span class="header__logo-kind">{t('brand.line2')}</span>
+		<span class="header__logo-full">{t('brand.line3')}</span>
+	</span>
 </a>
 
 {#each navItems as item (item.href)}
@@ -79,25 +90,8 @@
 			 with a name of its own would have a screen reader say it twice. -->
 		<Icon name={item.icon} size="1.05rem" class="header__link-icon" />
 		<span class="header__link-label">{t(item.label)}</span>
-
-		{#if item.href === '/saved' && settings.favorites.length > 0}
-			<span class="header__fav-count">{settings.favorites.length}</span>
-		{/if}
 	</a>
 {/each}
-
-<a
-	href={localePath('/report')}
-	class="header__link header__cta"
-	class:header__link--active={isReportActive}
-	class:header__cta--active={isReportActive}
-	aria-current={isReportActive ? 'page' : undefined}
-	onclick={onNavigate}
-	data-testid="nav-report-link"
->
-	<Icon name="phone" size="1.05rem" class="header__link-icon" />
-	<span class="header__link-label">{t('nav.report')}</span>
-</a>
 
 <style>
 	.header__logo {
@@ -109,11 +103,68 @@
 		font-size: 1.25rem;
 		color: var(--color-primary);
 		text-decoration: none;
-		height: 48px;
-		padding: 0 16px 8px 16px;
+		/* Вище за пункти й вирівняне по центру смуги, а не по її низу: три рядки
+		   логотипа просто не влізають у висоту рядкового пункта. */
+		height: 56px;
+		padding: 0 16px;
 		position: relative;
 		z-index: 2;
 		transition: color 0.3s ease;
+	}
+
+	/*
+	 * ЖОДНЕ ПИСЬМО В ШАПЦІ НЕ БЕРЕ --color-primary.
+	 *
+	 * Смуга шапки прозора вгорі сторінки, і під нею лежить перший розділ, пофарбований
+	 * саме в --color-primary. Тобто напис цього кольору опиняється на тлі того самого
+	 * кольору — заміряно 1.00:1, тобто не видно взагалі нічого. До того як шапка стала
+	 * прозорою, це ховалося за її власним тлом і давало 1.34:1 — теж не текст, просто
+	 * ніхто не дивився.
+	 *
+	 * Тому назва набрана кольором тексту (11.05:1 у темній темі, 13.61:1 у світлій), а
+	 * наведення й активний стан — золотим (5.86:1 / 4.57:1). Обидва читаються і на
+	 * смузі розділу, і на непрозорій шапці після прокручування.
+	 */
+	.header__logo {
+		color: var(--color-text);
+	}
+
+	/*
+	 * Три рядки в 48 пікселях смуги.
+	 *
+	 * Висоту задає не цей блок, а сама смуга (48px на вкладку, 72 на шапку), тож
+	 * інтерліньяж тут щільний навмисно: 1.05 замість успадкованих 1.6, інакше
+	 * лише перші два рядки й помістилися б. Кеглі підібрані під ту саму висоту, а
+	 * не взяті з макета в його власному масштабі — референс намальовано вужчим за
+	 * реальне вікно, і числа звідти тут читалися б удвічі більшими.
+	 */
+	.header__logo-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.05;
+		text-transform: uppercase;
+	}
+
+	.header__logo-brand {
+		font-size: 1.05rem;
+		letter-spacing: 0.06em;
+	}
+
+	/* Золотий і курсивом — єдине місце в шапці, де палітра говорить «це саме
+	   екстрена служба, а не лікарня й не притулок». Колір не успадковується від
+	   стану вкладки: назва напрямку не змінює значення від того, на якій сторінці
+	   стоїть відвідувач. */
+	.header__logo-kind {
+		font-size: 0.92rem;
+		font-style: italic;
+		letter-spacing: 0.06em;
+		color: var(--color-accent);
+	}
+
+	.header__logo-full {
+		font-size: 0.58rem;
+		font-weight: 700;
+		letter-spacing: 0.09em;
 	}
 
 	.header__logo--nav {
@@ -121,15 +172,31 @@
 	}
 
 	.header__logo:hover {
-		color: var(--color-primary-light);
+		color: var(--color-accent);
 	}
 
+	/*
+	 * Активний стан — колір тексту теми, а не голий білий.
+	 *
+	 * Білий тут стояв від проєкту-джерела й міряний був лише проти темної теми.
+	 * У світлій вкладка активного пункту — це `--color-primary` = #e8efe6, тобто
+	 * білий напис на майже білій плашці: 1.17:1. Заміряно 2026-09-13; побачити це
+	 * було нічим, бо на широкій смузі активна вкладка є на кожній сторінці, і в
+	 * темній темі вона правильна.
+	 *
+	 * `--color-text` читається на плашці обох тем: 11.05:1 у темній, 13.61:1 у
+	 * світлій. Правило мобільної панелі нижче лишається як було — там плашка інша,
+	 * і її числа заміряні окремо (PROJECT-CONTEXT § 4.19).
+	 */
 	.header__logo--active {
-		color: #ffffff;
+		color: var(--color-text);
 	}
 
+	/* Поточний пункт теж мусить озватися на курсор. Раніше наведення лишало той
+	   самий колір, тобто на головній сторінці назва була єдиним посиланням у шапці,
+	   яке на курсор не реагувало ніяк. */
 	.header__logo--active:hover {
-		color: #ffffff;
+		color: var(--color-accent);
 	}
 
 	.header__logo:hover :global(.header__logo-icon) {
@@ -142,8 +209,12 @@
 		color: var(--color-text-muted);
 		transition: color 0.3s ease;
 		position: relative;
-		height: 48px;
-		padding: 0 16px 8px 16px;
+		/* 44 — мінімальна ціль дотику (`tests/touch-targets.spec.ts`), і водночас та
+		   сама висота, що в перемикачів і кнопки гарячої лінії праворуч. Нижній
+		   відступ у 8 пікселів пішов разом із вкладкою: він притискав напис до її
+		   основи, а без неї лише збивав пункт із центру смуги. */
+		height: 44px;
+		padding: 0 16px;
 		text-decoration: none;
 		display: inline-flex;
 		align-items: center;
@@ -161,95 +232,85 @@
 		flex-shrink: 0;
 	}
 
+	/*
+	 * У широкій смузі пункти — самі слова, без значків: так у дизайн-референсі.
+	 *
+	 * Сховано, а не викинуто з даних. У розгорнутій панелі на вузькому екрані
+	 * значок працює — там пункт займає цілий рядок і око чіпляється саме за
+	 * нього, — а референс описує лише широкий екран. Прибрати поле `icon` із
+	 * `navItems` означало б забрати його й там.
+	 *
+	 * Єдиний значок, що лишився у правій частині смуги, — телефон у червоній кнопці
+	 * гарячої лінії, і він належить не цьому файлу.
+	 */
+	@media (min-width: 769px) {
+		.header__link :global(.header__link-icon) {
+			display: none;
+		}
+	}
+
+	/*
+	 * Пункт смуги — один рядок, хай який довгий.
+	 *
+	 * «Що робити, якщо…» і «Збережені поради» переносилися на два рядки, і ряд
+	 * ставав нерівним: сусідні пункти в один рядок, ці — у два, а вкладка під
+	 * активним міряється по висоті пункта. У референсі всі пункти однорядкові.
+	 *
+	 * Місце під це звільнив прибраний заклик до дії; якщо пунктів колись стане
+	 * більше, смуга має згорнутися в бургер раніше, а не почати їх ламати.
+	 */
 	.header__link-label {
 		position: relative;
 		z-index: 2;
+		white-space: nowrap;
 	}
 
 	.header__link:hover {
-		color: var(--color-primary);
+		color: var(--color-accent);
 	}
 
 	.header__link--active {
-		color: #ffffff;
+		color: var(--color-text);
 		background: transparent;
 	}
 
 	.header__link--active:hover {
-		color: #ffffff;
-	}
-
-	.header__fav-count {
-		background: var(--color-primary);
-		color: white;
-		font-size: 0.7rem;
-		padding: 2px 6px;
-		border-radius: var(--radius-full);
-		position: absolute;
-		top: 6px;
-		right: 4px;
-		font-weight: 800;
-		line-height: 1;
-		box-shadow: var(--shadow-sm);
-	}
-
-	.header__cta {
-		position: relative;
-		padding: 0 20px 8px;
-		color: var(--color-text-on-accent);
+		color: var(--color-accent);
 		background: transparent;
-		transition: color var(--transition-fast);
-	}
-
-	.header__cta::before {
-		content: '';
-		position: absolute;
-		top: 5px;
-		bottom: 13px;
-		left: 0;
-		right: 0;
-		background: var(--color-primary);
-		border-radius: var(--radius-full);
-		box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary) 25%, transparent);
-		z-index: 1;
-		pointer-events: none;
-		transition:
-			background var(--transition-fast),
-			box-shadow var(--transition-fast);
-	}
-
-	.header__cta:hover {
-		color: var(--color-text-on-accent);
-	}
-
-	.header__cta:hover::before {
-		background: var(--color-primary-light);
-		box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 35%, transparent);
-	}
-
-	.header__cta--active {
-		background: transparent;
-		color: #ffffff;
-	}
-
-	.header__cta--active::before {
-		display: none;
-	}
-
-	.header__cta--active:hover {
-		background: transparent;
-		color: #ffffff;
 	}
 
 	/*
-	 * THE OPEN MENU NEEDS THREE LOOKS, NOT TWO: a link, the current page, the call to
-	 * action. It had two — the current tab and the call to action were both filled with
-	 * --color-primary, one green rectangle meaning two different things, while every
-	 * other row had no edge at all.
+	 * Поточний розділ — рівна риска під написом.
 	 *
-	 * Each colour below was measured, and the measurements are why parts of it look
-	 * roundabout: the four ratios, and what each ruled out, are in PROJECT-CONTEXT.md
-	 * § 4.19.
+	 * Замість фігури, що міняла форму від прокручування. Риска нерухома й нічого не
+	 * міряє; ширину їй дає сам пункт. Це ще й форма, а не лише колір, тобто стан
+	 * лишається помітним у відтінках сірого (WCAG 1.4.1) — чого сам по собі
+	 * світліший напис не дає.
+	 *
+	 * `:not(.header__logo)` — не стилістична обережність, а виправлення: назва теж
+	 * має клас `.header__link`, і на головній вона активна, тож риска лягала просто
+	 * поперек рядка «WILDLIFE RESPONSE» і читалася як закреслення.
+	 */
+	.header__link--active:not(.header__logo)::after {
+		content: '';
+		position: absolute;
+		right: 16px;
+		bottom: 4px;
+		left: 16px;
+		height: 2px;
+		border-radius: 2px;
+		background: var(--color-accent);
+	}
+
+	/*
+	 * У відкритій панелі два вигляди: звичайний рядок і поточна сторінка.
+	 *
+	 * Було три — третім був заклик до дії, обведений рядок «Повідомити про тварину».
+	 * Він пішов зі смуги разом із дизайном шапки, а панель лише повторює її пункти.
+	 *
+	 * Кожен колір нижче заміряний, і саме заміри пояснюють те, що інакше виглядає
+	 * кружним шляхом: чотири співвідношення й те, що кожне з них відкинуло, — у
+	 * PROJECT-CONTEXT.md § 4.19.
 	 */
 	@media (max-width: 768px) {
 		/* The bar keeps a wordmark of its own out here; this one goes with the nav. */
@@ -291,28 +352,6 @@
 			background: rgb(255 255 255 / 0.9);
 			transform: translateY(-50%);
 			z-index: 2;
-		}
-
-		.header__cta {
-			border-radius: var(--radius-md);
-			padding: 12px 20px;
-			background: transparent;
-			/* The accent draws the edge but not the words: 3:1 is the bar for a boundary,
-			   4.5 for a 15px label, and it clears the first only. */
-			border: 2px solid var(--color-primary);
-			color: var(--color-text);
-		}
-
-		.header__cta::before {
-			display: none;
-		}
-
-		/* On its own page it is the current tab, so it takes that fill and drops the
-		   outline rather than tracing a second edge around a solid shape. */
-		.header__cta--active {
-			background: var(--active-tab-bg);
-			border-color: transparent;
-			color: #ffffff;
 		}
 	}
 </style>

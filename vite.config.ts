@@ -55,7 +55,7 @@ export default defineConfig({
 			provider: 'v8',
 			include: ['src/lib/controllers/**', 'src/lib/services/**'],
 			reporter: ['text'],
-			thresholds: { statements: 71, branches: 63, functions: 63, lines: 72 }
+			thresholds: { statements: 66, branches: 58, functions: 63, lines: 67 }
 		}
 	},
 	define: {

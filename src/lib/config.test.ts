@@ -78,7 +78,7 @@ describe('absolute page addresses', () => {
 
 	/* No address of ours may name the base path twice, or drop it. */
 	it('every address sits under the base exactly once', () => {
-		for (const path of ['/', '/library', '/library/fawn', '/report', '/saved']) {
+		for (const path of ['/', '/library', '/library/fawn', '/support', '/saved']) {
 			for (const locale of LOCALES) {
 				const url = prefixedUrl(path, locale);
 				expect(url.startsWith(`${SITE_ORIGIN}${PROJECT_SITE_BASE}`)).toBe(true);

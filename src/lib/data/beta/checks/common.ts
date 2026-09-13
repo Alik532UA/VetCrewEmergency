@@ -9,10 +9,10 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_1',
 		category: { uk: 'Тема', en: 'Theme' },
 		text: {
-			uk: 'Натисніть кнопку теми в шапці. Мусить відкритися список із чотирьох тем із позначеною поточною; вибір теми одразу міняє кольори сторінки.',
-			en: 'Press the theme button in the header. A list of four themes must open with the current one marked; picking one changes the page colours at once.'
+			uk: 'Натисніть кнопку налаштувань у шапці. Мусить відкритися одне меню з трьох груп — тема, стиль, мова, — у кожній позначено поточний вибір; вибір теми одразу міняє кольори сторінки.',
+			en: 'Press the settings button in the header. One menu must open with three groups — theme, style, language — each showing the current choice; picking a theme changes the page colours at once.'
 		},
-		testid: 'theme-toggle-btn',
+		testid: 'settings-toggle-btn',
 		coverage: 'covered',
 		test: 'tests/ui.spec.ts'
 	},
@@ -20,10 +20,10 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_15',
 		category: { uk: 'Тема', en: 'Theme' },
 		text: {
-			uk: 'На комп’ютері відкрийте список тем і наведіть курсор на тему, якою ЗАРАЗ не користуєтесь, не натискаючи. Сторінка мусить показати цю тему цілком, а щойно курсор піде — повернутися до попередньої. Самі пункти списку мусять бути пофарбовані кожен під СВОЮ тему, а не всі під поточну.',
-			en: 'On a desktop, open the theme list and hover a theme you are NOT using, without clicking. The page must show that theme in full and return to the previous one as soon as the pointer leaves. The list items themselves must each be coloured in THEIR OWN theme, not all in the current one.'
+			uk: 'На комп’ютері відкрийте налаштування й наведіть курсор на тему, якою ЗАРАЗ не користуєтесь, не натискаючи. Сторінка мусить показати цю тему цілком, а щойно курсор піде — повернутися до попередньої. Наведення на стиль чи мову теми міняти НЕ мусить.',
+			en: 'On a desktop, open the settings and hover a theme you are NOT using, without clicking. The page must show that theme in full and return to the previous one as soon as the pointer leaves. Hovering a style or a language must NOT change the theme.'
 		},
-		testid: 'theme-menu',
+		testid: 'settings-menu',
 		coverage: 'manual'
 	},
 	{
@@ -40,8 +40,8 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_3',
 		category: { uk: 'Тема', en: 'Theme' },
 		text: {
-			uk: 'Пройдіть усі чотири теми на цій сторінці. У кожній усі написи мусять читатися; напису, що зливається з тлом, бути НЕ мусить.',
-			en: 'Walk through all four themes on this page. Every label must stay readable in each; no label may blend into its background.'
+			uk: 'Пройдіть обидві теми на цій сторінці. У кожній усі написи мусять читатися; напису, що зливається з тлом, бути НЕ мусить.',
+			en: 'Walk through both themes on this page. Every label must stay readable in each; no label may blend into its background.'
 		},
 		negative: true,
 		coverage: 'covered',
@@ -51,10 +51,10 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_4',
 		category: { uk: 'Вигляд', en: 'Style' },
 		text: {
-			uk: 'Натисніть кнопку вигляду. Мусить бути рівно два варіанти; перемикання міняє форму кутів у кнопок і карток, а кольори лишає ті самі.',
-			en: 'Press the style button. There must be exactly two options; switching changes the corner shapes of buttons and cards and leaves the colours alone.'
+			uk: 'У налаштуваннях знайдіть групу «Стиль». Мусить бути рівно два варіанти; перемикання міняє форму кутів у кнопок і карток, а кольори лишає ті самі.',
+			en: 'Find the “Style” group in the settings. There must be exactly two options; switching changes the corner shapes of buttons and cards and leaves the colours alone.'
 		},
-		testid: 'style-toggle-btn',
+		testid: 'settings-toggle-btn',
 		coverage: 'covered',
 		test: 'tests/skin-overrides.spec.ts'
 	},
@@ -62,10 +62,10 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_5',
 		category: { uk: 'Мова', en: 'Language' },
 		text: {
-			uk: 'Натисніть кнопку мови й оберіть українську. Адреса мусить початися з /uk/, а всі підписи стати українськими — включно з шапкою й підвалом.',
-			en: 'Press the language button and pick Ukrainian. The address must start with /uk/ and every label must turn Ukrainian — header and footer included.'
+			uk: 'У налаштуваннях оберіть English. Адреса мусить початися з /en/, а всі підписи стати англійськими — включно з шапкою й підвалом.',
+			en: 'Pick English in the settings. The address must start with /en/ and every label must turn English — header and footer included.'
 		},
-		testid: 'lang-toggle-btn',
+		testid: 'settings-toggle-btn',
 		coverage: 'covered',
 		test: 'tests/i18n.spec.ts'
 	},
@@ -73,10 +73,10 @@ export const commonChecks: readonly BetaCheck[] = [
 		id: 'common_6',
 		category: { uk: 'Мова', en: 'Language' },
 		text: {
-			uk: 'Оберіть німецьку, потім нідерландську. Англійських рядків серед підписів лишитися НЕ мусить.',
-			en: 'Pick German, then Dutch. No English strings may be left among the labels.'
+			uk: 'Перемкніться на English і назад на українську. Змішаних підписів — половина однією мовою, половина іншою — лишитися НЕ мусить.',
+			en: 'Switch to English and back to Ukrainian. No mixed labels — half in one language, half in the other — may be left.'
 		},
-		testid: 'lang-toggle-btn',
+		testid: 'settings-toggle-btn',
 		negative: true,
 		coverage: 'manual'
 	},

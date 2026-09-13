@@ -205,6 +205,7 @@
 	$effect(() => {
 		if (!browser) return;
 		document.documentElement.classList.toggle('has-custom-scrollbar', scrollbar.hidesNative);
+		document.documentElement.classList.toggle('has-snap-scroll', scrollbar.snapScroll);
 	});
 
 	// Read once, on purpose, before Header and the page render. Prerendering runs every
@@ -296,9 +297,7 @@
 	// controller; this is just the mount point.
 	$effect(() => webVitals.start());
 
-	afterNavigate((nav) => {
-		trackPageView(nav.to?.url.pathname);
-	});
+	afterNavigate((nav) => trackPageView(nav.to?.url.pathname));
 </script>
 
 <svelte:head>
@@ -510,11 +509,24 @@
 		right: var(--space-xl);
 		width: 50px;
 		height: 50px;
-		background: color-mix(in srgb, var(--color-primary) 50%, transparent);
+		/*
+		 * Поверхня картки із золотою межею — а не напівпрозорий --color-primary.
+		 *
+		 * У світлій темі первинний колір це #e8efe6, тобто майже білий: кнопка була
+		 * блідою плямою на блідому тлі (1.02:1 на межі), а біла стрілка всередині
+		 * зникала зовсім. Заміряно 2026-09-13; автор надіслав знімок, де від кнопки
+		 * видно лише тінь.
+		 *
+		 * Межу тепер тримає золота лінія — 8.7:1 у темній темі й 4.8:1 у світлій
+		 * проти тла сторінки, тобто вище за 3:1, які WCAG 1.4.11 просить для контуру
+		 * елемента керування. Стрілка того ж кольору. Та сама пара, що в стрілок
+		 * каруселі: плаваючі кнопки сайту виглядають однаково не випадково.
+		 */
+		background: var(--color-bg-card);
 		-webkit-backdrop-filter: blur(var(--glass-blur));
 		backdrop-filter: blur(var(--glass-blur));
-		color: white;
-		border: none;
+		color: var(--color-accent);
+		border: 1px solid var(--color-accent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -532,7 +544,7 @@
 	}
 
 	.back-to-top:hover {
-		background: color-mix(in srgb, var(--color-primary-light) 70%, transparent);
+		background: var(--color-bg-card-hover);
 		box-shadow: var(--shadow-xl);
 	}
 
@@ -571,7 +583,7 @@
 	 * because there the active item is the wordmark and the tab is at the far left.
 	 */
 	.main > :global(:first-child) {
-		background-color: var(--color-primary);
+		background-color: var(--color-band);
 	}
 
 	.boundary__inner {

@@ -216,13 +216,35 @@ describe('§ 5 — a shortcut nobody is told about exists only for its author', 
 
 	const markup = files.filter((f) => f.path.endsWith('.svelte'));
 
+	/**
+	 * Оголошені літери — з РОЗІБРАНОГО значення, а не з дослівного збігу рядка.
+	 *
+	 * `aria-keyshortcuts` за специфікацією приймає ПЕРЕЛІК, розділений пробілами, і це
+	 * не теоретична можливість: відколи три кнопки шапки — тема, стиль і мова —
+	 * зійшлися в одну «Налаштування», обидві літери веде один елемент, і він каже
+	 * `keyshortcuts="T L"`. Пошук підрядка `keyshortcuts="T"` на такому значенні не
+	 * знаходить нічого й називає невидимим скорочення, оголошене точно за каноном.
+	 */
+	const announced = new Set(
+		markup.flatMap((f) =>
+			[...f.text.matchAll(/keyshortcuts="([^"]+)"/g)].flatMap((m) => m[1].trim().split(/\s+/))
+		)
+	);
+
 	it('every visitor-facing letter is announced on the control it drives', () => {
 		const silent = Object.entries(ANNOUNCED)
 			.filter(([code]) => files.some((f) => f.text.includes(`'${code}'`)))
-			.filter(([, aria]) => !markup.some((f) => f.text.includes(`keyshortcuts="${aria}"`)))
+			.filter(([, aria]) => !announced.has(aria))
 			.map(([code, aria]) => `${code}: nothing carries aria-keyshortcuts="${aria}"`);
 
 		expect(silent, `undiscoverable shortcuts:\n${silent.join('\n')}`).toEqual([]);
+	});
+
+	it('перевірка жива: розбір знаходить оголошені літери', () => {
+		// Розбір, що нічого не знаходить, дав би порожній набір — і тоді перевірка вище
+		// червоніла б завжди. Небезпечніший зворотний бік: якби порожнім став ANNOUNCED,
+		// вона стала б зеленою ні на чому. Цей рядок тримає саме розбір.
+		expect(announced.size, 'жодного keyshortcuts у розмітці — розбір зламався').toBeGreaterThan(0);
 	});
 
 	it('the announcement reaches the DOM rather than stopping at a prop', () => {

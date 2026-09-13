@@ -28,13 +28,24 @@
 	href="tel:{HOTLINE.tel}"
 	data-testid={testid ?? 'hotline-btn'}
 >
-	<Icon name="phone" size={compact ? '1rem' : '1.4rem'} />
+	<Icon name="phone" size={compact ? '1.25rem' : '1.4rem'} />
+	<!--
+		Порядок рядків різний, і це з референсу.
+
+		У шапці зверху стоїть «ТЕРМІНОВА ЛІНІЯ 24/7», під ним номер: смуга вузька,
+		і першим має читатися, ЩО це за номер. На першому екрані місця більше —
+		там номер обрамлений з двох боків, зверху заклик, знизу та сама назва
+		лінії, і найбільшим кеглем стоїть він сам.
+	-->
 	<span class="hotline__text">
-		{#if !compact}
+		{#if compact}
+			<small class="hotline__kind">{t('hotline.label')}</small>
+			<strong>{HOTLINE.display}</strong>
+		{:else}
 			<small>{t('hotline.call')}</small>
+			<strong>{HOTLINE.display}</strong>
+			<small>{t('hotline.label')}</small>
 		{/if}
-		<strong>{HOTLINE.display}</strong>
-		<small>{t('hotline.label')}</small>
 	</span>
 </a>
 
@@ -49,11 +60,38 @@
 		color: var(--color-text-on-secondary);
 		text-decoration: none;
 		font-family: var(--font-accent);
+		transition: background-color var(--transition-fast);
 	}
 
+	/*
+	 * Кнопка мусить озватися на курсор — раніше не озивалася зовсім.
+	 *
+	 * Світліший відтінок того самого червоного, а не яскравість чи тінь: `filter`
+	 * зачепив би й білий напис усередині, а тінь на червоному блоці в темній темі
+	 * майже не читається. Білий на `--color-secondary-light` — 9.39:1 у темній темі
+	 * й 7.16:1 у світлій, тобто наведення нічого не коштує читомості.
+	 */
+	.hotline:hover {
+		background: var(--color-secondary-light);
+	}
+
+	/* Та сама висота, що в пунктів смуги й трьох перемикачів поруч: 44 пікселі.
+	   Задана числом, а не відступами, бо всередині два рядки різного кегля — від
+	   них висота виходила на кілька пікселів іншою, ніж у сусідів, і ряд читався
+	   як складений нашвидкуруч. */
 	.hotline--compact {
-		padding: 0.5rem 0.9rem;
-		gap: 0.5rem;
+		height: 44px;
+		padding: 0 1.1rem;
+		gap: 0.65rem;
+	}
+
+	/* Назва лінії над номером набрана капітеллю з розрядкою — у референсі це
+	   найдрібніший рядок у всій шапці, і саме розрядка не дає йому злитися в
+	   пляму. */
+	.hotline__kind {
+		text-transform: uppercase;
+		letter-spacing: 0.07em;
+		font-weight: 700;
 	}
 
 	.hotline__text {

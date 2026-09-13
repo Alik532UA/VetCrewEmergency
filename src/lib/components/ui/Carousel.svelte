@@ -2,6 +2,8 @@
 	import { onMount, tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
+	import { copiesNeeded, rebaseBefore, wrapOffset } from '$lib/utils/carouselLoop';
+	import { untabbable } from '$lib/utils/untabbable';
 	import { t } from '$lib/i18n';
 
 	interface Props {
@@ -15,6 +17,12 @@
 
 	let viewport: HTMLElement;
 	let content: HTMLElement;
+	let unit: HTMLElement | undefined = $state();
+	/** Ширина однієї копії з проміжком після неї. Решта арифметики — `carouselLoop`. */
+	let unitWidth = $state(0);
+	let copies = $state(2);
+	/** Поки триває плавний рух від стрілки, перескок чекає: інакше він обірве його. */
+	let smoothUntil = 0;
 	let isInteracting = $state(false);
 	let isDragging = false;
 	let isMoved = false;
@@ -61,14 +69,8 @@
 			if (!isInteracting && Math.abs(currentSpeed) > 0.1) {
 				virtualScrollLeft += currentSpeed * deltaTime;
 
-				// Optimized infinite jump: keep virtualScrollLeft within [0.5 * half, 1.5 * half]
-				if (content) {
-					const halfWidth = content.offsetWidth / 2;
-					if (halfWidth > 0) {
-						while (virtualScrollLeft > halfWidth * 1.5) virtualScrollLeft -= halfWidth;
-						while (virtualScrollLeft < halfWidth * 0.5) virtualScrollLeft += halfWidth;
-					}
-				}
+				// Та сама петля, що й у handleInfiniteJump: позиція живе в межах однієї копії.
+				virtualScrollLeft = wrapOffset(virtualScrollLeft, unitWidth);
 
 				viewport.scrollLeft = virtualScrollLeft;
 			} else {
@@ -88,19 +90,25 @@
 		animationFrame = requestAnimationFrame(step);
 	}
 
-	function handleInfiniteJump() {
-		if (!viewport || !content) return;
-		const halfWidth = content.offsetWidth / 2;
-		if (halfWidth <= 0) return;
+	function measure() {
+		if (!unit || !viewport || !content) return;
+		const gap = parseFloat(getComputedStyle(content).columnGap) || 0;
+		// Дробова ширина, а не offsetWidth: той округлює до цілого, і кожен перескок
+		// зсував би стрічку на пів пікселя — за десяток обертів це вже тремтіння.
+		const width = unit.getBoundingClientRect().width + gap;
+		if (width <= 0) return;
+		unitWidth = width;
+		copies = copiesNeeded(viewport.clientWidth, width);
+	}
 
-		// Seamlessly wrap around if the user scrolls past the buffer zones
-		if (viewport.scrollLeft > halfWidth * 1.5) {
-			viewport.scrollLeft -= halfWidth;
-			virtualScrollLeft = viewport.scrollLeft;
-		} else if (viewport.scrollLeft < halfWidth * 0.5) {
-			viewport.scrollLeft += halfWidth;
-			virtualScrollLeft = viewport.scrollLeft;
-		}
+	function handleInfiniteJump() {
+		if (!viewport || unitWidth <= 0 || performance.now() < smoothUntil) return;
+
+		const wrapped = wrapOffset(viewport.scrollLeft, unitWidth);
+		if (Math.abs(wrapped - viewport.scrollLeft) < 1) return;
+
+		viewport.scrollLeft = wrapped;
+		virtualScrollLeft = wrapped;
 	}
 
 	function handleScroll() {
@@ -126,13 +134,23 @@
 		 * from its own stale idea of the position and undid it.
 		 */
 		const sideways = e.shiftKey ? e.deltaX || e.deltaY : e.deltaX;
-		const delta = sideways || e.deltaY;
-		if (!delta) return;
+
+		/*
+		 * Звичайне коліщатко — це СТОРІНКА, а не стрічка.
+		 *
+		 * Тут стояло `sideways || e.deltaY`, тобто будь-яке прокручування над
+		 * каруселлю перехоплювалося й рухало картки вбік, а сторінка стояла. Людина,
+		 * яка просто гортала сторінку вниз і провела курсором над стрічкою,
+		 * застрягала: сторінка не їде, замість неї чомусь їдуть картки. Стрічка
+		 * тепер реагує лише на бічний намір — Shift+коліщатко або горизонтальний
+		 * жест на тачпаді.
+		 */
+		if (!sideways) return;
 
 		e.preventDefault();
-		viewport.scrollLeft += delta;
+		viewport.scrollLeft += sideways;
 		// The drift picks up where the visitor left off, in the direction they went.
-		direction = Math.sign(delta);
+		direction = Math.sign(sideways);
 		startInteraction();
 		stopInteraction();
 	}
@@ -188,6 +206,19 @@
 		startInteraction();
 		direction = towards;
 		const scrollAmount = viewport.clientWidth * 0.8 * towards;
+
+		// Позиція зводиться ДО плавного руху, а не під час нього: перескок посеред
+		// прокрутки обриває її на півдорозі — саме це й читається як «карусель глючить».
+		if (unitWidth > 0) {
+			const max = unitWidth * copies - viewport.clientWidth;
+			const rebased = rebaseBefore(viewport.scrollLeft, scrollAmount, unitWidth, max);
+			if (rebased !== null) {
+				viewport.scrollLeft = rebased;
+				virtualScrollLeft = rebased;
+			}
+			smoothUntil = performance.now() + 600;
+		}
+
 		viewport.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 		stopInteraction();
 	}
@@ -195,26 +226,6 @@
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowLeft') scrollBy(-1);
 		if (e.key === 'ArrowRight') scrollBy(1);
-	}
-
-	/**
-	 * Takes every interactive descendant out of the tab order. Used on the cloned
-	 * half of the track, which is aria-hidden and must therefore hold nothing tabbable.
-	 */
-	function untabbable(node: HTMLElement) {
-		const apply = () => {
-			for (const el of node.querySelectorAll<HTMLElement>(
-				'a, button, input, select, textarea, [tabindex]'
-			)) {
-				el.tabIndex = -1;
-			}
-		};
-
-		apply();
-		const observer = new MutationObserver(apply);
-		observer.observe(node, { childList: true, subtree: true });
-
-		return () => observer.disconnect();
 	}
 
 	function handleClickCapture(e: MouseEvent) {
@@ -229,17 +240,24 @@
 
 		const init = async () => {
 			await tick();
-			if (viewport && content) {
-				const halfWidth = content.offsetWidth / 2;
-				// Start from the middle of the second half to allow immediate back-scroll
-				viewport.scrollLeft = halfWidth;
-				virtualScrollLeft = halfWidth;
+			measure();
+			// З нуля, а не з середини: позиція тепер живе в межах однієї копії, і назад
+			// однаково можна — за лівим краєм стоїть попередня.
+			if (viewport) {
+				viewport.scrollLeft = 0;
+				virtualScrollLeft = 0;
 			}
 		};
 		init();
 
+		// Ширина копії міняється від вікна (картки переносяться) і від вмісту.
+		const observer = new ResizeObserver(measure);
+		if (unit) observer.observe(unit);
+		if (viewport) observer.observe(viewport);
+
 		animationFrame = requestAnimationFrame(step);
 		return () => {
+			observer.disconnect();
 			cancelAnimationFrame(animationFrame);
 			clearTimeout(resumeTimeout);
 		};
@@ -307,16 +325,19 @@
 		ondragstart={(e) => e.preventDefault()}
 	>
 		<div class="carousel-track" bind:this={content}>
-			<div class="carousel-content">
+			<div class="carousel-content" bind:this={unit}>
 				{@render children()}
 			</div>
-			<!-- Duplicate for infinite scroll. It is hidden from assistive tech, so its
-				 links must leave the tab order too — aria-hidden wrapped around tabbable
-				 elements is a WCAG 4.1.2 failure. Pointer users can still click them. -->
+			<!-- Копії для безшовної петлі. Їх стільки, скільки треба, щоб за правим краєм
+				 лишалася ще ціла — див. `unitWidth` угорі. Кожна прихована від читалок, тож
+				 її посилання мусять вийти й із черги табуляції: aria-hidden навколо
+				 фокусованого елемента — це порушення WCAG 4.1.2. Мишею вони клікаються. -->
 			{#if mounted}
-				<div class="carousel-content" aria-hidden="true" {@attach untabbable}>
-					{@render children()}
-				</div>
+				{#each Array.from({ length: copies - 1 }, (_, i) => i) as i (i)}
+					<div class="carousel-content" aria-hidden="true" {@attach untabbable}>
+						{@render children()}
+					</div>
+				{/each}
 			{/if}
 		</div>
 	</div>
@@ -380,8 +401,15 @@
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		cursor: grab;
-		/* Priority to horizontal scroll for touch */
-		touch-action: pan-x;
+		/*
+		 * Обидві осі, а не лише горизонтальна.
+		 *
+		 * `pan-x` означало «тут панорамують ТІЛЬКИ вбік», і вертикальний змах пальцем
+		 * над стрічкою не робив нічого: сторінка під ним не їхала. Те саме, що й із
+		 * коліщатком вище, тільки на дотику. З обома осями браузер сам обирає вісь за
+		 * напрямком жесту — убік їде стрічка, униз сторінка.
+		 */
+		touch-action: pan-x pan-y;
 		scroll-behavior: auto; /* Managed by JS for auto, smooth for buttons */
 		/* Part of the room is taken back out of the layout; the rest stays as the gap
 		   between the cards and what sits above and below them. See --overhang-* above. */
@@ -392,38 +420,54 @@
 		display: none;
 	}
 
+	/*
+	 * Проміжок між копіями — той самий, що між картками.
+	 *
+	 * Бічні відступи стояли на самій копії, тож на стику їх складалося два, і місце
+	 * зшивання було видно як ширшу щілину. Тепер відстань одна на всіх.
+	 */
 	.carousel-track {
 		display: flex;
+		gap: var(--space-lg);
 		width: max-content;
 	}
 
 	.carousel-content {
 		display: flex;
 		gap: var(--space-lg);
-		padding: var(--shadow-room-top) var(--space-lg) var(--shadow-room-bottom);
+		padding: var(--shadow-room-top) 0 var(--shadow-room-bottom);
 	}
 
+	/*
+	 * Стрілки видно завжди, а не лише під курсором.
+	 *
+	 * Так у дизайн-референсі: два кружки на краях стрічки стоять постійно, і це
+	 * не оформлення — вони єдина видима ознака, що праворуч є ще картки. Поки
+	 * вони з'являлися по `:hover`, стрічка на широкому екрані читалася як ряд
+	 * карток, обрізаний з обох боків без причини (а на дотику ховер не настає
+	 * ніколи, тож там їх не було взагалі — і саме тому на вузькому екрані вони
+	 * сховані зовсім, а не показані марно).
+	 *
+	 * Колір — золотий, а не --color-primary: той у темній темі майже збігається з
+	 * кольором картки під ним (1.3:1), і кнопка, яку показали, лишалася б
+	 * невидимою.
+	 */
 	.nav-btn {
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
 		z-index: 10;
 		background: var(--color-bg-card);
-		color: var(--color-primary);
-		border: none;
+		color: var(--color-accent);
+		border: 1px solid var(--color-border);
 		width: 44px;
 		height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
-		opacity: 0;
 		transition: all var(--transition-normal);
 		box-shadow: var(--shadow-md);
-	}
-
-	.carousel-root:hover .nav-btn {
-		opacity: 1;
 	}
 
 	.nav-btn--prev {
@@ -434,8 +478,8 @@
 	}
 
 	.nav-btn:hover {
-		background: var(--color-primary);
-		color: white;
+		background: var(--color-bg-card-hover);
+		color: var(--color-accent);
 		transform: translateY(-50%) scale(1.1);
 		box-shadow: var(--shadow-lg);
 	}

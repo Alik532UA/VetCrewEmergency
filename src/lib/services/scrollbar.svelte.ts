@@ -53,6 +53,12 @@ class ScrollbarState {
 	 */
 	holdScroll = $state(false);
 
+	/**
+	 * Магнітний скрол по контейнерах (CSS Scroll Snap).
+	 * Увімкнений за замовчуванням, може бути вимкнений у меню смуги прокрутки.
+	 */
+	snapScroll = $state(true);
+
 	menu = $state<{ open: boolean; x: number; y: number }>({ open: false, x: 0, y: 0 });
 
 	/**
@@ -86,6 +92,13 @@ class ScrollbarState {
 		// а не вмикає механіку через truthiness.
 		const held = storage.get('holdScroll');
 		if (held === 'true' || held === 'false') this.holdScroll = held === 'true';
+
+		const snapped = storage.get('snapScroll');
+		if (snapped === 'false') {
+			this.snapScroll = false;
+		} else if (snapped === 'true') {
+			this.snapScroll = true;
+		}
 	}
 
 	set(mode: ScrollbarMode) {
@@ -98,6 +111,12 @@ class ScrollbarState {
 		this.holdScroll = on;
 		storage.set('holdScroll', String(on));
 		logService.info('ui', `Hold scroll: ${on}`);
+	}
+
+	setSnapScroll(on: boolean) {
+		this.snapScroll = on;
+		storage.set('snapScroll', String(on));
+		logService.info('ui', `Snap scroll: ${on}`);
 	}
 
 	openMenu = (x: number, y: number) => {

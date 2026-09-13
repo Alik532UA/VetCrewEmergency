@@ -94,7 +94,6 @@ describe('CSS custom properties', () => {
 		'--footer-link-hover',
 		'--footer-text',
 		'--footer-wave',
-		'--gradient-hero',
 		'--header-border',
 		'--hero-shape-color-1',
 		'--hero-shape-color-2',

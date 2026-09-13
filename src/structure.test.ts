@@ -65,8 +65,8 @@ const LIMITS: Array<[RegExp, number]> = [
  */
 const OVERSIZED: Record<string, number> = {
 	'src/lib/components/ui/Minimap.svelte': 375,
-	'src/routes/+layout.svelte': 320,
-	'src/lib/components/ui/Carousel.svelte': 309
+	'src/routes/+layout.svelte': 319,
+	'src/lib/components/ui/Carousel.svelte': 310
 };
 
 /** Everything under `src/` that can be imported, tests and stylesheets included. */

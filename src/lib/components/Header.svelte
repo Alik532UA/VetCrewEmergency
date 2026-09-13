@@ -2,9 +2,8 @@
 	import { localePath } from '$lib/utils/withBase';
 	import { t } from '$lib/i18n';
 	import Icon from '$lib/components/ui/Icon.svelte';
-	import { settings } from '$lib/services/settings.svelte';
 	import HeaderNav from '$lib/components/header/HeaderNav.svelte';
-	import { clamp01, SETTLE_DISTANCE } from '$lib/utils/tabWave';
+	import { clamp01, SETTLE_DISTANCE } from '$lib/utils/headerScroll';
 
 	/**
 	 * The bar itself: what it looks like, how far the page has moved under it, and
@@ -25,8 +24,8 @@
 	/**
 	 * 0 while the page is at the top, 1 once the coloured band has scrolled away.
 	 *
-	 * Read here rather than in the nav because the bar's own shadow is the other thing
-	 * that fades in along it — one listener, one number, two things drawn from it.
+	 * Both things the bar does on scroll read it: its own background fades in from
+	 * nothing, and so does the shadow under it. One listener, one number.
 	 */
 	let scrollProgress = $state(0);
 
@@ -61,37 +60,15 @@
 			data-testid="header-logo-mobile-link"
 		>
 			<Icon name="paw" size="1.75rem" class="header__logo-icon" />
-			<span class="header__logo-text">{t('app.title')}</span>
+			<!-- Власна назва класу, не `header__logo-text` із HeaderNavLinks: там тепер
+				 лежить розкладка три-рядкового логотипа з референсу, а тут потрібен один
+				 рядок — на вузькому екрані місця під лого рівно на назву. Спільна назва
+				 означала б, що це правило приходить із чужого компонента, куди скоуп
+				 Svelte не дістає (§ 3.5). -->
+			<span class="header__logo-title">{t('app.title')}</span>
 		</a>
 
-		<HeaderNav open={mobileMenuOpen} {scrollProgress} onNavigate={closeMenu} />
-
-		<!--
-			The one destination worth reaching without opening the menu, and only once it
-			leads somewhere: with nothing saved it is a link to an empty page and a number
-			reading zero, so it is not rendered at all rather than shown disabled.
-
-			Its own locator, not the nav's. `nav-favorites-link` already exists inside the
-			panel, and a second element carrying it would be a duplicate in the DOM — which
-			tests/testids.spec.ts fails on, correctly: two elements answering one locator
-			make every test that uses it a guess.
-		-->
-		{#if settings.favorites.length > 0}
-			<a
-				href={localePath('/favorites')}
-				class="header__bar-fav control-shape"
-				onclick={closeMenu}
-				aria-label="{t('nav.saved')}: {settings.favorites.length}"
-				data-testid="header-favorites-mobile-link"
-			>
-				<!-- The glyph and the number are the whole control, so the name has to come
-					 from aria-label — the same shape AnimalCard uses for its heart. There is
-					 no visually-hidden utility in this project, and inventing one for a single
-					 span would be a second way of saying what aria-label already says. -->
-				<Icon name="heart" size="1.35rem" />
-				<span class="header__bar-fav-count">{settings.favorites.length}</span>
-			</a>
-		{/if}
+		<HeaderNav open={mobileMenuOpen} onNavigate={closeMenu} />
 
 		<button
 			class="header__burger"
@@ -110,15 +87,29 @@
 {/if}
 
 <style>
+	/*
+	 * Угорі сторінки смуги не видно зовсім — вона проявляється від прокручування.
+	 *
+	 * Так у дизайн-референсі: знімок першого екрана йде під самий верх вікна, а
+	 * логотип, пункти й червона кнопка лежать просто на ньому, без панелі під
+	 * ними. Щойно сторінка зрушила, під шапкою вже звичайний вміст, і вона мусить
+	 * стати непрозорою, інакше текст поїде крізь неї.
+	 *
+	 * Обидва шари прив'язані до того самого числа `--header-shadow` (0 угорі, 1
+	 * після 120 пікселів прокручування), яким уже міряється тінь і форма
+	 * активної вкладки. Розмиття теж проявляється разом із тлом: залишене на
+	 * повну, воно мазало б знімок під шапкою саме там, де в референсі він
+	 * найчіткіший.
+	 */
 	.header {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		z-index: 1000;
-		background: var(--header-bg);
-		-webkit-backdrop-filter: blur(16px);
-		backdrop-filter: blur(16px);
+		background: color-mix(in srgb, var(--header-bg) calc(var(--header-shadow) * 100%), transparent);
+		-webkit-backdrop-filter: blur(calc(var(--header-shadow) * 16px));
+		backdrop-filter: blur(calc(var(--header-shadow) * 16px));
 		border-bottom: none;
 		transition: all var(--transition-normal);
 
@@ -183,7 +174,10 @@
 		font-family: var(--font-accent);
 		font-weight: 800;
 		font-size: 1.25rem;
-		color: var(--color-primary);
+		/* Не --color-primary: угорі сторінки смуга прозора, а під нею перший розділ
+		   того самого кольору — напис зникав цілком. Те саме міркування, що й для
+		   назви в самій навігації. */
+		color: var(--color-text);
 		text-decoration: none;
 		position: relative;
 		z-index: 2;
@@ -191,7 +185,7 @@
 	}
 
 	.header__logo--mobile:hover {
-		color: var(--color-primary-light);
+		color: var(--color-accent);
 	}
 
 	/* :global because the class is handed to an Icon, and because both wordmarks wear
@@ -216,30 +210,6 @@
 	 * 44px square: the button is the only way into the menu on a phone, and it is
 	 * pressed with a fingertip.
 	 */
-	/*
-	 * Only in the bar, and only on a phone: on a wide screen the nav carries a Favorites
-	 * item of its own a few pixels away, and two of them side by side would be one too
-	 * many. Hidden by default and revealed in the same query that reveals the burger.
-	 */
-	.header__bar-fav {
-		display: none;
-	}
-
-	.header__bar-fav-count {
-		position: absolute;
-		top: 2px;
-		right: 0;
-		min-width: 18px;
-		padding: 1px 5px;
-		border-radius: var(--radius-full);
-		background: var(--color-primary);
-		color: var(--color-text-on-accent);
-		font-size: 0.7rem;
-		font-weight: 800;
-		line-height: 1.4;
-		box-shadow: var(--shadow-sm);
-	}
-
 	.header__burger {
 		display: none;
 		align-items: center;
@@ -263,23 +233,6 @@
 		}
 		.header__burger {
 			display: flex;
-		}
-
-		/* Pushed to the right by the logo's `margin-right: auto`, so it lands beside the
-		   burger rather than beside the wordmark. Relative for the counter. */
-		.header__bar-fav {
-			position: relative;
-			/* Grouped with the burger rather than left to `space-between`, which would
-			   strand it alone in the middle of the bar. */
-			margin-left: auto;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 44px;
-			height: 44px;
-			background: var(--control-surface);
-			color: var(--color-text);
-			flex-shrink: 0;
 		}
 	}
 </style>

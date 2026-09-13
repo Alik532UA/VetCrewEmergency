@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { withBase, localePath } from '$lib/utils/withBase';
 	import { page } from '$app/state';
 	import { base } from '$app/paths';
 	import { acceptsShortcut } from '$lib/services/keyboard';
+	import { createKeySequence } from '$lib/services/keySequence';
+	import { storage } from '$lib/services/storage';
 	import { t } from '$lib/i18n';
 	import { splitLocale } from '$lib/i18n/locales';
 	import { settings, type Locale, type SiteStyle, type Theme } from '$lib/services/settings.svelte';
@@ -15,21 +18,60 @@
 	 *
 	 * The same two numbers as `.header__flag` below, and they have to be: the attributes
 	 * reserve the space before any stylesheet arrives, the CSS keeps it once one has.
-	 * Without them the row reflows on first paint — small, but it is the header, so it
-	 * happens on every page. The flags are SVGs of differing natural size, hence a fixed
+	 * Without them the row reflows on first paint — smaller than it was, now that the
+	 * flag appears only inside the open settings menu rather than on the bar itself, but
+	 * a reflow all the same. The flags are SVGs of differing natural size, hence a fixed
 	 * pair rather than the file's own dimensions: `object-fit: cover` crops to this box.
 	 */
 	const FLAG_WIDTH = 20;
 	const FLAG_HEIGHT = 14;
 
 	/**
-	 * Theme, style and language — the three things the header lets a visitor change.
+	 * Тема, стиль і мова — під однією кнопкою «Налаштування».
 	 *
-	 * Together in one component because they are one row and one behaviour: only one of
-	 * the three may be open at a time, and that rule needs a single piece of state to
-	 * live in.
+	 * Було три кнопки поспіль у смузі, кожна зі своїм меню. Три однакові на вигляд
+	 * значки праворуч від навігації читалися як три невідомі дії, а в
+	 * дизайн-референсі праворуч стоїть рівно один елемент — номер гарячої лінії.
+	 * Тепер це одне меню з трьома групами, як у сусідніх проєктах автора
+	 * (`teatralo4ka.odesa.ua`, `as5.odesa.ua`).
+	 *
+	 * Стан лишився булевим по суті, але записаний як `'settings' | null`, а не
+	 * `boolean`: `DropdownMenu` приймає `open`/`onToggle` саме такою парою, і
+	 * перейменування на `settingsOpen` дало б другу назву тому самому.
 	 */
-	let openMenu = $state<'theme' | 'style' | 'lang' | null>(null);
+	let openMenu = $state<'settings' | null>(null);
+
+	/**
+	 * ПРИХОВАНО ДО ЗАПУСКУ (рішення автора, 2026-09-13).
+	 *
+	 * За замовчуванням приховано, але можна відобразити (або знову приховати),
+	 * натиснувши клавішу `h` 7 разів підряд.
+	 */
+	let visible = $state(browser && storage.session.get('header_controls_visible') === '1');
+
+	const headerSequence = createKeySequence({
+		code: 'KeyH', // home / header controls toggle gesture
+		threshold: 7,
+		onComplete: () => {
+			visible = !visible;
+			storage.session.set('header_controls_visible', visible ? '1' : '0');
+		}
+	});
+
+	$effect(() => {
+		return () => headerSequence.reset();
+	});
+
+	/**
+	 * Один список на три групи, тож ідентифікатори мусять бути унікальні між ними.
+	 *
+	 * Префікс несе й другу роботу: за ним `onselect` розрізняє, що саме обрали, і
+	 * `onPreview` пропускає все, крім тем. Меню, яке від наведення на «Українська»
+	 * почало б міняти тему, — це дефект, а не фіча.
+	 */
+	const THEME_PREFIX = 'theme-';
+	const STYLE_PREFIX = 'style-';
+	const LANG_PREFIX = 'lang-';
 
 	/*
 	 * Close on any outside click. In an $effect so the listener leaves with the component
@@ -59,6 +101,8 @@
 	 * are service gestures, not something to offer a visitor.
 	 */
 	function handleShortcut(event: KeyboardEvent) {
+		headerSequence.handle(event);
+
 		if (!acceptsShortcut(event)) return;
 
 		// One `else return` rather than a `preventDefault` per branch: that way the key is
@@ -66,7 +110,8 @@
 		// nothing open falls through here, which is what lets it keep its usual meaning.
 		if (event.code === 'Escape' && openMenu !== null) openMenu = null;
 		else if (event.code === 'KeyT') settings.toggleTheme();
-		else if (event.code === 'KeyL') openMenu = openMenu === 'lang' ? null : 'lang';
+		// `L` — вибір locale; окремого меню мов більше немає, мова живе в налаштуваннях.
+		else if (event.code === 'KeyL') openMenu = openMenu === 'settings' ? null : 'settings';
 		else return;
 
 		event.preventDefault();
@@ -88,105 +133,75 @@
 
 <svelte:window onkeydown={handleShortcut} />
 
-<div class="header__controls">
+<div class="header__controls" class:header__controls--visible={visible}>
 	<DropdownMenu
-		label={t('a11y.toggleTheme')}
-		keyshortcuts="T"
-		testId="theme"
-		items={THEME_OPTIONS.map((theme) => ({
-			id: theme.id,
-			label: t(theme.labelKey),
-			active: settings.theme === theme.id
-		}))}
-		open={openMenu === 'theme'}
-		onToggle={(next) => (openMenu = next ? 'theme' : null)}
+		label={t('settings.title')}
+		keyshortcuts="T L"
+		testId="settings"
+		items={[
+			...THEME_OPTIONS.map((theme) => ({
+				id: `${THEME_PREFIX}${theme.id}`,
+				label: t(theme.labelKey),
+				group: t('settings.theme'),
+				active: settings.theme === theme.id
+			})),
+			...STYLE_OPTIONS.map((style) => ({
+				id: `${STYLE_PREFIX}${style.id}`,
+				label: t(style.labelKey),
+				group: t('settings.style'),
+				active: settings.style === style.id
+			})),
+			...LOCALE_OPTIONS.map((locale) => ({
+				id: `${LANG_PREFIX}${locale.id}`,
+				label: locale.label,
+				group: t('settings.language'),
+				href: localeHref(locale.id),
+				hreflang: locale.id,
+				active: settings.locale === locale.id
+			}))
+		]}
+		open={openMenu === 'settings'}
+		onToggle={(next) => (openMenu = next ? 'settings' : null)}
 		onselect={(id) => {
-			settings.setTheme(id as Theme);
+			if (id.startsWith(THEME_PREFIX)) settings.setTheme(id.slice(THEME_PREFIX.length) as Theme);
+			else if (id.startsWith(STYLE_PREFIX))
+				settings.setStyle(id.slice(STYLE_PREFIX.length) as SiteStyle);
+			else if (id.startsWith(LANG_PREFIX))
+				settings.setLocale(id.slice(LANG_PREFIX.length) as Locale);
 			openMenu = null;
 		}}
-		onPreview={(id) => settings.previewTheme(id as Theme | null)}
+		onPreview={(id) =>
+			settings.previewTheme(
+				id && id.startsWith(THEME_PREFIX) ? (id.slice(THEME_PREFIX.length) as Theme) : null
+			)}
 	>
 		{#snippet trigger()}
-			<Icon
-				name={THEME_OPTIONS.find((x) => x.id === settings.theme)?.icon ?? 'moon'}
-				size="1.2rem"
-			/>
+			<Icon name="settings" size="1.2rem" />
 		{/snippet}
 		{#snippet itemVisual(item)}
-			<Icon name={THEME_OPTIONS.find((x) => x.id === item.id)?.icon ?? 'moon'} size="1.1rem" />
-		{/snippet}
-	</DropdownMenu>
-
-	<DropdownMenu
-		label={t('a11y.toggleStyle')}
-		testId="style"
-		items={STYLE_OPTIONS.map((style) => ({
-			id: style.id,
-			label: t(style.labelKey),
-			active: settings.style === style.id
-		}))}
-		open={openMenu === 'style'}
-		onToggle={(next) => (openMenu = next ? 'style' : null)}
-		onselect={(id) => {
-			settings.setStyle(id as SiteStyle);
-			openMenu = null;
-		}}
-	>
-		{#snippet trigger()}
-			<Icon
-				name={STYLE_OPTIONS.find((x) => x.id === settings.style)?.icon ?? 'sparkles'}
-				size="1.2rem"
-			/>
-		{/snippet}
-		{#snippet itemVisual(item)}
-			<Icon name={STYLE_OPTIONS.find((x) => x.id === item.id)?.icon ?? 'sparkles'} size="1.1rem" />
-		{/snippet}
-	</DropdownMenu>
-
-	<DropdownMenu
-		label={t('a11y.toggleLanguage')}
-		keyshortcuts="L"
-		testId="lang"
-		items={LOCALE_OPTIONS.map((locale) => ({
-			id: locale.id,
-			label: locale.label,
-			href: localeHref(locale.id),
-			hreflang: locale.id,
-			active: settings.locale === locale.id
-		}))}
-		open={openMenu === 'lang'}
-		onToggle={(next) => (openMenu = next ? 'lang' : null)}
-		onselect={(id) => {
-			settings.setLocale(id as Locale);
-			openMenu = null;
-		}}
-	>
-		{#snippet trigger()}
-			<span class="header__lang">
-				{#if LOCALE_OPTIONS.find((l) => l.id === settings.locale)?.flags[0]}
-					<img
-						src={withBase(LOCALE_OPTIONS.find((l) => l.id === settings.locale)!.flags[0])}
-						alt=""
-						class="header__flag"
-						width={FLAG_WIDTH}
-						height={FLAG_HEIGHT}
-					/>
-				{/if}
-				<span class="header__lang-code">{settings.locale.toUpperCase()}</span>
-			</span>
-		{/snippet}
-		{#snippet itemVisual(item)}
-			<span class="header__flags">
-				{#each LOCALE_OPTIONS.find((l) => l.id === item.id)?.flags ?? [] as flag (flag)}
-					<img
-						src={withBase(flag)}
-						alt=""
-						class="header__flag"
-						width={FLAG_WIDTH}
-						height={FLAG_HEIGHT}
-					/>
-				{/each}
-			</span>
+			{#if item.id.startsWith(THEME_PREFIX)}
+				<Icon
+					name={THEME_OPTIONS.find((x) => `${THEME_PREFIX}${x.id}` === item.id)?.icon ?? 'moon'}
+					size="1.1rem"
+				/>
+			{:else if item.id.startsWith(STYLE_PREFIX)}
+				<Icon
+					name={STYLE_OPTIONS.find((x) => `${STYLE_PREFIX}${x.id}` === item.id)?.icon ?? 'sparkles'}
+					size="1.1rem"
+				/>
+			{:else}
+				<span class="header__flags">
+					{#each LOCALE_OPTIONS.find((l) => `${LANG_PREFIX}${l.id}` === item.id)?.flags ?? [] as flag (flag)}
+						<img
+							src={withBase(flag)}
+							alt=""
+							class="header__flag"
+							width={FLAG_WIDTH}
+							height={FLAG_HEIGHT}
+						/>
+					{/each}
+				</span>
+			{/if}
 		{/snippet}
 	</DropdownMenu>
 </div>
@@ -235,19 +250,33 @@
 		border: 1px solid var(--color-border);
 	}
 
+	/*
+	 * ПРИХОВАНО ДО ЗАПУСКУ (рішення автора, 2026-09-13).
+	 *
+	 * Сайт відкривається в темній темі, виразному стилі й українською — і поки що
+	 * лише так. Перемикачі нікуди не поділися: компонент малюється, гарячі клавіші
+	 * `T` і `L` працюють, локатори на місці, тож повернути ряд — це прибрати
+	 * `display: none` нижче.
+	 *
+	 * `display: none`, а не прозорість чи виніс за екран: обидва лишили б кнопки в
+	 * черзі табуляції, і клавіатура водила б фокус по тому, чого не видно.
+	 */
 	.header__controls {
-		display: flex;
+		display: none;
 		align-items: center;
 		gap: var(--space-xs);
 		flex-shrink: 0;
-		align-self: center;
-		margin-bottom: 4px;
 	}
 
-	.header__lang {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
+	.header__controls.header__controls--visible {
+		display: flex;
+	}
+
+	/* Одна висота на всі три перемикачі, ту саму, що в пунктів і кнопки гарячої
+	   лінії. DropdownMenu малює тригер під свій вміст, і три різні значки давали
+	   три різні висоти. */
+	.header__controls :global(.dropdown__trigger) {
+		height: 44px;
 	}
 
 	.header__flags {
@@ -264,14 +293,6 @@
 		border-radius: 2px;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 		display: block;
-	}
-
-	.header__lang-code {
-		font-size: 0.85rem;
-		font-weight: 800;
-		font-family: var(--font-accent);
-		letter-spacing: 0.04em;
-		line-height: 1;
 	}
 
 	/*

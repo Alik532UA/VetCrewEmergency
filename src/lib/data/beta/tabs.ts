@@ -1,6 +1,5 @@
 import type { BetaTab } from './types';
 import { commonChecks } from './checks/common';
-import { favoriteChecks } from './checks/favorites';
 import { libraryChecks } from './checks/library';
 import { reportChecks } from './checks/report';
 import { storyChecks } from './checks/stories';
@@ -50,14 +49,8 @@ export const BETA_TABS: readonly BetaTab[] = [
 	{
 		id: 'report',
 		title: { uk: 'Повідомити про тварину', en: 'Reporting an animal' },
-		routes: ['/report', '/support', '/about'],
+		routes: ['/support', '/about'],
 		checks: reportChecks
-	},
-	{
-		id: 'saved',
-		title: { uk: 'Збережені поради', en: 'Saved advice' },
-		routes: ['/saved'],
-		checks: favoriteChecks
 	}
 ];
 

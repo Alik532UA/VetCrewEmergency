@@ -12,25 +12,66 @@
 	--color-primary-light: #2a4630;
 	--color-primary-dark: #16251a;
 
+	/*
+	 * Колір розділу, яким відкривається сторінка, — і водночас активної вкладки шапки.
+	 *
+	 * ОКРЕМО від --color-primary, хоч довго був ним. Первинний зелений має свою
+	 * роботу: заливка кнопок, обведення фокуса, значки. Смузі першого екрана він
+	 * задавав середньо-зелений прямокутник, тоді як у дизайн-референсі там той
+	 * самий майже чорний, що й на решті сторінки, — заміряно на макеті #020c07
+	 * під логотипом і #010a08 посередині. Один токен на дві ролі означав, що
+	 * потемніти смузі можна лише разом із кнопками й фокусом.
+	 *
+	 * Ледь світліший за --color-bg навмисно: розділ мусить лишатися відрізнюваним
+	 * від тла, інакше «смуга» перестає бути смугою, а вкладка шапки після
+	 * прокручування не має чим відрізнятися від самої шапки.
+	 */
+	--color-band: #06120b;
+
 	/* The brand colour in its *text* role.
 	   --color-primary is chosen to work as a surface, and in several themes that makes
 	   it too light to read as text on this theme's own cards. Same hue, dark enough to
 	   clear 4.5:1; where the primary already clears it, this is the primary. */
-	--color-primary-on-surface: #8fbf6a; /* 8.12:1 on --color-bg, 6.69:1 on --color-bg-card */
-	--color-secondary: #d13b3b;
-	--color-secondary-light: #e05252;
+	--color-primary-on-surface: #8fbf6a; /* 9.18:1 on --color-bg, 8.29:1 on --color-bg-card */
+	/* Золотий — акцент ЧИТАННЯ: ним підсвічено ключове слово заголовка, назви
+	   карток і посилання «детальніше». Червоний (--color-secondary) — акцент ДІЇ,
+	   і тільки термінової: гаряча лінія та пожертва. Якби вони були одним
+	   кольором, червоне перестало б означати «дзвони зараз».
+	   8.72:1 на --color-bg, 7.87:1 на --color-bg-card. */
+	--color-accent: #d9a441;
+
+	--color-secondary: #66100a;
+	--color-secondary-light: #8a1a10;
+
+	/* Чотири випадки, з якими до служби звертаються, — чотири кольори заголовка
+	   (розділ «коли телефонувати» на головній). Зняті піпеткою з дизайн-референсу:
+	   оливковий, бурштиновий, зелений, блакитний. Це не п'ятий і не шостий акцент
+	   палітри — вони живуть рівно в одному ряду карток і ніде більше, і роль у них
+	   не «важливо», а «інший випадок». Найгірший контраст із поверхнями цієї теми —
+	   5.53:1 (зелений). */
+	--case-injured: #a2b160;
+	--case-cruelty: #d99a3c;
+	--case-front: #8fa25d;
+	--case-baby: #6fadc5;
 
 	/* Backgrounds */
-	--color-bg: #0e1710;
+	--color-bg: #030e08;
 	--bg-image: url('../../assets/backgrounds/bg-dark-v01.webp');
 	/* Laid over --bg-image so the photograph reads as a background rather than as
-	   something to look at. Half-transparent, in this theme's own colour: the image is
-	   shared furniture, the tint is what makes it belong to the palette. */
-	--bg-tint: rgb(18 24 15 / 0.5);
-	--color-bg-surface: #16211a;
-	--color-bg-warm: #121d15;
-	--color-bg-card: #1b2a1f;
-	--color-bg-card-hover: #24382a;
+	   something to look at. In this theme's own colour: the image is shared furniture,
+	   the tint is what makes it belong to the palette.
+
+	   0.93, а не «напівпрозоро»: обидві теми тримають ОДНАКОВУ силу пелени. Світла
+	   довго стояла на 0.5 — фотографія там читалася як картинка, на яку дивляться, а
+	   в темній на тому самому місці було рівне тло. Один сайт із двома різними
+	   характерами фону, і різниця бралася не з рішення, а з того, що числа писали
+	   окремо. Тепер вони окремі рівно в одному — у самому кольорі, і кожна тема бере
+	   свій --color-bg. */
+	--bg-tint: rgb(3 14 8 / 0.93);
+	--color-bg-surface: #0a150e;
+	--color-bg-warm: #121b0d;
+	--color-bg-card: #0f1b12;
+	--color-bg-card-hover: #17281b;
 
 	/* Text */
 	--color-text: #e8ece8;
@@ -39,7 +80,7 @@
 	--color-text-on-secondary: #ffffff;
 
 	/* Border & UI */
-	--color-border: #2c4030;
+	--color-border: #223226;
 	--header-bg: color-mix(in srgb, var(--color-bg-card) 88%, transparent);
 	--header-border: transparent;
 	--footer-bg: #132510;
@@ -55,8 +96,8 @@
 	   Its own surface, because neither of the obvious answers works in all four themes:
 	   the card colour is a dark grey that vanishes into a dark panel, and the primary is
 	   the hero colour itself in two of them. Paired with a foreground chosen for it. */
-	--color-hero-btn: #d13b3b;
-	--color-text-on-hero-btn: #ffffff; /* 6.16:1 */
+	--color-hero-btn: #66100a;
+	--color-text-on-hero-btn: #ffffff; /* 12.78:1 */
 
 	/* UI Alpha & Overlays */
 	--color-overlay: rgba(0, 0, 0, 0.4);
@@ -82,7 +123,7 @@
 	/* Links.
 	   Through --color-primary-on-surface rather than --color-primary directly: the two are
 	   the same colour in this theme, and naming the text-role token keeps them that way if
-	   the surface-role one is ever lightened. 5.31:1 at worst (on --color-bg-card-hover). */
+	   the surface-role one is ever lightened. 7.25:1 at worst (on --color-bg-card-hover). */
 	--color-stat: #ffb327;
 	--color-link: #8fbf6a;
 	--color-link-hover: #a6d183;

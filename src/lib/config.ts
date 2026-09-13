@@ -63,22 +63,14 @@ export const isHiddenRoute = (path: string): boolean =>
  * came to advertise `/process`, `/partners` and `/about`, none of which this site
  * has ever had.
  */
-export const INDEXED_PATHS = [
-	'/',
-	'/library',
-	'/stories',
-	'/about',
-	'/report',
-	'/support',
-	'/saved'
-] as const;
+export const INDEXED_PATHS = ['/', '/library', '/stories', '/about', '/support'] as const;
 
 /**
  * Contact addresses, in one place. They used to be typed out in the footer and again
  * in the apply form, which is how two copies of the same address start to differ.
  */
 export const CONTACT_EMAIL = {
-	rescue: 'rescue@vetcrew.com.ua'
+	rescue: 'alikvetcrew@gmail.com'
 } as const;
 
 /**
@@ -99,6 +91,22 @@ export const HOTLINE = {
 
 /** Адреса, куди приходять повідомлення про знайдену тварину. */
 export const REPORT_EMAIL = CONTACT_EMAIL.rescue;
+
+/**
+ * Куди веде «Повідомити про знахідку» — і чому це не сторінка сайту.
+ *
+ * Форми на сайті поки не буде (рішення автора, 2026-09-13), тож усі кнопки
+ * повідомлення ведуть у Telegram. Сама сторінка `/report` нікуди не поділася —
+ * вона лежить у `routes/[[lang=lang]]/_report/` і не збирається: SvelteKit
+ * типово пропускає все, чий шлях містить сегмент із підкресленням на початку.
+ * Повернути її — це перейменувати теку назад і повернути `/report` у
+ * `INDEXED_PATHS`, а тут поставити `localePath('/report', lang)`.
+ *
+ * Зовнішня адреса, тому кожне посилання на неї мусить мати
+ * `target="_blank" rel="noopener noreferrer"` — інакше людина з наполовину
+ * заповненим повідомленням ідe геть зі сторінки.
+ */
+export const REPORT_URL = 'https://t.me/alik532';
 
 /** Фізична адреса — зі специфікації. */
 export const ADDRESS = {
@@ -200,15 +208,27 @@ export const SIDE_PROJECTS = [
 }[];
 
 /**
- * Соцмережі — заглушки за адресами, справжні акаунти впишемо перед запуском.
- *
- * Значки лишилися з проєкту-джерела: це загальні логотипи мереж, а не чужий
- * бренд. `#` в адресі краще за вигаданий профіль — вигаданий веде людину на
- * чужу сторінку й виглядає як наша.
+ * Офіційні акаунти Vet Crew у соцмережах.
  */
 export const SOCIALS = [
-	{ id: 'facebook', url: '#', icon: '/images/social_media/facebook-se-512-50.png' },
-	{ id: 'instagram', url: '#', icon: '/images/social_media/instagram-se-512-50.png' },
-	{ id: 'telegram', url: '#', icon: '/images/social_media/Telegram-se-320px-50q.png' },
-	{ id: 'youtube', url: '#', icon: '/images/social_media/YouTube-se-512px-50q.png' }
+	{
+		id: 'instagram',
+		url: 'https://www.instagram.com/vet.crew/',
+		icon: '/images/social_media/instagram-se-512-50.png'
+	},
+	{
+		id: 'facebook',
+		url: 'https://www.facebook.com/vet.crew/',
+		icon: '/images/social_media/facebook-se-512-50.png'
+	},
+	{
+		id: 'tiktok',
+		url: 'https://www.tiktok.com/@vet.crew',
+		icon: '/images/social_media/TikTok-se-512-50.png'
+	},
+	{
+		id: 'x',
+		url: 'https://x.com/crew_vet',
+		icon: '/images/social_media/Twitter-SE-512-50q.png'
+	}
 ] as const;

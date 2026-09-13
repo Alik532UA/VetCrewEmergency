@@ -86,8 +86,13 @@
 		gap: 0.4rem;
 		margin-top: 0.75rem;
 		font-weight: 600;
-		color: var(--color-primary-on-surface);
+		color: var(--color-accent);
 		text-decoration: none;
+	}
+	/* Наведення мусить бути видно. Підкреслення, а не зміна кольору: ці посилання вже набрані акцентом, і «золоте на трохи іншому золотому» читається як нічого. */
+	.empty__link:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
 	}
 
 	.cards {
@@ -129,7 +134,12 @@
 		gap: 0.35rem;
 		margin-top: auto;
 		font-weight: 600;
-		color: var(--color-primary-on-surface);
+		color: var(--color-accent);
 		text-decoration: none;
+	}
+	/* Наведення мусить бути видно. Підкреслення, а не зміна кольору: ці посилання вже набрані акцентом, і «золоте на трохи іншому золотому» читається як нічого. */
+	.card__link:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
 	}
 </style>

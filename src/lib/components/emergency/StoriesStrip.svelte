@@ -22,7 +22,7 @@
 <Carousel testId="stories-carousel">
 	{#each STORIES as s (s.slug)}
 		<a class="story" href={localePath(`/stories/${s.slug}`, lang)}>
-			<span class="story__emoji" aria-hidden="true">{s.emoji}</span>
+			<span class="story__shot" aria-hidden="true">{s.emoji}</span>
 			<h3>{s.title[lang]}</h3>
 			<p>{s.summary[lang]}</p>
 			<span class="story__more">
@@ -35,29 +35,60 @@
 
 <style>
 	.story {
+		transition:
+			border-color var(--transition-fast),
+			background-color var(--transition-fast);
 		display: flex;
 		flex-direction: column;
 		gap: 0.4rem;
 		width: 17rem;
-		padding: 1.25rem;
+		padding: 0.75rem 0.75rem 1.1rem;
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
-		background: var(--color-bg-surface);
+		background: var(--color-bg-card);
 		color: inherit;
 		text-decoration: none;
 	}
+	/* Посилання тут — ціла картка, тож і відповідати на курсор мусить вона ціла, а
+	   не рядок «Детальніше» всередині: людина цілиться в картку. */
+	.story:hover {
+		border-color: var(--color-accent);
+		background: var(--color-bg-card-hover);
+	}
 
-	.story__emoji {
-		font-size: 1.75rem;
+	/*
+	 * Разом із карткою відповідає й рядок «Детальніше».
+	 *
+	 * Межа й тло картки міняються стримано — навмисно, щоб ряд карток не миготів
+	 * під курсором, — але око шукає підтвердження саме на тому слові, яке читає як
+	 * посилання. Підкреслення те саме, що в решти акцентних посилань сайту.
+	 */
+	.story:hover .story__more {
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+
+	/* Місце знімка. Пропорція задана тут, а не змістом: із нею картки стоять на
+	   одній висоті ще до того, як з'являться самі фотографії. */
+	.story__shot {
+		display: grid;
+		place-items: center;
+		margin-bottom: 0.6rem;
+		aspect-ratio: 16 / 10;
+		border-radius: var(--radius-md);
+		background: var(--gradient-hero);
+		font-size: 2.5rem;
 	}
 
 	.story h3 {
 		margin: 0;
+		padding: 0 0.5rem;
 		font-size: 1.05rem;
 	}
 
 	.story p {
 		margin: 0;
+		padding: 0 0.5rem;
 		color: var(--color-text-muted);
 	}
 
@@ -66,7 +97,8 @@
 		align-items: center;
 		gap: 0.35rem;
 		margin-top: auto;
+		padding: 0.5rem 0.5rem 0;
 		font-weight: 600;
-		color: var(--color-primary-on-surface);
+		color: var(--color-accent);
 	}
 </style>

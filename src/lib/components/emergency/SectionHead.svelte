@@ -4,12 +4,18 @@
 		id: string;
 		title: string;
 		subtitle?: string;
+		/**
+		 * Заголовок посередині — для розділів, які самі є симетричним рядом
+		 * (кружки кроків, ланцюжок етапів). Ліве вирівнювання над симетричним
+		 * рядом читається як помилка складання, а не як рішення.
+		 */
+		center?: boolean;
 	}
 
-	let { id, title, subtitle }: Props = $props();
+	let { id, title, subtitle, center = false }: Props = $props();
 </script>
 
-<header class="head">
+<header class="head" class:head--center={center}>
 	<h2 class="head__title" {id}>{title}</h2>
 	{#if subtitle}
 		<p class="head__subtitle">{subtitle}</p>
@@ -19,6 +25,10 @@
 <style>
 	.head {
 		margin-bottom: 0.5rem;
+	}
+
+	.head--center {
+		text-align: center;
 	}
 
 	.head__title {

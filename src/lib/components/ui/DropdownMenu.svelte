@@ -4,6 +4,17 @@
 	export interface DropdownItem {
 		id: string;
 		label: string;
+		/**
+		 * Заголовок групи, до якої належить пункт.
+		 *
+		 * З'явився, коли три меню шапки — тема, стиль і мова — злилися в одне під
+		 * кнопкою «Налаштування»: без підписів це був би список із шести пунктів,
+		 * де «Темна» й «Виразний» стоять поруч і нічим не пояснені. Пункти йдуть
+		 * у порядку масиву, а заголовок малюється там, де група змінилася, — тож
+		 * порядок задає той, хто складає список, і жодного групування «за собою»
+		 * тут немає.
+		 */
+		group?: string;
 		/** Present turns the item into a link — used by the language picker, where
 		 *  choosing an option changes the address and must be openable in a new tab. */
 		href?: string;
@@ -204,7 +215,13 @@
 			data-testid="{testId}-menu"
 			{@attach focusFirstItem}
 		>
-			{#each items as item (item.id)}
+			{#each items as item, index (item.id)}
+				{#if item.group && item.group !== items[index - 1]?.group}
+					<!-- `presentation`, не заголовок: усередині `role="menu"` будь-яка інша
+						 роль розриває перелік пунктів для читалки. Групу читалці називає
+						 `aria-label` самого пункта, а цей рядок — для очей. -->
+					<span class="dropdown__group" role="presentation">{item.group}</span>
+				{/if}
 				{#if item.href}
 					<!--
 						data-sveltekit-noscroll: a menu item changes a setting, and the address
@@ -268,9 +285,20 @@
 		transition: all var(--transition-fast);
 	}
 
+	/*
+	 * Наведення золотим, а не --color-primary.
+	 *
+	 * Первинний зелений у темній темі — це #1f3524, і на теплій поверхні, яку
+	 * наведення підставляє під нього, він дає 1.2:1. Тобто значок при наведенні
+	 * ЗНИКАВ: людина веде курсор на кнопку налаштувань, і кнопка гасне. Заміряно
+	 * 2026-09-13 на живій сторінці.
+	 *
+	 * Золотий читається в обох темах (7.86:1 у темній, 4.8:1 у світлій) і вже
+	 * означає «сюди дивись» у решті палітри.
+	 */
 	.dropdown__trigger:hover {
 		background: var(--color-bg-warm);
-		color: var(--color-primary);
+		color: var(--color-accent);
 		box-shadow: var(--shadow-sm);
 	}
 
@@ -349,15 +377,43 @@
 		min-width: 0;
 	}
 
+	/* Підпис групи — не пункт: дрібніший, приглушений і не натискається. Верхній
+	   відступ лише в тих, що не перші, інакше меню відкривається з порожнім
+	   рядком. */
+	.dropdown__group {
+		display: block;
+		padding: 0.75rem 0.85rem 0.25rem;
+		font-size: 0.72rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.07em;
+		color: var(--color-text-muted);
+	}
+
+	.dropdown__group:first-child {
+		padding-top: 0.35rem;
+	}
+
 	.dropdown__item:hover {
-		background: var(--color-bg-warm);
-		color: var(--color-primary);
+		background: color-mix(in srgb, var(--color-text) 10%, transparent);
+		color: var(--color-primary-on-surface);
+	}
+
+	.dropdown__item:focus-visible {
+		background: color-mix(in srgb, var(--color-text) 10%, transparent);
+		color: var(--color-primary-on-surface);
+		outline: 2px solid var(--color-accent);
+		outline-offset: -2px;
 	}
 
 	.dropdown__item--active {
 		background: var(--color-primary);
-		/* The token, not a literal white: on the dark theme's #93bf4c white measures
-		   2.14:1. axe never caught it because a closed menu has nothing to measure. */
+		color: var(--color-text-on-accent);
+		font-weight: 700;
+	}
+
+	.dropdown__item--active:hover {
+		background: color-mix(in srgb, var(--color-primary) 80%, var(--color-text-on-accent));
 		color: var(--color-text-on-accent);
 	}
 

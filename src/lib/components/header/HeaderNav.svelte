@@ -2,7 +2,7 @@
 	import HeaderControls from '$lib/components/header/HeaderControls.svelte';
 	import HeaderMenuFooter from '$lib/components/header/HeaderMenuFooter.svelte';
 	import HeaderNavLinks from '$lib/components/header/HeaderNavLinks.svelte';
-	import HeaderTabWave from '$lib/components/header/HeaderTabWave.svelte';
+	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
 
 	/**
 	 * One element in two shapes: a row of tabs across the bar, and the panel the burger
@@ -12,56 +12,73 @@
 	interface Props {
 		/** Whether the burger has unfolded this into the full-screen panel. */
 		open: boolean;
-		/** 0 while the page is at the top, 1 once the coloured band has scrolled away. */
-		scrollProgress: number;
 		/** Called on every link, so following one folds the panel away. */
 		onNavigate: () => void;
 	}
 
-	let { open, scrollProgress, onNavigate }: Props = $props();
-
-	/** What the wave measures the active item against. */
-	let navElement: HTMLElement | undefined = $state();
-
-	/*
-	 * Колір активної вкладки один на весь сайт.
-	 *
-	 * У проєкті-джерелі він залежав від розділу — коти й собаки мали власні
-	 * кольори, — і розвилка перелічувала маршрути поіменно. Тут розділи не
-	 * поділені за видом тварини, тож розвилка звелася б до п'яти гілок, які
-	 * повертають те саме; лишається сам колір.
-	 */
-	const activeColor = 'var(--color-primary)';
+	let { open, onNavigate }: Props = $props();
 </script>
 
-<nav
-	bind:this={navElement}
-	class="header__nav"
-	class:header__nav--open={open}
-	style="--active-tab-bg: {activeColor};"
->
-	<HeaderTabWave container={navElement} {scrollProgress} />
+<!--
+	Анімованої вкладки під активним пунктом більше немає.
 
+	Вона була фігурою, що міряла ширину активного пункта, малювалася SVG-контуром і
+	перетікала з розкльошеної в пілюлю за перші 120 пікселів прокручування. Автор
+	попросив прибрати, і в дизайн-референсі такого стану справді немає: пункти там —
+	самі слова, а поточний розділ підкреслено. Разом із нею пішли `HeaderTabWave`,
+	`tabShape`, `TAB_HEIGHT` і одинадцять тестів на геометрію контуру; частка
+	прокручування лишилася й переїхала в `utils/headerScroll.ts` — нею шапка
+	проявляє власне тло.
+-->
+<nav class="header__nav" class:header__nav--open={open}>
 	<HeaderNavLinks {onNavigate} />
 
 	<HeaderControls />
+
+	<!--
+		Номер у самій смузі, як у дизайн-референсі.
+
+		Це єдиний елемент шапки, заради якого сюди приходять у найгіршу мить, і
+		він не має ховатися за бургер. На вузькому екрані смуга віддана бургеру,
+		тож тут номер переїжджає нагору розгорнутої панелі — на два дотики
+		замість одного. Гірше, ніж хотілося б, і краще за прокручування всієї
+		сторінки до підвалу.
+	-->
+	<span class="header__hotline"><HotlineButton compact testid="header-hotline-btn" /></span>
 
 	<HeaderMenuFooter {onNavigate} />
 </nav>
 
 <style>
+	/* По центру, а не по нижньому краю. Низом пункти вирівнювалися заради вкладки:
+	   вона стояла на основі смуги, і напис мусив стояти на ній же. Вкладки немає —
+	   і різновисокі елементи ряду (логотип у три рядки, пункти, перемикачі,
+	   червона кнопка) перестали висіти на спільній нижній лінії. */
 	.header__nav {
 		display: flex;
-		align-items: flex-end;
+		align-items: center;
 		justify-content: space-between;
 		flex: 1;
 		height: 72px;
 		position: relative;
 	}
 
+	.header__hotline {
+		display: flex;
+	}
+
 	@media (max-width: 768px) {
 		.header__nav {
 			display: none;
+		}
+
+		/* У розгорнутій панелі номер стоїть першим, попри те що в розмітці він
+		   передостанній: у смузі його місце праворуч, а в стовпці — нагорі.
+		   Обгортка своя, а не клас самої кнопки: той належить HotlineButton, і
+		   правило, що спирається на чужу приватну назву, ламається мовчки. */
+		.header__nav--open .header__hotline {
+			order: -1;
+			display: flex;
 		}
 
 		/*

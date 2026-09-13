@@ -61,7 +61,7 @@
 	}
 
 	.breadcrumbs a:hover {
-		color: var(--color-primary);
+		color: var(--color-accent);
 	}
 
 	.breadcrumbs__separator {

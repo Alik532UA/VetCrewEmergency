@@ -105,7 +105,11 @@ html {
 	 * so one declaration covers the page and every block with its own scrolling —
 	 * dropdowns, the mobile menu, the carousel.
 	 */
-	--scrollbar-thumb: color-mix(in srgb, var(--color-primary), transparent 45%);
+	/* Акцент, а не --color-primary: у темній темі повзунок був темно-зеленим на
+	   майже чорному, у світлій — майже білим на білому, тобто в ОБОХ темах смуга
+	   прокрутки була там, де її не видно. Золотий однаково читається на обох тлах;
+	   прозорості лишилося чверть, щоб він не сперечався з текстом сторінки. */
+	--scrollbar-thumb: color-mix(in srgb, var(--color-accent), transparent 25%);
 	--scrollbar-track: color-mix(in srgb, var(--color-bg-card), transparent 40%);
 
 	scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -134,6 +138,36 @@ body {
 	color: var(--color-text);
 	line-height: 1.6;
 	overflow-x: hidden;
+}
+
+/*
+ * Магнітний скрол по контейнерах (CSS Scroll Snap).
+ *
+ * Притягує скрол до початку кожного контейнера/розділу сторінки.
+ * Вмикається класом `has-snap-scroll` на <html>, вимикається в меню смуги.
+ */
+html.has-snap-scroll {
+	scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html.has-snap-scroll {
+		scroll-snap-type: none;
+	}
+}
+
+html.has-snap-scroll .hero {
+	scroll-snap-align: start;
+	scroll-snap-stop: normal;
+	scroll-margin-top: 0;
+}
+
+html.has-snap-scroll .band,
+html.has-snap-scroll .page,
+html.has-snap-scroll .footer {
+	scroll-snap-align: start;
+	scroll-snap-stop: normal;
+	scroll-margin-top: 72px;
 }
 
 /*

@@ -9,8 +9,9 @@ import { expect, test } from '@playwright/test';
 test('switching language keeps the page and carries into later links', async ({ page }) => {
 	await page.goto('/adopt/cat/basti');
 
-	await page.getByTestId('lang-toggle-btn').click();
-	const german = page.getByTestId('lang-option-de-link');
+	// Мова живе в меню «Налаштування»; окремої кнопки мов більше немає.
+	await page.getByTestId('settings-toggle-btn').click();
+	const german = page.getByTestId('settings-option-lang-en-link');
 
 	// A real link, so it can be opened in a new tab and followed by a crawler.
 	await expect(german).toHaveAttribute('href', '/de/adopt/cat/basti');

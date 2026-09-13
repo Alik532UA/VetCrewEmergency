@@ -40,10 +40,19 @@ const walk = (dir: string, out: string[] = []): string[] => {
  *
  * `src/routes/[[lang=lang]]/adopt/cat/[slug]/+page.svelte` → `/adopt/cat/[slug]`. The
  * language segment comes off because a tab answers for a page, not for a translation.
+ *
+ * Тека з підкресленням на початку сегмента — НЕ маршрут. Так вирішує сам SvelteKit:
+ * типовий фільтр `kit.routes` відкидає все, чий шлях містить `/_`, і саме цим у цьому
+ * проєкті «закоментовано» сторінку `/report` — вона лежить у `_report/` і не
+ * збирається. Гейт, що не знає цього правила, вимагає вкладку чеклиста для сторінки,
+ * якої на сайті немає, і червоніє на здоровому коді.
  */
+const ROUTE_EXCLUDED = /(?:^|\/)[_.]/;
+
 const routesOnDisk = (): string[] =>
 	walk('src/routes')
 		.filter((f) => f.endsWith('/+page.svelte'))
+		.filter((f) => !ROUTE_EXCLUDED.test(f.replace(/^src\/routes/, '')))
 		.map((f) =>
 			f
 				.replace(/^src\/routes/, '')

@@ -318,19 +318,22 @@ for (const theme of THEMES) {
 test('a dropdown can be operated and left with the keyboard alone', async ({ page }) => {
 	await page.goto('/adopt/cat');
 
-	await page.getByTestId('theme-toggle-btn').click();
+	// Одне меню на три групи (тема, стиль, мова) — відколи три кнопки шапки зійшлися
+	// під кнопку «Налаштування». Перевіряється тут не вміст, а поведінка клавіатури.
+	await page.getByTestId('settings-toggle-btn').click();
 	// Focus moves into the menu, so the arrow keys have somewhere to start. First in the
 	// list is the theme the site opens in.
-	await expect(page.getByTestId('theme-option-light-green-btn')).toBeFocused();
+	await expect(page.getByTestId('settings-option-theme-dark-btn')).toBeFocused();
 
 	await page.keyboard.press('ArrowDown');
-	await expect(page.getByTestId('theme-option-dark-btn')).toBeFocused();
+	await expect(page.getByTestId('settings-option-theme-light-btn')).toBeFocused();
 
+	// Останній пункт — мова, бо групи йдуть у порядку «тема, стиль, мова».
 	await page.keyboard.press('End');
-	await expect(page.getByTestId('theme-option-winter-btn')).toBeFocused();
+	await expect(page.getByTestId('settings-option-lang-en-link')).toBeFocused();
 
 	// Escape closes and hands focus back, rather than stranding the user inside.
 	await page.keyboard.press('Escape');
 	await expect(page.getByRole('menu')).toBeHidden();
-	await expect(page.getByTestId('theme-toggle-btn')).toBeFocused();
+	await expect(page.getByTestId('settings-toggle-btn')).toBeFocused();
 });
