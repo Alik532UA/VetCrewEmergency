@@ -84,11 +84,17 @@
 		background: var(--color-secondary-light);
 	}
 
-	/* Червоний вогонь пари. Синій — на кнопці «повідомити», і він іде з
-	   протифазою (`Hero.svelte`). */
+	/* Червоний вогонь пари: шість позицій із десяти. Сині чотири бере кнопка
+	   «повідомити» тією ж тривалістю й без затримки — розклад у них спільний
+	   (`@keyframes` в `app.css`). */
 	.hotline--beacon {
 		--beacon-glow: var(--beacon-red);
-		animation: beacon 3.2s steps(1, end) infinite;
+		/* Довгою формою, а не скороченням: `calc()` у скороченні `animation`
+		   розбирають не всі рушії, і помилка там ковтає ВСІ інші її частини. */
+		animation-name: beacon-a;
+		animation-duration: calc(var(--beacon-flash) * 92);
+		animation-timing-function: steps(1, end);
+		animation-iteration-count: infinite;
 	}
 
 	/* Та сама висота, що в пунктів смуги й трьох перемикачів поруч: 44 пікселі.
