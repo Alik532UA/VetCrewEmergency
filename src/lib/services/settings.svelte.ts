@@ -13,6 +13,37 @@ export type SiteStyle = 'modern' | 'minimal' | 'playful';
  * дістає три черги, далі по одній.
  */
 export type BeaconMode = 'off' | 'temporary' | 'always';
+
+const BEACON_MODES: readonly BeaconMode[] = ['off', 'temporary', 'always'];
+
+/**
+ * Чи це справді один із трьох режимів маячка.
+ *
+ * У сховищі лежить рядок, і написати туди можна будь-що — рукою в консолі, старою
+ * версією сайту, чужим розширенням. Без перевірки `data-` атрибут і класи взяли б
+ * це «будь-що» на віру, і маячок мовчав би без жодної помилки в консолі.
+ */
+export function isBeaconMode(value: string | null): value is BeaconMode {
+	return value !== null && BEACON_MODES.includes(value as BeaconMode);
+}
+
+/**
+ * Булеве значення зі сховища — або `null`, якщо там не булеве.
+ *
+ * Порівнянням із рядком, а не `Boolean(...)`: у сховищі лежить `'true'` чи
+ * `'false'`, і будь-який непорожній рядок — ЗОКРЕМА `'false'` — у булеве
+ * перетворення приходить істиною. Тобто наївний варіант вмикав би те, що людина
+ * щойно вимкнула, і робив би це лише після перезавантаження.
+ *
+ * `null` окремо від `false`: «нічого не збережено» означає «лишити типове», а не
+ * «вимкнути». Для облямівок і маячків типове — увімкнено, тож сплутати ці два
+ * стани означало б вимкнути їх усім, хто до налаштувань не заходив.
+ */
+export function parseStoredFlag(value: string | null): boolean | null {
+	if (value === 'true') return true;
+	if (value === 'false') return false;
+	return null;
+}
 export type { Locale };
 
 /**
@@ -74,8 +105,6 @@ class Settings {
 		{ key: 'glassPanels', css: 'glass-panels', on: true }
 	] as const;
 
-	private beaconModes: BeaconMode[] = ['off', 'temporary', 'always'];
-
 	private themes: Theme[] = ['dark', 'light'];
 	private styles: SiteStyle[] = ['modern', 'minimal', 'playful'];
 
@@ -122,18 +151,15 @@ class Settings {
 				this.style = savedStyle;
 			}
 
-			/*
-			 * Вигляд. Читається порівнянням із рядком, а не `Boolean(...)`: у сховищі
-			 * лежить `'true'`/`'false'`, і будь-який непорожній рядок — зокрема
-			 * `'false'` — у булеве перетворення приходить істиною.
-			 */
+			// Вигляд. Правила читання — у `parseStoredFlag` і `isBeaconMode` угорі файлу:
+			// вони чисті, тож перевіряються тестом, а не лише живою сторінкою.
 			for (const look of Settings.LOOKS) {
-				const saved = storage.get(look.key);
-				if (saved === 'true' || saved === 'false') this[look.key] = saved === 'true';
+				const saved = parseStoredFlag(storage.get(look.key));
+				if (saved !== null) this[look.key] = saved;
 			}
 
-			const savedBeacons = storage.get('beacons') as BeaconMode | null;
-			if (savedBeacons && this.beaconModes.includes(savedBeacons)) this.beacons = savedBeacons;
+			const savedBeacons = storage.get('beacons');
+			if (isBeaconMode(savedBeacons)) this.beacons = savedBeacons;
 
 			// Favorites
 			const savedFavs = storage.getJSON<string[]>('favorites');
