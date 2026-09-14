@@ -54,6 +54,11 @@
 	}
 
 	.breadcrumbs a {
+		/* 44px — межа дотику проєкту (`tests/touch-targets.spec.ts`). Рядок короткий,
+		   тож без цього мішень виходить удвічі нижчою за палець. */
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
 		color: inherit;
 		text-decoration: underline;
 		text-underline-offset: 3px;

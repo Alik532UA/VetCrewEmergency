@@ -81,6 +81,10 @@
 	}
 
 	.link {
+		/* 44px — межа дотику проєкту (`tests/touch-targets.spec.ts`). */
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;

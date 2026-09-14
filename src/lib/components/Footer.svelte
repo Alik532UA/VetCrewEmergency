@@ -214,6 +214,10 @@
 	}
 
 	.footer__list a {
+		/* 44px — межа дотику проєкту (`tests/touch-targets.spec.ts`). */
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
 		color: inherit;
 	}
 
@@ -235,6 +239,26 @@
 	.footer__socials img {
 		display: block;
 		border-radius: var(--radius-sm);
+	}
+
+	/*
+	 * Область дотику — 44px, хоч сам значок менший.
+	 *
+	 * Значок лишається 28px (соцмережі) чи 22px (сусідні сайти): міняється не
+	 * малюнок, а те, куди можна влучити пальцем. Другі з них були 22×22, тобто
+	 * НИЖЧЕ за поріг самого WCAG 2.2 (SC 2.5.8, 24px) — не «менше за стандарт
+	 * проєкту», а порушення.
+	 *
+	 * `inline-flex` із центруванням, а не `padding`: відступ розсунув би сусідів
+	 * у ряду, а тут потрібна лише більша мішень навколо того самого значка.
+	 */
+	.footer__socials a,
+	.footer__aside a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 44px;
+		min-height: 44px;
 	}
 
 	.footer__col--actions {

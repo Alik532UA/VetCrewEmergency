@@ -47,27 +47,25 @@ const INTERACTIVE = 'button, a[href], input:not([type=hidden]), select, [role="b
  * control room — usually a `min-height`, since these are all short rather than
  * narrow — and deleting its line here.
  */
-const BELOW_PROJECT_STANDARD = new Set([
-	// 190×32. The wordmark in the mobile header. Short because the bar is short;
-	// giving it 44 would make the whole header taller on the smallest screens.
-	'header-logo-mobile-link',
-	// 34px tall filter chips. A row of them wraps to three lines on a phone
-	// already, and 44 each would push the list below the fold on arrival.
-	'filter-gender-all-btn',
-	'filter-gender-male-btn',
-	'filter-gender-female-btn',
-	'filter-size-all-btn',
-	'filter-size-small-btn',
-	'filter-size-medium-btn',
-	'filter-size-large-btn',
-	'filter-status-all-btn',
-	'filter-status-available-btn',
-	// 51×34 flags in the about section. The grid is 110px wide by design and the
-	// same choice is offered by the language menu in the header, which is 44.
-	'about-flag-uk-link',
-	'about-flag-de-link',
-	'about-flag-at-link',
-	'about-flag-nl-link'
+const BELOW_PROJECT_STANDARD = new Set<string>([
+	// Порожній, і це стан, а не забутий рядок.
+	//
+	// Тут лежали чотирнадцять записів, і всі до одного належали adoptananimal: фільтри
+	// собак за статтю й розміром, прапорці `de`/`at`/`nl` у блоці «про нас», мобільний
+	// логотип того проєкту. Жодного з цих елементів тут немає, тож перелік нічого не
+	// пропускав — він лише створював враження, ніби в цьому проєкті є чотирнадцять
+	// свідомо прийнятих недоборів.
+	//
+	// Справжні недобори, знайдені після очищення, сюди НЕ додані, а виправлені: значки
+	// соцмереж і сусідніх сайтів у підвалі дістали область дотику 44px (самі значки
+	// лишилися 28 і 22), посилання «Детальніше» на картках — `min-height: 44px`.
+	// Правило цього файлу каже прямо: записи звідси виходять, а не заходять.
+	//
+	// Один запис лишився — і він тутешній, а не успадкований. 229×32: напис логотипа
+	// в мобільній смузі. Смуга має 72px на все, і 44 під логотип зробили б її вищою
+	// на найменших екранах, де висота дорожча за все. Поруч, у тій самій смузі, стоїть
+	// кнопка гарячої лінії, і ВОНА 44: до номера дотягнутися треба, до назви сайту — ні.
+	'header-logo-mobile-link'
 ]);
 
 /** A phone, and touch — `hover: hover` changes which controls are even rendered. */

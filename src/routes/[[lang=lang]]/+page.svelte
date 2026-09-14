@@ -254,6 +254,11 @@
 	 * ні».
 	 */
 	.band__all {
+		/* 44px — межа дотику проєкту (`tests/touch-targets.spec.ts`). Рядок короткий,
+		   тож без цього мішень виходить удвічі нижчою за палець. */
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
 		position: relative;
 		z-index: 1;
 		display: flex;
@@ -327,6 +332,9 @@
 		margin-top: auto;
 		margin-left: auto;
 		font-weight: 600;
+		/* 44px — межа дотику цього проєкту. Посилання коротке, тож без цього воно
+		   виходить 26px заввишки: попасти пальцем удвічі важче, ніж прочитати. */
+		min-height: 44px;
 		color: var(--color-accent);
 		text-decoration: none;
 	}

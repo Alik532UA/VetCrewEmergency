@@ -123,4 +123,12 @@
 		align-items: center;
 		gap: 0.5rem;
 	}
+
+	/* 44px — межа дотику проєкту (`tests/touch-targets.spec.ts`). Адреса пошти тут
+	   не просто текст: по ній натискають, і вона копіюється в буфер. */
+	.contacts a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
 </style>

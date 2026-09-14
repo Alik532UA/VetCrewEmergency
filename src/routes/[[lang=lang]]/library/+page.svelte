@@ -104,6 +104,9 @@
 		margin-top: auto;
 		margin-left: auto;
 		font-weight: 600;
+		/* 44px — межа дотику цього проєкту. Посилання коротке, тож без цього воно
+		   виходить 26px заввишки: попасти пальцем удвічі важче, ніж прочитати. */
+		min-height: 44px;
 		color: var(--color-accent);
 		text-decoration: none;
 	}
