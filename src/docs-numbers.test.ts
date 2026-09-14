@@ -161,6 +161,20 @@ describe('числа в прозі', () => {
 	});
 
 	it('порти в документації — ті, що в .claude/launch.json і playwright.config.ts', () => {
+		/*
+		 * Файл мусить бути в репозиторії, і рядок `!.claude/launch.json` у `.gitignore`
+		 * тримає його там навмисно.
+		 *
+		 * Без цього рядка гейт існував лише на машині розробника: локально файл є й
+		 * перевірка зелена, а в CI `readFileSync` кидав ENOENT — крок червонів
+		 * помилкою читання, і про порти в документації не дізнавався ніхто. Явна
+		 * перевірка нижче каже, ЩО зникло; `ENOENT: no such file` цього не казав.
+		 */
+		expect(
+			existsSync('.claude/launch.json'),
+			'.claude/launch.json не потрапив у репозиторій — перевірте рядок !.claude/launch.json у .gitignore'
+		).toBe(true);
+
 		const launch = JSON.parse(read('.claude/launch.json')) as {
 			configurations: { name: string; port: number }[];
 		};

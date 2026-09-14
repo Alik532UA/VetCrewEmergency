@@ -1,0 +1,17 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "emergency-dev",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run", "dev", "--", "--port", "5195", "--strictPort"],
+			"port": 5195
+		},
+		{
+			"name": "emergency-preview",
+			"runtimeExecutable": "npm",
+			"runtimeArgs": ["run", "preview", "--", "--port", "4195", "--strictPort"],
+			"port": 4195
+		}
+	]
+}
