@@ -23,6 +23,21 @@ import { browser } from '$app/environment';
  */
 const HEADER_HEIGHT = 72;
 
+/** Що дія `twin` розповідає про свою пару. */
+export interface TwinSighting {
+	/** Чи пара зараз на екрані. */
+	onScreen: boolean;
+	/**
+	 * Скільки разів вона на нього потрапляла — від завантаження сторінки, не від
+	 * першого візиту.
+	 *
+	 * Рахується в пам'яті навмисно: у сховищі це означало б, що людина, яка
+	 * повернулася на сайт наступного дня, більше ніколи не побачить довшої першої
+	 * черги маячка. Показати її ще раз — дешевше, ніж пояснити, чому її немає.
+	 */
+	times: number;
+}
+
 let onScreen = $state(0);
 /**
  * Доки спостерігач не озвався хоч раз, вважаємо, що пару видно.
@@ -43,8 +58,14 @@ export const twinActions = {
 };
 
 let observer: IntersectionObserver | null = null;
-/** Що саме зараз перетинає екран — щоб не рахувати одну ціль двічі. */
-const state = new WeakMap<Element, boolean>();
+
+/** Що саме зараз перетинає екран, скільки разів перетинало і кому про це казати. */
+interface Watched {
+	onScreen: boolean;
+	times: number;
+	report?: (sighting: TwinSighting) => void;
+}
+const watched = new WeakMap<Element, Watched>();
 
 function ensureObserver(): IntersectionObserver | null {
 	if (!browser) return null;
@@ -52,10 +73,13 @@ function ensureObserver(): IntersectionObserver | null {
 		(entries) => {
 			pending = false;
 			for (const entry of entries) {
-				const was = state.get(entry.target) ?? false;
-				if (was === entry.isIntersecting) continue;
-				state.set(entry.target, entry.isIntersecting);
+				const seen = watched.get(entry.target);
+				if (!seen || seen.onScreen === entry.isIntersecting) continue;
+
+				seen.onScreen = entry.isIntersecting;
+				if (entry.isIntersecting) seen.times += 1;
 				onScreen += entry.isIntersecting ? 1 : -1;
+				seen.report?.({ onScreen: seen.onScreen, times: seen.times });
 			}
 		},
 		// Нуль, а не половина: поки з кнопки видно хоч смужку, вона на екрані є, і
@@ -70,18 +94,39 @@ function ensureObserver(): IntersectionObserver | null {
  *
  * Вішається на групу, а не на кожну кнопку: кнопки в парі стоять поруч і зникають
  * з екрана разом, тож дві цілі замість однієї дали б ту саму відповідь удвічі.
+ *
+ * Необов'язковий аргумент — куди доповідати про появу пари. Ним користується
+ * тимчасовий маячок: йому треба знати не «чи видно десь», а «чи видно САМЕ цю» і
+ * вкотре, щоб перша черга була довша за наступні.
  */
-export function twin(node: HTMLElement) {
+export function twin(node: HTMLElement, report?: (sighting: TwinSighting) => void) {
 	const io = ensureObserver();
+	watched.set(node, { onScreen: false, times: 0, report });
 	io?.observe(node);
 
 	return {
+		update(next?: (sighting: TwinSighting) => void) {
+			const seen = watched.get(node);
+			if (seen) seen.report = next;
+		},
 		destroy() {
 			io?.unobserve(node);
 			// Ціль, що пішла зі сторінки, лишила б лічильник назавжди піднятим — а це
 			// шапка, яка мовчить до перезавантаження.
-			if (state.get(node)) onScreen -= 1;
-			state.delete(node);
+			if (watched.get(node)?.onScreen) onScreen -= 1;
+			watched.delete(node);
 		}
 	};
+}
+
+/**
+ * Скільки черг має дати маячок цієї пари.
+ *
+ * `infinite` — постійний режим, як було. У тимчасовому перша поява дістає три
+ * черги, кожна наступна одну: перший раз маячок мусить пояснити, що він таке, а
+ * далі лише нагадати.
+ */
+export function beaconRuns(mode: string, times: number): string {
+	if (mode !== 'temporary') return 'infinite';
+	return times <= 1 ? '3' : '1';
 }

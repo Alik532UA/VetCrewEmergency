@@ -131,7 +131,7 @@
 		animation-name: beacon-a;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
-		animation-iteration-count: infinite;
+		animation-iteration-count: var(--beacon-runs);
 	}
 
 	/* Та сама висота, що в пунктів смуги й трьох перемикачів поруч: 44 пікселі.

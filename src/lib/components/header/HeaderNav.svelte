@@ -6,7 +6,9 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { t } from '$lib/i18n';
 	import { REPORT_URL } from '$lib/config';
-	import { twinActions } from '$lib/utils/twinActions.svelte';
+	import { untrack } from 'svelte';
+	import { beaconRuns, twinActions } from '$lib/utils/twinActions.svelte';
+	import { settings } from '$lib/services/settings.svelte';
 
 	/**
 	 * One element in two shapes: a row of tabs across the bar, and the panel the burger
@@ -31,6 +33,30 @@
 	 * заливка й маячок, бо тепер це єдиний номер на видноті.
 	 */
 	const loud = $derived(!twinActions.visible);
+
+	/**
+	 * Чи світить маячок шапки, і скількома чергами.
+	 *
+	 * Тут «поява пари» — це не в'їзд на екран (кнопки й так завжди в смузі), а мить,
+	 * коли шапка стає гучною: саме тоді людина долистала до місця, де інших кнопок
+	 * уже не видно. Тому лічильник свій, а не з `twin`.
+	 *
+	 * `$effect`, а не `$derived`: лічильник мусить пам'ятати, скільки разів це вже
+	 * ставалося, а похідне значення пам'яті не має.
+	 *
+	 * `untrack` навколо збільшення — обов'язковий, а не про всяк випадок. `timesLoud
+	 * += 1` СПОЧАТКУ читає змінну, і без `untrack` цим читанням ефект підписується
+	 * сам на себе: запис будить ефект, ефект пише знову. Svelte це ловить і кидає
+	 * `effect_update_depth_exceeded` — а та помилка вбиває реактивність УСІЄЇ
+	 * сторінки, не лише цього компонента. Ззовні це виглядає так, наче зламався
+	 * скрол.
+	 */
+	let timesLoud = $state(0);
+	$effect(() => {
+		if (loud) untrack(() => (timesLoud += 1));
+	});
+	const lit = $derived(loud && settings.beacons !== 'off');
+	const runs = $derived(beaconRuns(settings.beacons, timesLoud));
 </script>
 
 <!--
@@ -58,8 +84,8 @@
 		замість одного. Гірше, ніж хотілося б, і краще за прокручування всієї
 		сторінки до підвалу.
 	-->
-	<span class="header__actions">
-		<HotlineButton compact testid="header-hotline-btn" beacon={loud} quiet={!loud} />
+	<span class="header__actions" style="--beacon-runs: {runs}">
+		<HotlineButton compact testid="header-hotline-btn" beacon={lit} quiet={!loud} />
 		<!--
 			Друга дія пари — написати. Без підпису навмисно: у смузі поруч уже стоїть
 			номер із трьох рядків, і другий підпис перетворив би кут шапки на текст.
@@ -69,7 +95,7 @@
 		<a
 			class="header__write"
 			class:header__write--quiet={!loud}
-			class:header__write--beacon={loud}
+			class:header__write--beacon={lit}
 			href={REPORT_URL}
 			target="_blank"
 			rel="noopener noreferrer"
@@ -152,7 +178,7 @@
 		animation-name: beacon-b;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
-		animation-iteration-count: infinite;
+		animation-iteration-count: var(--beacon-runs);
 	}
 
 	@media (max-width: 768px) {

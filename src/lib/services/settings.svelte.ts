@@ -6,6 +6,13 @@ import { DEFAULT_LOCALE, isLocale, type Locale } from '$lib/i18n/locales';
 
 export type Theme = 'dark' | 'light';
 export type SiteStyle = 'modern' | 'minimal' | 'playful';
+/**
+ * Як поводиться проблисковий маячок.
+ *
+ * `temporary` — черга при появі пари на екрані й тиша до наступної; перша поява
+ * дістає три черги, далі по одній.
+ */
+export type BeaconMode = 'off' | 'temporary' | 'always';
 export type { Locale };
 
 /**
@@ -44,15 +51,16 @@ class Settings {
 	/** Скляна заливка панелей, на яких лежать розділи. */
 	glassPanels = $state(false);
 	/** Проблискові маячки на парах кнопок. */
-	beacons = $state(true);
+	beacons = $state<BeaconMode>('always');
 
 	/** Прапорець → ключ сховища → клас на `<html>`. Один перелік на всі три ролі. */
 	static readonly LOOKS = [
 		{ key: 'borders', css: 'no-borders', on: false },
 		{ key: 'glassButtons', css: 'glass-buttons', on: true },
-		{ key: 'glassPanels', css: 'glass-panels', on: true },
-		{ key: 'beacons', css: 'no-beacons', on: false }
+		{ key: 'glassPanels', css: 'glass-panels', on: true }
 	] as const;
+
+	private beaconModes: BeaconMode[] = ['off', 'temporary', 'always'];
 
 	private themes: Theme[] = ['dark', 'light'];
 	private styles: SiteStyle[] = ['modern', 'minimal', 'playful'];
@@ -110,6 +118,9 @@ class Settings {
 				if (saved === 'true' || saved === 'false') this[look.key] = saved === 'true';
 			}
 
+			const savedBeacons = storage.get('beacons') as BeaconMode | null;
+			if (savedBeacons && this.beaconModes.includes(savedBeacons)) this.beacons = savedBeacons;
+
 			// Favorites
 			const savedFavs = storage.getJSON<string[]>('favorites');
 			if (savedFavs) {
@@ -162,6 +173,10 @@ class Settings {
 			 * доводиться нічим лагодити.
 			 */
 			$effect(() => {
+				if (browser) storage.set('beacons', this.beacons);
+			});
+
+			$effect(() => {
 				if (!browser) return;
 				for (const look of Settings.LOOKS) {
 					const value = this[look.key];
@@ -172,7 +187,12 @@ class Settings {
 		});
 	}
 
-	/** Перемикає один із чотирьох прапорців вигляду. */
+	setBeacons(mode: BeaconMode) {
+		this.beacons = mode;
+		logService.info('ui', `Beacons: ${mode}`);
+	}
+
+	/** Перемикає один із прапорців вигляду. */
 	toggleLook(key: (typeof Settings.LOOKS)[number]['key']) {
 		this[key] = !this[key];
 		logService.info('ui', `Look ${key}: ${this[key]}`);

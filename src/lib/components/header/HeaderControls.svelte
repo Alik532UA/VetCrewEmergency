@@ -8,8 +8,20 @@
 	import { storage } from '$lib/services/storage';
 	import { t } from '$lib/i18n';
 	import { splitLocale } from '$lib/i18n/locales';
-	import { settings, type Locale, type SiteStyle, type Theme } from '$lib/services/settings.svelte';
-	import { LOCALE_OPTIONS, LOOK_OPTIONS, STYLE_OPTIONS, THEME_OPTIONS } from './menuOptions';
+	import {
+		settings,
+		type BeaconMode,
+		type Locale,
+		type SiteStyle,
+		type Theme
+	} from '$lib/services/settings.svelte';
+	import {
+		BEACON_OPTIONS,
+		LOCALE_OPTIONS,
+		LOOK_OPTIONS,
+		STYLE_OPTIONS,
+		THEME_OPTIONS
+	} from './menuOptions';
 
 	/** Ключ прапорця вигляду — той самий перелік, що в `menuOptions`. */
 	type LookKey = (typeof LOOK_OPTIONS)[number]['key'];
@@ -76,6 +88,7 @@
 	const STYLE_PREFIX = 'style-';
 	const LANG_PREFIX = 'lang-';
 	const LOOK_PREFIX = 'look-';
+	const BEACON_PREFIX = 'beacon-';
 
 	/*
 	 * Close on any outside click. In an $effect so the listener leaves with the component
@@ -164,6 +177,12 @@
 				toggle: true,
 				active: settings[look.key]
 			})),
+			...BEACON_OPTIONS.map((mode) => ({
+				id: `${BEACON_PREFIX}${mode.id}`,
+				label: t(mode.labelKey),
+				group: t('settings.beacon'),
+				active: settings.beacons === mode.id
+			})),
 			...LOCALE_OPTIONS.map((locale) => ({
 				id: `${LANG_PREFIX}${locale.id}`,
 				label: locale.label,
@@ -181,7 +200,10 @@
 				settings.setStyle(id.slice(STYLE_PREFIX.length) as SiteStyle);
 			else if (id.startsWith(LANG_PREFIX))
 				settings.setLocale(id.slice(LANG_PREFIX.length) as Locale);
-			else if (id.startsWith(LOOK_PREFIX)) {
+			else if (id.startsWith(BEACON_PREFIX)) {
+				settings.setBeacons(id.slice(BEACON_PREFIX.length) as BeaconMode);
+				return;
+			} else if (id.startsWith(LOOK_PREFIX)) {
 				settings.toggleLook(id.slice(LOOK_PREFIX.length) as LookKey);
 				// Меню лишається відкритим: чотири перемикачі вмикають, дивлячись на
 				// сторінку, і закриття після кожного означало б чотири відкривання
@@ -202,6 +224,11 @@
 			{#if item.id.startsWith(THEME_PREFIX)}
 				<Icon
 					name={THEME_OPTIONS.find((x) => `${THEME_PREFIX}${x.id}` === item.id)?.icon ?? 'moon'}
+					size="1.1rem"
+				/>
+			{:else if item.id.startsWith(BEACON_PREFIX)}
+				<Icon
+					name={BEACON_OPTIONS.find((x) => `${BEACON_PREFIX}${x.id}` === item.id)?.icon ?? 'siren'}
 					size="1.1rem"
 				/>
 			{:else if item.id.startsWith(LOOK_PREFIX)}

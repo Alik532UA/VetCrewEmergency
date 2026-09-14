@@ -1,5 +1,5 @@
 import type { TranslationKey } from '$lib/i18n';
-import type { Locale, SiteStyle, Theme } from '$lib/services/settings.svelte';
+import type { BeaconMode, Locale, SiteStyle, Theme } from '$lib/services/settings.svelte';
 
 /**
  * What the three header menus offer — separated from how the header behaves.
@@ -45,14 +45,31 @@ export const STYLE_OPTIONS: {
  * місцях немає, звідси ж береться й ключ сховища, і клас на `<html>`.
  */
 export const LOOK_OPTIONS: {
-	key: 'borders' | 'glassButtons' | 'glassPanels' | 'beacons';
+	key: 'borders' | 'glassButtons' | 'glassPanels';
 	labelKey: TranslationKey;
 	icon: 'view' | 'sparkles' | 'box' | 'siren';
 }[] = [
 	{ key: 'borders', labelKey: 'look.borders', icon: 'view' },
 	{ key: 'glassButtons', labelKey: 'look.glassButtons', icon: 'sparkles' },
-	{ key: 'glassPanels', labelKey: 'look.glassPanels', icon: 'box' },
-	{ key: 'beacons', labelKey: 'look.beacons', icon: 'siren' }
+	{ key: 'glassPanels', labelKey: 'look.glassPanels', icon: 'box' }
+];
+
+/**
+ * Маячок — вибір із трьох, а не прапорець.
+ *
+ * «Тимчасовий» не є ні «увімкнено», ні «вимкнено»: він світить при появі пари й
+ * мовчить решту часу. Другий прапорець поруч із першим («маячки» + «лише
+ * тимчасово») означав би стан, у якому перший вимкнений, а другий про щось
+ * говорить, — і питання, що робити з такою парою, лишилося б читачеві.
+ */
+export const BEACON_OPTIONS: {
+	id: BeaconMode;
+	labelKey: TranslationKey;
+	icon: 'close' | 'quiet' | 'siren';
+}[] = [
+	{ id: 'off', labelKey: 'beacon.off', icon: 'close' },
+	{ id: 'temporary', labelKey: 'beacon.temporary', icon: 'quiet' },
+	{ id: 'always', labelKey: 'beacon.always', icon: 'siren' }
 ];
 
 export const THEME_OPTIONS: {

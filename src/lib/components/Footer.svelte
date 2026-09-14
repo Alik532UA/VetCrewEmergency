@@ -6,7 +6,14 @@
 	import { siblingUrl } from '$lib/siblings';
 	import { settings } from '$lib/services/settings.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
-	import { twin } from '$lib/utils/twinActions.svelte';
+	import { beaconRuns, twin, type TwinSighting } from '$lib/utils/twinActions.svelte';
+
+	/** Те саме, що в `Hero.svelte`: у тимчасовому режимі світить лише на екрані. */
+	let sighting = $state<TwinSighting>({ onScreen: false, times: 0 });
+	const lit = $derived(
+		settings.beacons === 'always' || (settings.beacons === 'temporary' && sighting.onScreen)
+	);
+	const runs = $derived(beaconRuns(settings.beacons, sighting.times));
 	import { handleEmailClick } from '$lib/utils/emailAction';
 
 	/**
@@ -61,10 +68,15 @@
 			</ul>
 		</div>
 
-		<div class="footer__col footer__col--actions" use:twin>
-			<HotlineButton testid="footer-hotline-btn" beacon />
+		<div
+			class="footer__col footer__col--actions"
+			use:twin={(s) => (sighting = s)}
+			style="--beacon-runs: {runs}"
+		>
+			<HotlineButton testid="footer-hotline-btn" beacon={lit} />
 			<a
 				class="footer__report"
+				class:footer__report--beacon={lit}
 				href={REPORT_URL}
 				target="_blank"
 				rel="noopener noreferrer"
@@ -253,12 +265,12 @@
 
 	/* Синій вогонь пари підвалу. Червоний бере кнопка над нею — розклад обох в
 	   одному циклі (`@keyframes` в `app.css`), тож світять по черзі, не разом. */
-	.footer__report {
+	.footer__report--beacon {
 		--beacon-glow: color-mix(in srgb, var(--beacon-blue), transparent var(--beacon-fade));
 		animation-name: beacon-b;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
-		animation-iteration-count: infinite;
+		animation-iteration-count: var(--beacon-runs);
 	}
 
 	.footer__report span {
