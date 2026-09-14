@@ -62,7 +62,6 @@ const BELOW_PROJECT_STANDARD = new Set([
 	'filter-size-large-btn',
 	'filter-status-all-btn',
 	'filter-status-available-btn',
-	'filter-status-adopted-btn',
 	// 51×34 flags in the about section. The grid is 110px wide by design and the
 	// same choice is offered by the language menu in the header, which is 44.
 	'about-flag-uk-link',

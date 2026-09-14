@@ -45,7 +45,7 @@ for (const path of PAGES) {
 }
 
 test('every interactive element can be reached by a stable locator', async ({ page }) => {
-	await page.goto('/adopt/cat');
+	await page.goto('/library');
 	await page.waitForLoadState('networkidle');
 
 	// A control with neither an accessible name nor a testid cannot be targeted in a

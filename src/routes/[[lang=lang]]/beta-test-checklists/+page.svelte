@@ -156,7 +156,13 @@
 	/* White on the accent, the same pairing every other hero on the site uses. */
 	.beta-hero {
 		background: var(--color-primary);
-		color: white;
+		/*
+		 * `--color-text`, а не `white`: `--color-primary` — це ПОВЕРХНЯ, і в світлій
+		 * темі вона майже біла (#e8efe6). Білий напис на ній давав 1.17:1 — заголовок
+		 * сторінки просто не було видно. Токен теми дає темний напис на світлій
+		 * поверхні й світлий на темній, тобто правильний в обох.
+		 */
+		color: var(--color-text);
 		padding: var(--space-xl) 0;
 	}
 

@@ -93,7 +93,10 @@ const settlePage = (page: import('@playwright/test').Page) =>
  * and came off it: the colours it was excluded for have been replaced by ones that
  * measure.
  */
-const OWNER_EXCEPTIONS = ['.animal-card--adopted'];
+// Порожній, і це стан, а не забутий рядок: тут лежав `.animal-card--adopted` —
+// клас adoptananimal, якого в цьому проєкті немає. Виняток для елемента, що не
+// існує, нічого не пропускає, зате читається як «щось тут свідомо не міряють».
+const OWNER_EXCEPTIONS: string[] = [];
 
 /** Someone else's document: axe cannot audit across the origin boundary, and what is
  *  inside is not ours to fix. */
@@ -269,7 +272,9 @@ for (const style of STYLES) {
 }
 
 test('the skip link reaches this page, not the home page', async ({ page }) => {
-	await page.goto('/adopt/cat');
+	// Будь-яка сторінка, КРІМ головної: у цьому й перевірка — посилання «до вмісту»
+	// мусить вести на цю сторінку, а не відкидати на головну.
+	await page.goto('/library');
 
 	await page.keyboard.press('Tab');
 	const skip = page.locator('.skip-link');
@@ -277,15 +282,16 @@ test('the skip link reaches this page, not the home page', async ({ page }) => {
 
 	await page.keyboard.press('Enter');
 	// It must stay on the same page — the bug it replaced sent keyboard users home.
-	await expect(page).toHaveURL(/\/adopt\/cat(#main-content)?$/);
+	await expect(page).toHaveURL(/\/library(#main-content)?$/);
 });
 
 test('the language pages declare their own language', async ({ page }) => {
 	for (const [path, lang] of [
 		['/', 'en'],
-		['/uk/adopt/cat', 'uk'],
-		['/de/apply', 'de'],
-		['/nl', 'nl']
+		['/', 'uk'],
+		['/library', 'uk'],
+		['/en', 'en'],
+		['/en/library', 'en']
 	] as const) {
 		await page.goto(path);
 		expect(await page.getAttribute('html', 'lang')).toBe(lang);
@@ -297,7 +303,7 @@ for (const theme of THEMES) {
 		// A closed menu has nothing to measure, so axe over the page as loaded said
 		// nothing about it. The active item paired --color-primary with a literal
 		// white, which is 2.14:1 on the dark theme's green.
-		await page.goto('/adopt/cat');
+		await page.goto('/');
 		await page.evaluate((t) => localStorage.setItem('vetcrewemergency_theme', t), theme);
 		await page.reload();
 
@@ -337,7 +343,7 @@ test('a dropdown can be operated and left with the keyboard alone', async ({ pag
 		}
 	});
 
-	await page.goto('/adopt/cat');
+	await page.goto('/');
 
 	// Одне меню на п'ять груп (тема, стиль, вигляд, маячки, мова) — відколи кнопки
 	// шапки зійшлися під кнопку «Налаштування». Перевіряється тут не вміст, а
