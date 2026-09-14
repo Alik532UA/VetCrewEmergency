@@ -61,7 +61,28 @@
 		</div>
 
 		<div class="footer__col footer__col--actions">
-			<HotlineButton testid="footer-hotline-btn" />
+			<!--
+				Пара в один рядок: подзвонити — і написати, не читаючи.
+
+				Друга кнопка без підпису навмисно. Той самий телеграм уже підписаний
+				нижче великою кнопкою, тож текст тут не пояснив би нічого нового, а
+				рядок із двох підписів сперечався б сам із собою. Назва в неї є, просто
+				не намальована: `aria-label` дає екранному читачеві те саме слово, що
+				стоїть на великій кнопці.
+			-->
+			<div class="footer__call">
+				<HotlineButton testid="footer-hotline-btn" />
+				<a
+					class="footer__write"
+					href={REPORT_URL}
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label={t('hero.report')}
+					data-testid="footer-write-btn"
+				>
+					<Icon name="telegram" size="1.5rem" />
+				</a>
+			</div>
 			<a
 				class="footer__report"
 				href={REPORT_URL}
@@ -214,9 +235,47 @@
 		gap: 0.75rem;
 	}
 
-	.footer__col--actions :global(.hotline),
 	.footer__report {
 		width: 100%;
+	}
+
+	/*
+	 * Смуга «подзвонити + написати».
+	 *
+	 * `align-items: stretch`, а не задана висота: квадратна кнопка бере висоту від
+	 * сусідки сама, і пара лишається однією смугою, хоч би що сталося з кеглем
+	 * номера всередині — а він там з двох рядків різного розміру.
+	 */
+	.footer__call {
+		display: flex;
+		align-items: stretch;
+		gap: 0.75rem;
+	}
+
+	/* Тягнеться, бо підпис у неї довгий і саме він задає ширину смуги. */
+	.footer__call :global(.hotline) {
+		flex: 1;
+	}
+
+	.footer__write {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+		/* Квадратна на вигляд, але не вужча за 44px — межа дотику в цьому проєкті
+		   (`tests/touch-targets.spec.ts`). */
+		width: 3.5rem;
+		min-width: 44px;
+		border-radius: var(--radius-lg);
+		/* Той самий синій, що й у великої кнопки нижче: це одна дія, показана двічі. */
+		background: var(--color-tertiary);
+		color: var(--color-text-on-tertiary);
+		text-decoration: none;
+		transition: background-color var(--transition-fast);
+	}
+
+	.footer__write:hover {
+		background: var(--color-tertiary-light);
 	}
 
 	.footer__report {
