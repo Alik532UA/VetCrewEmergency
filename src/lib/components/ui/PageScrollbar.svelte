@@ -243,9 +243,20 @@
 		const current = window.scrollY;
 		const remaining = scrollTarget - current;
 
-		if (Math.abs(remaining) < 0.5) {
+		/*
+		 * Ціль — дробова (частка від висоти сторінки), а місце, куди браузер уміє
+		 * поставити сторінку, — ні. Поріг у пів пікселя означав, що різниця в 0.6
+		 * не зникала НІКОЛИ: крок від неї виходив менший за піксель, сторінка не
+		 * рухалася, `remaining` лишався тим самим — і цикл крутився вічно.
+		 *
+		 * Вічний він був тихо, бо нічого не малював. Але щокадру видавав `scrollTo`,
+		 * а кожен такий виклик СКАСОВУЄ чужу плавну анімацію — і кнопка «нагору»
+		 * переставала працювати після будь-якої тяги смуги, назавжди до наступного
+		 * миттєвого скролу.
+		 */
+		if (Math.abs(remaining) < 1) {
 			window.scrollTo({ top: scrollTarget, behavior: 'instant' });
-			followApplied = scrollTarget;
+			followApplied = window.scrollY;
 			settling = false;
 			return;
 		}
@@ -255,6 +266,16 @@
 		// екранах.
 		const next = current + remaining * (1 - Math.exp(-dt / FOLLOW_TAU));
 		window.scrollTo({ top: next, behavior: 'instant' });
+
+		// Друга засувка, на випадок, якого перша не передбачила: сторінку попросили
+		// зрушити, і вона не зрушила. Далі просити нема сенсу — чи то доїхали, чи то
+		// впіймали край, і в обох випадках наступний кадр буде таким самим.
+		if (window.scrollY === current) {
+			followApplied = window.scrollY;
+			settling = false;
+			return;
+		}
+
 		followApplied = window.scrollY;
 		followFrame = requestAnimationFrame(follow);
 	}

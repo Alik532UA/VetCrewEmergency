@@ -109,6 +109,53 @@ test.describe('the scrollbar modes', () => {
 		expect(top).toBeGreaterThan(100);
 	});
 
+	test('a drag leaves nothing behind that kills the next smooth scroll', async ({ page }) => {
+		/*
+		 * Сторінка доїжджає за повзунком циклом `requestAnimationFrame`, і кожен його
+		 * кадр видає `scrollTo`. Цикл, що не спинився, нічого не малює — але кожен
+		 * такий виклик СКАСОВУЄ чужу плавну анімацію, і кнопка «нагору» після будь-якої
+		 * тяги переставала повертати сторінку. Назавжди: миттєвий скрол її «лікував»,
+		 * плавний — ні.
+		 *
+		 * Заміряно 2026-09-14: ціль доїзду дробова (частка від висоти сторінки), а
+		 * місце, куди браузер уміє поставити сторінку, — ні; поріг у пів пікселя
+		 * різниця в 0.6 не долала ніколи.
+		 */
+		await useMode(page, 'custom');
+		const bar = page.getByTestId('page-scrollbar-container');
+		await expect(bar).toBeVisible();
+
+		const box = (await bar.boundingBox())!;
+		const x = box.x + box.width / 2;
+		await page.mouse.move(x, 100);
+		await page.mouse.down();
+		await page.mouse.move(x, 420, { steps: 10 });
+		await page.mouse.up();
+
+		// Доїзд закінчується сам; поки він триває, наступна перевірка нічого не значила б.
+		let previous = Number.NaN;
+		await expect
+			.poll(
+				async () => {
+					const y = await page.evaluate(() => window.scrollY);
+					const still = y === previous;
+					previous = y;
+					return still;
+				},
+				{ timeout: 3000, intervals: [100] }
+			)
+			.toBe(true);
+		expect(await page.evaluate(() => window.scrollY), 'тяга нічого не зрушила').toBeGreaterThan(
+			200
+		);
+
+		// Те саме, що робить кнопка «нагору» (`+layout.svelte`), і те саме, що ламалося.
+		await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+		await expect
+			.poll(async () => page.evaluate(() => window.scrollY), { timeout: 3000 })
+			.toBeLessThan(5);
+	});
+
 	test('the schematic minimap draws the page as stripes', async ({ page }) => {
 		await useMode(page, 'minimap');
 
