@@ -28,8 +28,16 @@ class Settings {
 	/** The language the visitor last chose, used to offer their language on arrival. */
 	preferredLocale = $state<Locale | null>(null);
 
-	/** Playful by owner's choice; see the theme note below for why that is written here. */
-	style = $state<SiteStyle>('playful');
+	/**
+	 * Сучасний — вибір власника (2026-09-14), як і тема нижче.
+	 *
+	 * Це число живе ДВІЧІ: тут і в скрипті першого кадру `app.html`, який мусить
+	 * поставити `data-style` ще до гідрації — інакше перший кадр малюється без
+	 * жодного `--radius-*`, бо всі вони оголошені під `[data-style]`. Міняти
+	 * доводиться обидва разом; розійдуться — і сторінка стрибне формою кутів на
+	 * очах у читача.
+	 */
+	style = $state<SiteStyle>('modern');
 	favorites = $state<string[]>([]);
 
 	/*
@@ -50,8 +58,14 @@ class Settings {
 	glassButtons = $state(false);
 	/** Скляна заливка панелей, на яких лежать розділи. */
 	glassPanels = $state(false);
-	/** Проблискові маячки на парах кнопок. */
-	beacons = $state<BeaconMode>('always');
+	/**
+	 * Проблискові маячки на парах кнопок.
+	 *
+	 * Типово тимчасові (вибір власника, 2026-09-14): маячок нагадує про себе, коли
+	 * пара з'являється на екрані, і мовчить решту часу. Постійний лишився вибором,
+	 * а не станом за замовчуванням.
+	 */
+	beacons = $state<BeaconMode>('temporary');
 
 	/** Прапорець → ключ сховища → клас на `<html>`. Один перелік на всі три ролі. */
 	static readonly LOOKS = [
