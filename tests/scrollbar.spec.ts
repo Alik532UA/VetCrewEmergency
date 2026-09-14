@@ -312,6 +312,32 @@ test.describe('магніт бере лише те, що йому належит
 		await page.goto('/');
 	});
 
+	/**
+	 * Сайт живе під базовим шляхом (`svelte.config.js`, типово `/VetCrewEmergency`).
+	 *
+	 * `/` на нього перекидає сам, а `/library` — ні: це 404, і сторінка, де скрипт не
+	 * виконується взагалі. Перша редакція цих тестів саме туди й била, тобто доводила
+	 * «магніту немає» з геть іншої причини. Береться з самого перекидання, а не
+	 * пишеться числом, щоб збірка з порожнім `BASE_PATH` теж працювала.
+	 */
+	async function siteRoot(page: Page): Promise<string> {
+		await page.goto('/');
+		return new URL(page.url()).pathname.replace(/\/$/, '');
+	}
+
+	/**
+	 * Відкрити сторінку і дочекатися, поки КЛІЄНТ на ній ожив.
+	 *
+	 * `has-snap-scroll` вішає лише ефект у `+layout.svelte` — у першокадровому
+	 * скрипті `app.html` його немає. Без цього очікування перевірка «доводчик жесту
+	 * не взяв» проходила б і на негідрованій сторінці, де брати його нема кому.
+	 */
+	async function openHydrated(page: Page, path: string) {
+		const response = await page.goto(path);
+		expect(response?.status(), `${path} не відкрилася`).toBeLessThan(400);
+		await expect(page.locator('html'), `${path} не ожила`).toHaveClass(/has-snap-scroll/);
+	}
+
 	/** Проганяє жест і каже, які його події доводчик забрав собі. */
 	const gesture = (page: Page, deltas: number[], gapMs: number) =>
 		page.evaluate(
@@ -359,24 +385,32 @@ test.describe('магніт бере лише те, що йому належит
 		// ручна перевірка цього правила міряла 404-сторінку, де скрипт не виконується
 		// взагалі — «магніту немає» там було правдою з іншої причини. `page.goto`
 		// нижче йде через baseURL і 404 дав би падіння на самому `goto`.
-		for (const path of ['/library', '/stories', '/about', '/en/library']) {
-			const response = await page.goto(path);
-			expect(response?.status(), `${path} не відкрилася`).toBeLessThan(400);
+		const root = await siteRoot(page);
 
-			const taken = await gesture(page, [120], 0);
-			expect(taken, `доводчик магнітить на ${path}`).toEqual([false]);
+		// Спершу — що доводчик тут узагалі є: інакше «не магнітить» нижче нічого не
+		// доводить, бо так само мовчала б сторінка зі зламаним скриптом.
+		await openHydrated(page, `${root}/`);
+		expect(await gesture(page, [120], 0), 'доводчика немає й на головній').toEqual([true]);
+
+		for (const path of ['/library', '/stories', '/about', '/en/library']) {
+			await openHydrated(page, root + path);
+			expect(await gesture(page, [120], 0), `доводчик магнітить на ${path}`).toEqual([false]);
 		}
 	});
 
 	test('головна магнітить у кожній мові', async ({ page }) => {
+		const root = await siteRoot(page);
+
 		for (const path of ['/', '/en']) {
-			const response = await page.goto(path);
-			expect(response?.status(), `${path} не відкрилася`).toBeLessThan(400);
+			await openHydrated(page, root + path);
 			expect(await gesture(page, [120], 0), `на ${path} магніту немає`).toEqual([true]);
 		}
 	});
 
 	test('жест тачпада лишається у людини від початку й до кінця', async ({ page }) => {
+		// Гідрація перевіряється явно з тієї ж причини, що й вище: очікування на
+		// «жодної події не взято» справдилося б і на сторінці без живого скрипта.
+		await expect(page.locator('html')).toHaveClass(/has-snap-scroll/);
 		await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
 		// Справжній ривок двома пальцями: розгін із нуля, дробові дельти на початку,
