@@ -3,6 +3,9 @@
 	import HeaderMenuFooter from '$lib/components/header/HeaderMenuFooter.svelte';
 	import HeaderNavLinks from '$lib/components/header/HeaderNavLinks.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import { t } from '$lib/i18n';
+	import { REPORT_URL } from '$lib/config';
 
 	/**
 	 * One element in two shapes: a row of tabs across the bar, and the panel the burger
@@ -44,7 +47,25 @@
 		замість одного. Гірше, ніж хотілося б, і краще за прокручування всієї
 		сторінки до підвалу.
 	-->
-	<span class="header__hotline"><HotlineButton compact testid="header-hotline-btn" /></span>
+	<span class="header__actions">
+		<HotlineButton compact testid="header-hotline-btn" />
+		<!--
+			Друга дія пари — написати. Без підпису навмисно: у смузі поруч уже стоїть
+			номер із трьох рядків, і другий підпис перетворив би кут шапки на текст.
+			Назва в кнопки є, просто не намальована — `aria-label` віддає екранному
+			читачеві те саме слово, що стоїть на великій кнопці першого екрана.
+		-->
+		<a
+			class="header__write"
+			href={REPORT_URL}
+			target="_blank"
+			rel="noopener noreferrer"
+			aria-label={t('hero.report')}
+			data-testid="header-write-btn"
+		>
+			<Icon name="telegram" size="1.25rem" />
+		</a>
+	</span>
 
 	<HeaderMenuFooter {onNavigate} />
 </nav>
@@ -63,8 +84,29 @@
 		position: relative;
 	}
 
-	.header__hotline {
+	.header__actions {
 		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.header__write {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		/* Рівно межа дотику цього проєкту, і рівно висота компактної кнопки поруч:
+		   пара мусить читатися як одна смуга (`tests/touch-targets.spec.ts`). */
+		width: 44px;
+		height: 44px;
+		border-radius: var(--radius-lg);
+		background: var(--color-tertiary);
+		color: var(--color-text-on-tertiary);
+		text-decoration: none;
+		transition: background-color var(--transition-fast);
+	}
+
+	.header__write:hover {
+		background: var(--color-tertiary-light);
 	}
 
 	@media (max-width: 768px) {
@@ -76,7 +118,7 @@
 		   передостанній: у смузі його місце праворуч, а в стовпці — нагорі.
 		   Обгортка своя, а не клас самої кнопки: той належить HotlineButton, і
 		   правило, що спирається на чужу приватну назву, ламається мовчки. */
-		.header__nav--open .header__hotline {
+		.header__nav--open .header__actions {
 			order: -1;
 			display: flex;
 		}
