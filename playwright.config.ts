@@ -41,6 +41,24 @@ export default defineConfig({
 	webServer: {
 		command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
 		port: PORT,
+		/*
+		 * Збірка для тестів — БЕЗ базового шляху, і це не дрібниця конфігурації.
+		 *
+		 * `svelte.config.js` бере `process.env.BASE_PATH ?? '/VetCrewEmergency'`, тобто
+		 * незадана змінна дає НЕ порожній рядок, а справжній базовий шлях. Тоді сайт
+		 * живе під `/VetCrewEmergency`, `baseURL` нижче вказує на корінь, і кожен
+		 * `page.goto('/library')` потрапляє в 404 — сторінку, де скрипт не виконується
+		 * взагалі. Перевірки на ній не падали чесно, а перевіряли порожнечу: `main`
+		 * невидимий, `link[rel=alternate]` немає жодного, axe знаходить нуль порушень
+		 * на сторінці, якої нема.
+		 *
+		 * Коментар у `deploy.yml` стверджував, що «BASE_PATH порожній» саме тут —
+		 * стверджував і помилявся. Тепер це правда, бо записано явно.
+		 *
+		 * Ціна названа: дефекти САМОГО базового шляху цей набір не побачить. Їх ловить
+		 * `npm run check:build` над справжньою збіркою деплою, і ловить точніше.
+		 */
+		env: { BASE_PATH: '' },
 		// Never reuse: `vite preview` maps the output directory once at startup, so a
 		// server left over from an earlier build keeps serving that build and 404s the
 		// new hashed assets. The page then renders unstyled and axe reports a clean

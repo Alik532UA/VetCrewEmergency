@@ -37,35 +37,9 @@
 	transform: none;
 }
 
-/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
-   without it this ties with the component's own rule at equal specificity, and a
-   tie is settled by bundler order, which differs between dev and a build. */
-:root[data-style='minimal'] .animal-card {
-	background: var(--glass-bg);
-	-webkit-backdrop-filter: blur(var(--glass-blur));
-	backdrop-filter: blur(var(--glass-blur));
-}
-
 [data-style='minimal'] .badge {
 	background: var(--color-text) !important;
 	color: var(--color-bg) !important;
-}
-
-/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
-   without it this ties with the component's own rule at equal specificity, and a
-   tie is settled by bundler order, which differs between dev and a build. */
-:root[data-style='minimal'] .adoption-status-banner {
-	border-radius: 0;
-}
-
-/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
-   without it this ties with the component's own rule at equal specificity, and a
-   tie is settled by bundler order, which differs between dev and a build. */
-:root[data-style='minimal'] .filter-bar {
-	box-shadow: none;
-	background: var(--glass-bg);
-	-webkit-backdrop-filter: blur(var(--glass-blur));
-	backdrop-filter: blur(var(--glass-blur));
 }
 
 [data-style='minimal'] .hero {

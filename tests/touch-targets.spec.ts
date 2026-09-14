@@ -22,7 +22,20 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 const WCAG_MINIMUM = 24;
 const PROJECT_STANDARD = 44;
 
-const PAGES = ['/', '/adopt/dog', '/adopt/cat', '/favorites', '/apply'];
+const PAGES = [
+	'/',
+	'/library',
+	// Стаття, а не лише перелік: усередині інша розкладка — довгий текст, блоки
+	// «чого не можна», червона картка з гарячою лінією в кінці.
+	'/library/fawn',
+	'/stories',
+	'/stories/owl-broken-wing',
+	'/about',
+	'/support',
+	// Кета сторінку з індексу прибрано, але не з перевірки: саме на ній
+	// тестувальники проводять найбільше часу (BETA-CHECKLIST-v8 § 5.5).
+	'/beta-test-checklists'
+];
 
 const INTERACTIVE = 'button, a[href], input:not([type=hidden]), select, [role="button"]';
 

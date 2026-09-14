@@ -155,7 +155,7 @@ export function queuedPhoto(
 		 * image and fires an error; an absent src is simply no image yet.
 		 *
 		 * What the served HTML said is kept in `data-src` and never cleared. It is the only
-		 * record of which photograph this element was given, and `tests/ui.spec.ts` reads it
+		 * record of which photograph this element was given, and `tests/hero-background.spec.ts` reads it
 		 * to catch a card wearing another animal's face — the SSR value, deliberately, and
 		 * not the URL passed in here, which comes from the component and would agree with
 		 * itself even when hydration had paired the two up wrongly.

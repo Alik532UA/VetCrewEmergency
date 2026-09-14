@@ -8,14 +8,18 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = [
 	'/',
-	'/adopt/cat',
-	'/adopt/dog',
-	'/apply',
-	'/favorites',
-	'/uk',
-	'/uk/adopt/cat',
-	// Fifty-one items, each carrying four locators: if any of them shared an id this
-	// is the page where it would show, and nowhere else.
+	'/library',
+	// Стаття, а не лише перелік: усередині інша розкладка — довгий текст, блоки
+	// «чого не можна», червона картка з гарячою лінією в кінці.
+	'/library/fawn',
+	'/stories',
+	'/stories/owl-broken-wing',
+	'/about',
+	'/support',
+	// Кета сторінку з індексу прибрано, але не з перевірки: саме на ній
+	// тестувальники проводять найбільше часу (BETA-CHECKLIST-v8 § 5.5).
+	// Тридцять чотири пункти, кожен зі своїм локатором: якщо два колись збіглися б,
+	// це та сторінка, де було б видно, і більше ніде.
 	'/beta-test-checklists'
 ];
 

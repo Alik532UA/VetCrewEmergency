@@ -8,22 +8,29 @@ import { baselineFor, knownFor } from './a11y-baseline';
  * the theme nobody develops in is exactly the one that reaches users.
  */
 
-const THEMES = ['dark', 'light-green', 'orange-purple', 'winter'] as const;
+// Дві теми й два стилі — рівно ті, що проєкт пропонує в меню. Перелік прийшов із
+// adoptananimal, звідки копіювали цей файл, і називав чотири теми (`light-green`,
+// `orange-purple`, `winter`), яких тут немає жодної: перевірка ходила по темах, що
+// не існують, і падала на кожній.
+//
+// `minimal` лишився: він НЕ пропонується в меню (див. `menuOptions.ts`), але його
+// таблиця стилів і токени цілі, і поставлений руками він застосовується. Саме тому
+// його контраст варто міряти — інакше стиль, який можна ввімкнути, ніхто не
+// перевіряв би взагалі.
+const THEMES = ['dark', 'light'] as const;
 const STYLES = ['modern', 'minimal', 'playful'] as const;
 const PAGES = [
 	'/',
-	'/adopt/cat',
-	// The dog listing is not a copy of the cat one with other pictures — it holds
-	// different data, and the whole point of the note above is that the page nobody
-	// audits is the page that fails. Lighthouse measured it for the first time on
-	// 2026-08-26 and found two violations; this list is why neither showed up here.
-	'/adopt/dog',
-	'/adopt/cat/basti',
-	'/apply',
-	'/apply/form',
-	'/favorites',
-	// Kept out of the index, not out of the audit: it is the page testers spend the
-	// most time on, and BETA-CHECKLIST-v8 § 5.5 says so explicitly.
+	'/library',
+	// Стаття, а не лише перелік: усередині інша розкладка — довгий текст, блоки
+	// «чого не можна», червона картка з гарячою лінією в кінці.
+	'/library/fawn',
+	'/stories',
+	'/stories/owl-broken-wing',
+	'/about',
+	'/support',
+	// Кета сторінку з індексу прибрано, але не з перевірки: саме на ній
+	// тестувальники проводять найбільше часу (BETA-CHECKLIST-v8 § 5.5).
 	'/beta-test-checklists'
 ];
 
@@ -316,10 +323,25 @@ for (const theme of THEMES) {
 }
 
 test('a dropdown can be operated and left with the keyboard alone', async ({ page }) => {
+	/*
+	 * Ряд перемикачів у шапці схований до запуску сайту (`HeaderControls.svelte`) і
+	 * відкривається службовим жестом — сім натисків `H`. Прапорець ставиться напряму:
+	 * перевіряється клавіатурна поведінка МЕНЮ, і сім зайвих подій зробили б падіння
+	 * цього тесту неоднозначним.
+	 */
+	await page.addInitScript(() => {
+		try {
+			sessionStorage.setItem('vetcrewemergency_header_controls_visible', '1');
+		} catch {
+			/* приватний режим — перевірка нижче скаже, що меню не відкрилося */
+		}
+	});
+
 	await page.goto('/adopt/cat');
 
-	// Одне меню на три групи (тема, стиль, мова) — відколи три кнопки шапки зійшлися
-	// під кнопку «Налаштування». Перевіряється тут не вміст, а поведінка клавіатури.
+	// Одне меню на п'ять груп (тема, стиль, вигляд, маячки, мова) — відколи кнопки
+	// шапки зійшлися під кнопку «Налаштування». Перевіряється тут не вміст, а
+	// поведінка клавіатури.
 	await page.getByTestId('settings-toggle-btn').click();
 	// Focus moves into the menu, so the arrow keys have somewhere to start. First in the
 	// list is the theme the site opens in.

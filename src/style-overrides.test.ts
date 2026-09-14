@@ -28,7 +28,8 @@ import { join } from 'node:path';
  * winner — which is why this class of bug survives a green test suite and shows up
  * only when somebody opens dev and prod side by side.
  *
- * WHY STATIC AND NOT E2E. There is an e2e for this too (tests/skin-overrides.spec.ts),
+ * WHY STATIC AND NOT E2E. There WAS an e2e for this (tests/skin-overrides.spec.ts), deleted with the
+ * adoptananimal page and card it stood on;
  * and it is the stronger evidence — it measures the composed transform on the built
  * site. But it only covers the properties somebody thought to enumerate: three tests
  * for one class. This file covers the whole class for the price of one, without a

@@ -83,9 +83,9 @@
 - **Доступність (WCAG 2.2 AA):** семантичний HTML, клавіатурна доступність,
   `aria-label` для кнопок-піктограм, підтримка `prefers-reduced-motion`,
   skip-link у `+layout.svelte`. Автоперевірка — `tests/a11y.spec.ts`.
-- **Тести:** Vitest під `src/`, Playwright — **одинадцять** файлів у `tests/`
-  (`a11y`, `beta-checklist`, `fluid-sizing`, `i18n`, `journey`, `scrollbar`,
-  `skin-overrides`, `testids`, `toast`, `touch-targets`, `ui`). Playwright спершу робить
+- **Тести:** Vitest під `src/`, Playwright — **дев’ять** файлів у `tests/`
+  (`a11y`, `beta-checklist`, `fluid-sizing`, `hero-background`, `i18n`, `scrollbar`,
+  `testids`, `toast`, `touch-targets`). Playwright спершу робить
   `build`, тобто перевіряє **зібраний** сайт.
 - **Вердикт `npm run lint` — це код виходу, а не рядок у виводі.** Скрипт це
   `npm run lint:format && npm run lint:code`; коли падає prettier, ESLint не
@@ -101,7 +101,7 @@
 ```
 npm run check        # svelte-check, має бути 0 помилок
 npm run lint         # prettier --check + eslint, має бути 0 помилок
-npm run check:discovery # чи раннери досі беруть усі 50 + 11 файлів перевірок
+npm run check:discovery # чи раннери досі беруть усі 50 + 9 файлів перевірок
 npm test             # юніт-інваріанти (Vitest)
 npm run check:i18n   # паритет ключів у чотирьох мовах
 npm run build        # збірка

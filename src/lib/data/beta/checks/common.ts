@@ -13,8 +13,10 @@ export const commonChecks: readonly BetaCheck[] = [
 			en: 'Press the settings button in the header. One menu must open with three groups — theme, style, language — each showing the current choice; picking a theme changes the page colours at once.'
 		},
 		testid: 'settings-toggle-btn',
-		coverage: 'covered',
-		test: 'tests/ui.spec.ts'
+		// Було `covered` з посиланням на `tests/ui.spec.ts` — файл приїхав копією з
+		// adoptananimal, 89 із 95 його перевірок падали, і його видалено. Пункт
+		// перевіряється руками, як і має: жоден автотест його не робить.
+		coverage: 'testable'
 	},
 	{
 		id: 'common_15',
@@ -55,8 +57,11 @@ export const commonChecks: readonly BetaCheck[] = [
 			en: 'Find the “Style” group in the settings. There must be exactly two options; switching changes the corner shapes of buttons and cards and leaves the colours alone.'
 		},
 		testid: 'settings-toggle-btn',
-		coverage: 'covered',
-		test: 'tests/skin-overrides.spec.ts'
+		// `tests/skin-overrides.spec.ts` видалено разом із чужим `/adopt/cat` і
+		// `.animal-card`, на яких він стояв. Сама вимога — щоб скін перемагав власне
+		// правило компонента — лишилася під наглядом `src/style-overrides.test.ts`,
+		// але цей пункт про ВИГЛЯД кутів, і його дивляться очима.
+		coverage: 'testable'
 	},
 	{
 		id: 'common_5',
@@ -141,8 +146,7 @@ export const commonChecks: readonly BetaCheck[] = [
 			en: 'On a phone, press the menu button in the header. Items must be full-width rows, and the current page is marked by a white bar on the left as well as by colour.'
 		},
 		testid: 'mobile-menu-burger-btn',
-		coverage: 'covered',
-		test: 'tests/ui.spec.ts'
+		coverage: 'testable'
 	},
 	{
 		id: 'common_13',

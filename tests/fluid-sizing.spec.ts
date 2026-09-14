@@ -33,12 +33,15 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = [
 	'/',
-	'/adopt/dog',
-	'/adopt/cat',
-	'/favorites',
-	'/apply',
-	'/adopt/cat/basti',
-	// The longest text on the site sits here, in rows of vote buttons that wrap.
+	'/library',
+	// Стаття, а не лише перелік: усередині інша розкладка — довгий текст, блоки
+	// «чого не можна», червона картка з гарячою лінією в кінці.
+	'/library/fawn',
+	'/stories',
+	'/stories/owl-broken-wing',
+	'/about',
+	'/support',
+	// Найдовший текст на сайті — тут, у рядках кнопок, які переносяться.
 	'/beta-test-checklists'
 ];
 

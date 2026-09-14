@@ -1,69 +1,91 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * Switching language must keep the reader on the page they were reading, and every
- * link they follow afterwards must stay in that language. Getting this wrong is not
- * an error anyone sees in the console — the site simply drifts back to English.
+ * Перемикання мови мусить лишити читача на тій сторінці, яку він читав, а кожне
+ * посилання після цього — лишитися в обраній мові. Помилка тут не дає нічого в
+ * консолі: сайт просто тихо з'їжджає назад в українську.
+ *
+ * Файл приїхав копією з adoptananimal і був написаний під ЧОТИРИ мови (`de`, `nl`)
+ * та маршрути прилаштування — усі три перевірки падали на першому ж переході.
+ * Самі питання, які вони ставлять, від проєкту не залежать, тож переписано під
+ * дві мови цього сайту й справжні сторінки, а не видалено.
+ *
+ * Сайт живе під базовим шляхом, тож адреси порівнюються хвостом, а не цілком:
+ * `BASE_PATH` порожній у локальній збірці й `/VetCrewEmergency` на GitHub Pages,
+ * і жорстка адреса зробила б файл зеленим рівно в одному з двох місць.
  */
 
-test('switching language keeps the page and carries into later links', async ({ page }) => {
-	await page.goto('/adopt/cat/basti');
+/**
+ * Ряд перемикачів у шапці схований до запуску сайту й відкривається службовим
+ * жестом — сім натисків `H` (`HeaderControls.svelte`). Тест ставить прапорець
+ * напряму, а не імітує жест: перевіряється мова, а не спосіб дістатися до меню, і
+ * сім подій клавіатури зробили б падіння цього файлу неоднозначним.
+ */
+async function revealControls(page: import('@playwright/test').Page) {
+	await page.addInitScript(() => {
+		try {
+			sessionStorage.setItem('vetcrewemergency_header_controls_visible', '1');
+		} catch {
+			/* приватний режим — перевірка нижче скаже, що меню не відкрилося */
+		}
+	});
+}
+
+test('перемикання мови лишає ту саму сторінку', async ({ page }) => {
+	await revealControls(page);
+	await page.goto('/library/fawn');
 
 	// Мова живе в меню «Налаштування»; окремої кнопки мов більше немає.
 	await page.getByTestId('settings-toggle-btn').click();
-	const german = page.getByTestId('settings-option-lang-en-link');
+	const english = page.getByTestId('settings-option-lang-en-link');
 
-	// A real link, so it can be opened in a new tab and followed by a crawler.
-	await expect(german).toHaveAttribute('href', '/de/adopt/cat/basti');
-	await german.click();
+	// Справжнє посилання, а не кнопка: його мусить бути видно пошуковому роботу й
+	// можна відкрити в новій вкладці.
+	await expect(english).toHaveAttribute('href', /\/en\/library\/fawn$/);
+	await english.click();
 
-	await expect(page).toHaveURL(/\/de\/adopt\/cat\/basti$/);
+	await expect(page).toHaveURL(/\/en\/library\/fawn$/);
 
-	// Auto-retrying, not a one-shot read: on a client-side navigation the URL changes
-	// first and the attribute follows in an effect a frame later. Sampling immediately
-	// catches the old value roughly one run in five.
-	await expect(page.locator('html')).toHaveAttribute('lang', 'de');
-
-	await page.getByTestId('back-to-cats-link').click();
-	await expect(page).toHaveURL(/\/de\/adopt\/cat$/);
+	// З повторними спробами, а не одним зчитуванням: на клієнтському переході адреса
+	// міняється першою, а атрибут приходить ефектом кадром пізніше. Миттєве зчитування
+	// ловить старе значення приблизно раз на п'ять прогонів.
+	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
 
-test('the site chrome is in the same language as the page', async ({ page }) => {
-	// The bug this guards: prerendering runs every page in one process, so a language
-	// held in a module singleton leaked into the next page — a Ukrainian page came out
-	// with Dutch navigation.
-	for (const [path, expected] of [
-		['/uk', 'uk'],
-		['/de/adopt/dog', 'de'],
-		['/nl/apply', 'nl'],
-		['/favorites', 'en']
+test('обрамлення сторінки — тією ж мовою, що й сама сторінка', async ({ page }) => {
+	/*
+	 * Дефект, від якого це стереже: пререндер проганяє всі сторінки в ОДНОМУ процесі,
+	 * тож мова, залишена в модульному синглтоні, протікала на наступну сторінку —
+	 * українська сторінка виходила з англійською навігацією.
+	 */
+	for (const [path, lang, chrome] of [
+		['/', 'uk', 'Історії порятунку'],
+		['/en', 'en', 'Rescue stories'],
+		['/library', 'uk', 'Історії порятунку'],
+		['/en/library', 'en', 'Rescue stories']
 	] as const) {
 		await page.goto(path);
 
-		expect(await page.getAttribute('html', 'lang')).toBe(expected);
+		expect(await page.getAttribute('html', 'lang'), `${path} оголосила не ту мову`).toBe(lang);
 
-		const chromeLang = await page.evaluate(() => {
-			const logo = document.querySelector('.header__logo-text')?.textContent?.trim() ?? '';
-			return logo;
-		});
-
-		const byLanguage: Record<string, string> = {
-			en: 'Adopt an animal',
-			uk: 'Прихистити тварину',
-			de: 'Tier adoptieren',
-			nl: 'Adopteer een dier'
-		};
-		expect(chromeLang).toBe(byLanguage[expected]);
+		// `getByRole('banner')`, а не `locator('header')`: розділи сторінки теж мають
+		// власні `<header>` — на головній їх сім, — і простий локатор ламається на
+		// строгому режимі, не дійшовши до перевірки.
+		//
+		// Саме пункт навігації, а не заголовок сторінки: обрамлення й вміст приходять з
+		// різних місць, і протікала саме мова обрамлення.
+		await expect(page.getByRole('banner'), `${path}: шапка не тією мовою`).toContainText(chrome);
 	}
 });
 
-test('each language declares the others', async ({ page }) => {
-	await page.goto('/uk/adopt/cat');
+test('кожна мова оголошує решту', async ({ page }) => {
+	await page.goto('/library');
 
 	const alternates = await page.$$eval('link[rel="alternate"]', (links) =>
 		links.map((l) => ({ lang: l.getAttribute('hreflang'), href: l.getAttribute('href') }))
 	);
 
-	expect(alternates.map((a) => a.lang).sort()).toEqual(['de', 'en', 'nl', 'uk', 'x-default']);
+	expect(alternates.map((a) => a.lang).sort()).toEqual(['en', 'uk', 'x-default']);
+	// Абсолютні: відносний `hreflang` пошуковий робот просто не бере.
 	expect(alternates.every((a) => a.href?.startsWith('https://'))).toBe(true);
 });

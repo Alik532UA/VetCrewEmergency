@@ -36,62 +36,6 @@
 	box-shadow: var(--shadow-sm);
 }
 
-/* Modern, refined 'See All' button animation */
-[data-style='playful'] [data-testid='featured-see-all-link'] {
-	background: var(--color-primary);
-	color: white;
-	border: none;
-	padding: 16px 40px;
-	font-size: 1.1rem;
-	position: relative;
-	overflow: hidden;
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-[data-style='playful'] [data-testid='featured-see-all-link']::after {
-	content: '';
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 4px;
-	background: var(--glass-bg);
-	transform: scaleX(0);
-	transform-origin: right;
-	transition: transform 0.3s ease;
-}
-
-[data-style='playful'] [data-testid='featured-see-all-link']:hover {
-	background: var(--color-primary-dark);
-	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-[data-style='playful'] [data-testid='featured-see-all-link']:hover::after {
-	transform: scaleX(1);
-	transform-origin: left;
-}
-
-[data-style='playful'] [data-testid='featured-see-all-link']:active {
-	transform: scale(0.98);
-}
-
-/*
- * `:root` is load-bearing, not decoration — see the note above .animal-card:hover in
- * AnimalCard.svelte for the whole story.
- *
- * Short version: a skin is an override layer, so it has to outrank the component's own
- * hover. Without `:root` the two are both (0,3,0) — Svelte's scoping class quietly
- * makes the component's selector as specific as this one — and the winner is then
- * decided by whichever stylesheet the bundler happened to emit last. That differs
- * between dev and build, which is exactly how this rule worked in `npm run dev` and
- * silently did nothing on the deployed site.
- */
-:root[data-style='playful'] .animal-card:hover {
-	transform: scale(1.05) rotate(1.5deg);
-	border-color: transparent;
-}
-
 /*
  * What the plated title is written in, at rest and under the pointer.
  *
@@ -180,23 +124,4 @@
 	50% {
 		transform: translateY(-20px) scale(1.1);
 	}
-}
-
-/* `:root` for the reason spelled out beside .animal-card:hover in playful.css:
-   without it this ties with the component's own rule at equal specificity, and a
-   tie is settled by bundler order, which differs between dev and a build. */
-:root[data-style='playful'] .about__note {
-	border: none;
-	background: var(--glass-bg);
-	-webkit-backdrop-filter: blur(var(--glass-blur));
-	backdrop-filter: blur(var(--glass-blur));
-	box-shadow: var(--shadow-md);
-}
-
-[data-style='playful'] .about__flag {
-	transform: rotate(5deg);
-}
-
-[data-style='playful'] .about__flag:nth-child(even) {
-	transform: rotate(-5deg);
 }
