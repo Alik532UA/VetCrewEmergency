@@ -3,6 +3,7 @@
 	import { REPORT_URL } from '$lib/config';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
+	import { twin } from '$lib/utils/twinActions.svelte';
 	import heroPhoto from '$lib/assets/hero/hero-fawn-v02.webp';
 
 	/**
@@ -54,7 +55,7 @@
 			<p class="hero__tagline">{t('app.tagline')}</p>
 			<p class="hero__lead">{t('hero.text')}</p>
 
-			<div class="hero__actions">
+			<div class="hero__actions" use:twin>
 				<HotlineButton testid="hero-hotline-btn" beacon />
 				<!-- Веде в Telegram, а не на сторінку сайту: форми поки не буде (див.
 				 REPORT_URL у config.ts). -->

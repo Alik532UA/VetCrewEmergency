@@ -6,6 +6,7 @@
 	import { siblingUrl } from '$lib/siblings';
 	import { settings } from '$lib/services/settings.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
+	import { twin } from '$lib/utils/twinActions.svelte';
 	import { handleEmailClick } from '$lib/utils/emailAction';
 
 	/**
@@ -60,7 +61,7 @@
 			</ul>
 		</div>
 
-		<div class="footer__col footer__col--actions">
+		<div class="footer__col footer__col--actions" use:twin>
 			<HotlineButton testid="footer-hotline-btn" />
 			<a
 				class="footer__report"

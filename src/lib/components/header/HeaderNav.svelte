@@ -6,6 +6,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { t } from '$lib/i18n';
 	import { REPORT_URL } from '$lib/config';
+	import { twinActions } from '$lib/utils/twinActions.svelte';
 
 	/**
 	 * One element in two shapes: a row of tabs across the bar, and the panel the burger
@@ -20,6 +21,16 @@
 	}
 
 	let { open, onNavigate }: Props = $props();
+
+	/**
+	 * Шапка кричить лише тоді, коли більше нікому.
+	 *
+	 * Пару «подзвонити / написати» видно тричі за сторінку: тут, на першому екрані
+	 * й у підвалі. Поки видно будь-яку з двох інших — ці стоять контуром, бо
+	 * кричати над власною копією нема сенсу. Щойно обидві поїхали з екрана —
+	 * заливка й маячок, бо тепер це єдиний номер на видноті.
+	 */
+	const loud = $derived(!twinActions.visible);
 </script>
 
 <!--
@@ -48,7 +59,7 @@
 		сторінки до підвалу.
 	-->
 	<span class="header__actions">
-		<HotlineButton compact testid="header-hotline-btn" />
+		<HotlineButton compact testid="header-hotline-btn" beacon={loud} quiet={!loud} />
 		<!--
 			Друга дія пари — написати. Без підпису навмисно: у смузі поруч уже стоїть
 			номер із трьох рядків, і другий підпис перетворив би кут шапки на текст.
@@ -57,6 +68,8 @@
 		-->
 		<a
 			class="header__write"
+			class:header__write--quiet={!loud}
+			class:header__write--beacon={loud}
 			href={REPORT_URL}
 			target="_blank"
 			rel="noopener noreferrer"
@@ -99,14 +112,39 @@
 		width: 44px;
 		height: 44px;
 		border-radius: var(--radius-lg);
+		/* Прозорий контур є завжди — з тієї ж причини, що й у кнопки поруч: поява
+		   рамки в тихому вигляді інакше зсувала б смугу на чотири пікселі. */
+		border: var(--border-width-soft) solid transparent;
 		background: var(--color-tertiary);
 		color: var(--color-text-on-tertiary);
 		text-decoration: none;
-		transition: background-color var(--transition-fast);
+		/* Секунда на зміну вигляду, звичні мілісекунди на наведення — див. той самий
+		   прийом у `HotlineButton.svelte`. */
+		transition:
+			background-color 1s ease,
+			border-color 1s ease,
+			color 1s ease;
 	}
 
 	.header__write:hover {
 		background: var(--color-tertiary-light);
+		transition-duration: var(--transition-fast);
+	}
+
+	.header__write--quiet {
+		border-color: var(--beacon-blue);
+		background: transparent;
+		color: var(--color-text);
+	}
+
+	/* Синій вогонь пари. Червоний бере кнопка поруч — розклад обох в одному циклі
+	   (`@keyframes` в `app.css`). */
+	.header__write--beacon {
+		--beacon-glow: var(--beacon-blue);
+		animation-name: beacon-b;
+		animation-duration: calc(var(--beacon-flash) * 92);
+		animation-timing-function: steps(1, end);
+		animation-iteration-count: infinite;
 	}
 
 	@media (max-width: 768px) {
