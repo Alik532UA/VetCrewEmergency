@@ -161,6 +161,7 @@ export const uk = {
 	'saved.empty': 'Тут порожньо. Збережіть пораду з бібліотеки — і вона з’явиться тут.',
 	'saved.toLibrary': 'Перейти до бібліотеки',
 	'footer.title': 'Emergency',
+	'footer.orgSite': 'Сайт організації Vet Crew',
 	'footer.contacts': 'Контакти',
 	'footer.rights': 'Vet Crew Emergency Wildlife Response. Усі права захищені.',
 	'footer.play': 'Ігри Vet Crew',

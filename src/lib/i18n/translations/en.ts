@@ -160,6 +160,7 @@ export const en = {
 	'saved.empty': 'Nothing here yet. Save an article from the library and it will appear here.',
 	'saved.toLibrary': 'Go to the library',
 	'footer.title': 'Emergency',
+	'footer.orgSite': 'Vet Crew organisation website',
 	'footer.contacts': 'Contacts',
 	'footer.rights': 'Vet Crew Emergency Wildlife Response. All rights reserved.',
 	'footer.play': 'Vet Crew games',

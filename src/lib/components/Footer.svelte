@@ -2,7 +2,14 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { t } from '$lib/i18n';
 	import { withBase } from '$lib/utils/withBase';
-	import { SIDE_PROJECTS, CONTACT_EMAIL, ADDRESS, SOCIALS, REPORT_URL } from '$lib/config';
+	import {
+		SIDE_PROJECTS,
+		CONTACT_EMAIL,
+		ADDRESS,
+		SOCIALS,
+		REPORT_URL,
+		VETCREW_SITE
+	} from '$lib/config';
 	import { siblingUrl } from '$lib/siblings';
 	import { settings } from '$lib/services/settings.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
@@ -30,7 +37,17 @@
 	<div class="footer__content">
 		<div class="footer__brand">
 			<div class="footer__brand-head">
-				<img src={withBase('/images/logo/vetcrew.webp')} alt="" width="56" height="56" />
+				<!-- Логотип веде на сайт організації, а не на головну цього сайту: цей сайт —
+					 один із її проєктів, і знак належить їй. -->
+				<a
+					href={VETCREW_SITE}
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label={t('footer.orgSite')}
+					data-testid="footer-logo-link"
+				>
+					<img src={withBase('/images/logo/vetcrew.webp')} alt="" width="56" height="56" />
+				</a>
 				<ul class="footer__socials">
 					{#each SOCIALS as social (social.id)}
 						<li>
