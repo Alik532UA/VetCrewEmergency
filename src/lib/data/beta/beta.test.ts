@@ -255,4 +255,24 @@ describe('чеклист бета-тестування', () => {
 		);
 		expect(noBoundary, `вкладка без «не мусить»: ${noBoundary}`).toEqual([]);
 	});
+
+	/**
+	 * § 3.4 `BETA-LEVEL-BALANCE` — сильніша умова, ніж «хоч один manual».
+	 *
+	 * Контрольна група корисна доти, доки лишається групою, а не списком: кожен
+	 * `covered` витрачає час живої людини там, де автотест уже дивиться. Один
+	 * `manual` на вкладку рятує від найгіршого, але не від перекосу — а саме
+	 * перекіс і знайшов порівняльний прохід по дев'ятьох реалізаціях чеклиста.
+	 */
+	it('у вкладці covered не переважає manual (§ 3.4)', () => {
+		const skewed = BETA_TABS.map((tab) => {
+			const n = (level: string) => tab.checks.filter((c) => c.coverage === level).length;
+			return { id: tab.id, manual: n('manual'), covered: n('covered') };
+		}).filter((row) => row.covered > row.manual);
+
+		expect(
+			skewed.map((r) => `${r.id}: covered ${r.covered} > manual ${r.manual}`),
+			'контрольна група більша за роботу — половина часу людини йде туди, де тест уже дивиться'
+		).toEqual([]);
+	});
 });

@@ -28,7 +28,10 @@ test.describe('the beta checklist', () => {
 		await page.goto(PAGE);
 
 		await expect(page.getByTestId('beta-tab-common-btn')).toBeVisible();
-		await expect(page.getByTestId('beta-tab-favorites-btn')).toBeVisible();
+		// `library`, not `favorites`: this file arrived as a copy from the neighbouring
+		// project and named a tab this checklist has never had, so the case was red from
+		// the day it landed — a spec that cannot pass guards nothing.
+		await expect(page.getByTestId('beta-tab-library-btn')).toBeVisible();
 
 		// The order is the rule, not the decoration: a person spends themselves first
 		// where no machine exists (§ 3).
@@ -124,12 +127,18 @@ test.describe('the beta checklist', () => {
 		expect(report, 'the marked item, with the answer given').toContain(ITEM);
 	});
 
-	test('erasing the marks empties both the count and the storage', async ({ page }) => {
+	test('erasing takes two presses, and then empties count and storage', async ({ page }) => {
 		await page.goto(PAGE);
 		await page.getByTestId(`beta-check-${ITEM}-vote-ok-btn`).click();
+		const marked = await progress(page);
+
+		// § 6.3: erasing is the only irreversible action here, and it sits beside the
+		// button testers reach for every time. One press must only arm it.
+		await page.getByTestId('beta-clear-btn').click();
+		expect(await progress(page), 'one press wiped the whole session').toBe(marked);
+		expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).not.toBeNull();
 
 		await page.getByTestId('beta-clear-btn').click();
-
 		expect(await progress(page)).toMatch(/^0 \//);
 		expect(await page.evaluate((key) => localStorage.getItem(key), KEY)).toBeNull();
 	});
@@ -137,11 +146,14 @@ test.describe('the beta checklist', () => {
 	test('is reachable in every language and says so in the language of the URL', async ({
 		page
 	}) => {
-		await page.goto(`/uk${PAGE}`);
+		// Ukrainian has NO prefix here — it is the default language, and `/uk/...` is
+		// not a route at all. The copied version walked `/uk` and plain `/`, i.e. two
+		// addresses of which one did not exist and the other was not English.
+		await page.goto(PAGE);
 		await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
 		await expect(page.getByTestId('beta-tab-common-btn')).toContainText('Спільне');
 
-		await page.goto(PAGE);
+		await page.goto(`/en${PAGE}`);
 		await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 		await expect(page.getByTestId('beta-tab-common-btn')).toContainText('Shared');
 	});

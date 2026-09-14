@@ -169,5 +169,27 @@ export const commonChecks: readonly BetaCheck[] = [
 		testid: 'debug-log-copy-btn',
 		negative: true,
 		coverage: 'manual'
+	},
+	{
+		/*
+		 * Дописано при переході на канон 9.3 (§ 3.4, `BETA-LEVEL-BALANCE`): вкладка
+		 * мала 4 пункти для людини проти 5 покритих, тобто контрольна група була
+		 * більшою за роботу. Пункт написаний після читання `app.css` — коментар над
+		 * `@keyframes beacon-a` прямо каже, що під `prefers-reduced-motion` кадр
+		 * лишається без світла, — а не вигаданий під потрібне число.
+		 *
+		 * Машині це не віддати: наявний прогін Playwright уже йде з
+		 * `reducedMotion: 'reduce'` постійно, тож ПЕРЕМИКАННЯ між двома станами
+		 * там не відтворюється, а саме воно тут і перевіряється.
+		 */
+		id: 'common_16',
+		category: { uk: 'Рух', en: 'Motion' },
+		text: {
+			uk: 'Увімкніть у системі «зменшити рух» і відкрийте головну. Кнопка гарячої лінії мусить просто світитися рівно: проблисків бути НЕ мусить. Вимкніть налаштування й перезавантажте — проблиски мусять повернутися.',
+			en: 'Turn on reduced motion in your system and open the main page. The hotline button must simply glow steadily: there must be NO flashing. Turn the setting off, reload — and the flashing must come back.'
+		},
+		testid: 'hero-report-link',
+		negative: true,
+		coverage: 'manual'
 	}
 ];
