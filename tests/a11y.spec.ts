@@ -286,8 +286,9 @@ test('the skip link reaches this page, not the home page', async ({ page }) => {
 });
 
 test('the language pages declare their own language', async ({ page }) => {
+	// `/` — українська: типова мова йде без префікса. Рядок `['/', 'en']` тут лишався
+	// від adoptananimal, де без префікса була англійська.
 	for (const [path, lang] of [
-		['/', 'en'],
 		['/', 'uk'],
 		['/library', 'uk'],
 		['/en', 'en'],
@@ -303,12 +304,30 @@ for (const theme of THEMES) {
 		// A closed menu has nothing to measure, so axe over the page as loaded said
 		// nothing about it. The active item paired --color-primary with a literal
 		// white, which is 2.14:1 on the dark theme's green.
+		/*
+		 * Ряд перемикачів схований службовим жестом (`HeaderControls.svelte`), тож
+		 * прапорець ставиться напряму: міряється контраст меню, а не спосіб його
+		 * відкрити.
+		 */
+		await page.addInitScript(() => {
+			try {
+				sessionStorage.setItem('vetcrewemergency_header_controls_visible', '1');
+			} catch {
+				/* приватний режим — клік нижче скаже, що меню не відкрилося */
+			}
+		});
 		await page.goto('/');
 		await page.evaluate((t) => localStorage.setItem('vetcrewemergency_theme', t), theme);
 		await page.reload();
 
-		for (const menu of ['theme', 'style', 'lang']) {
-			await page.getByTestId(`${menu}-toggle-btn`).click();
+		/*
+		 * ОДНЕ меню, а не три. Тут стояв цикл по `theme-`, `style-` і `lang-toggle-btn`
+		 * — трьох кнопках, яких у цьому проєкті немає: тема, стиль і мова зійшлися під
+		 * «Налаштування» ще до того, як цей файл сюди скопіювали. Тест чекав на перший
+		 * локатор тридцять секунд і падав, так і не дійшовши до axe.
+		 */
+		{
+			await page.getByTestId('settings-toggle-btn').click();
 			await expect(page.getByRole('menu')).toBeVisible();
 			await settle(page.getByRole('menu'));
 
@@ -319,7 +338,7 @@ for (const theme of THEMES) {
 
 			expect(
 				results.violations.flatMap((v) =>
-					v.nodes.map((n) => `${theme}/${menu}: ${v.id} ${n.target}`)
+					v.nodes.map((n) => `${theme}/settings: ${v.id} ${n.target}`)
 				)
 			).toEqual([]);
 

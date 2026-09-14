@@ -42,7 +42,9 @@ export const libraryChecks: readonly BetaCheck[] = [
 			uk: 'Натисніть будь-яке посилання в блоці «Схожі статті». Сторінка мусить відкритися, а не віддати «не знайдено».',
 			en: 'Press any link in the “Related articles” block. The page must open rather than return a “not found”.'
 		},
-		testid: 'article-related-link',
+		// Перелік, а не окреме посилання: у кожного з них тепер власний локатор із
+		// гаслом статті, бо один спільний робив E2E-локатори недетермінованими.
+		testid: 'article-related-list',
 		coverage: 'testable'
 	},
 	{

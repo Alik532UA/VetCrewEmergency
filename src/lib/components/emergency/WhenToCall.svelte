@@ -60,7 +60,11 @@
 		<li class="case" style="--case-accent: {item.tint}" data-testid="when-{item.id}-card">
 			<div class="case__head">
 				<span class="case__icon" aria-hidden="true"><Icon name={item.icon} size="1.6rem" /></span>
-				<h3 class="case__title">{t(item.title)}</h3>
+				<!-- `h2`, а не `h3`: у цього розділу немає видимого заголовка (ім'я дає
+					 `aria-label`), тож картки йдуть одразу під `h1` першого екрана. `h3`
+					 перестрибував рівень, і axe називав це `heading-order` — те саме, що
+					 Lighthouse рахує проти 0.95. -->
+				<h2 class="case__title">{t(item.title)}</h2>
 			</div>
 			<p class="case__text">{t(item.text)}</p>
 		</li>

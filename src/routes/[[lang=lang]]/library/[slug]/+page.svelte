@@ -61,10 +61,16 @@
 	{#if related.length > 0}
 		<section class="block">
 			<h2>{t('library.related')}</h2>
-			<ul class="related">
+			<ul class="related" data-testid="article-related-list">
 				{#each related as r (r.slug)}
 					<li>
-						<a href={localePath(`/library/${r.slug}`, lang)} data-testid="article-related-link">
+						<!-- Локатор із гаслом статті: один `article-related-link` на всі три
+							 посилання робив кожен E2E-локатор, що його бере, недетермінованим —
+							 саме це й ловить `tests/testids.spec.ts`. -->
+						<a
+							href={localePath(`/library/${r.slug}`, lang)}
+							data-testid="article-related-{r.slug}-link"
+						>
 							<span aria-hidden="true">{r.emoji}</span>
 							{r.title[lang]}
 						</a>
