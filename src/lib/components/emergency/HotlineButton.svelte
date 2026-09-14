@@ -83,7 +83,7 @@
 		 */
 		--btn-tint: var(--color-secondary);
 		--btn-tint-hover: var(--color-secondary-light);
-		background: var(--btn-tint);
+		background: color-mix(in srgb, var(--btn-tint) var(--btn-fill), transparent);
 		color: var(--color-text-on-secondary);
 		text-decoration: none;
 		font-family: var(--font-accent);
@@ -118,7 +118,7 @@
 	 * й 7.16:1 у світлій, тобто наведення нічого не коштує читомості.
 	 */
 	.hotline:hover {
-		background: var(--btn-tint-hover);
+		background: color-mix(in srgb, var(--btn-tint-hover) var(--btn-fill), transparent);
 	}
 
 	/* Червоний вогонь пари: шість позицій із десяти. Сині чотири бере кнопка

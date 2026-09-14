@@ -123,7 +123,7 @@
 		/* Свій колір — змінною: див. `--btn-tint` у `HotlineButton.svelte`. */
 		--btn-tint: var(--color-tertiary);
 		--btn-tint-hover: var(--color-tertiary-light);
-		background: var(--btn-tint);
+		background: color-mix(in srgb, var(--btn-tint) var(--btn-fill), transparent);
 		color: var(--color-text-on-tertiary);
 		text-decoration: none;
 		/* Секунда на зміну вигляду, звичні мілісекунди на наведення — див. той самий
@@ -135,7 +135,7 @@
 	}
 
 	.header__write:hover {
-		background: var(--btn-tint-hover);
+		background: color-mix(in srgb, var(--btn-tint-hover) var(--btn-fill), transparent);
 		transition-duration: var(--transition-fast);
 	}
 
