@@ -73,7 +73,17 @@
 		gap: 0.75rem;
 		padding: 0.9rem 1.4rem;
 		border-radius: var(--radius-lg);
-		background: var(--color-secondary);
+		/*
+		 * Власний колір кнопки — змінною, а не прямо в `background`.
+		 *
+		 * Скляний вигляд (`base.css`, `html.glass-buttons`) робить із заливки
+		 * напівпрозору, і без цієї змінної йому нічого було б розбавляти, крім
+		 * нейтрального кольору картки — тоді червона кнопка й синя ставали
+		 * однаковими сірими плитками. Пара тримається на тому, що вони різні.
+		 */
+		--btn-tint: var(--color-secondary);
+		--btn-tint-hover: var(--color-secondary-light);
+		background: var(--btn-tint);
 		color: var(--color-text-on-secondary);
 		text-decoration: none;
 		font-family: var(--font-accent);
@@ -108,7 +118,7 @@
 	 * й 7.16:1 у світлій, тобто наведення нічого не коштує читомості.
 	 */
 	.hotline:hover {
-		background: var(--color-secondary-light);
+		background: var(--btn-tint-hover);
 	}
 
 	/* Червоний вогонь пари: шість позицій із десяти. Сині чотири бере кнопка

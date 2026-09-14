@@ -210,14 +210,17 @@
 		 * заливки, не від лінії: дві суцільні кнопки різного кольору нарешті
 		 * кажуть «подзвонити АБО написати», а не «головне і додаткове».
 		 */
-		background: var(--color-tertiary);
+		/* Свій колір — змінною: див. `--btn-tint` у `HotlineButton.svelte`. */
+		--btn-tint: var(--color-tertiary);
+		--btn-tint-hover: var(--color-tertiary-light);
+		background: var(--btn-tint);
 		color: var(--color-text-on-tertiary);
 		text-decoration: none;
 		transition: background-color var(--transition-fast);
 	}
 
 	.hero__report:hover {
-		background: var(--color-tertiary-light);
+		background: var(--btn-tint-hover);
 	}
 
 	/*

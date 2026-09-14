@@ -120,7 +120,10 @@
 		/* Прозорий контур є завжди — з тієї ж причини, що й у кнопки поруч: поява
 		   рамки в тихому вигляді інакше зсувала б смугу на чотири пікселі. */
 		border: var(--border-width-soft) solid transparent;
-		background: var(--color-tertiary);
+		/* Свій колір — змінною: див. `--btn-tint` у `HotlineButton.svelte`. */
+		--btn-tint: var(--color-tertiary);
+		--btn-tint-hover: var(--color-tertiary-light);
+		background: var(--btn-tint);
 		color: var(--color-text-on-tertiary);
 		text-decoration: none;
 		/* Секунда на зміну вигляду, звичні мілісекунди на наведення — див. той самий
@@ -132,7 +135,7 @@
 	}
 
 	.header__write:hover {
-		background: var(--color-tertiary-light);
+		background: var(--btn-tint-hover);
 		transition-duration: var(--transition-fast);
 	}
 

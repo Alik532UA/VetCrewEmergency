@@ -108,6 +108,19 @@
 	 * потрібна інша, а не полювання на копії `--beacon-red` по компонентах.
 	 */
 	--beacon-fade: 0%;
+
+	/*
+	 * Скільки СВОГО кольору лишається кнопці під склом.
+	 *
+	 * Не менше: скло тим прозоріше, чим менше це число, але разом із кольором іде
+	 * й контраст напису — а напис тут це номер телефону.
+	 *
+	 * 70 не на око. Заміряно НАМАЛЬОВАНИЙ піксель, а не оголошений колір: у темній
+	 * темі білий напис дає 15.6:1 на червоній і 15.2:1 на синій, у світлій — 4.80:1
+	 * і 4.82:1. Світла тема і є межа: там запас над AA менший за третину пункта, і
+	 * будь-яке менше число заганяє номер телефону під поріг.
+	 */
+	--glass-tint: 70%;
 }
 
 /*
@@ -148,12 +161,24 @@ html.glass-buttons .hotline:not(.hotline--quiet),
 html.glass-buttons .hero__report,
 html.glass-buttons .footer__report,
 html.glass-buttons .header__write:not(.header__write--quiet) {
-	background: var(--glass-bg);
+	background: color-mix(in srgb, var(--btn-tint) var(--glass-tint), transparent);
 	-webkit-backdrop-filter: blur(var(--glass-blur));
 	backdrop-filter: blur(var(--glass-blur));
-	/* Напис — кольором сторінки: крізь скло видно те, що позаду, і білий по-різному
-	   читається залежно від того, що саме там опинилося. */
-	color: var(--color-text);
+}
+
+/*
+ * Наведення мусить долати скло.
+ *
+ * Правило вище важче за `:hover` самої кнопки (той живе в компоненті й має на
+ * клас менше), тож зі склом кнопка переставала озиватися на курсор зовсім. Тут
+ * той самий розчин, але від світлішого відтінку — і вага на `:hover` більша, ніж
+ * у правила над ним.
+ */
+html.glass-buttons .hotline:not(.hotline--quiet):hover,
+html.glass-buttons .hero__report:hover,
+html.glass-buttons .footer__report:hover,
+html.glass-buttons .header__write:not(.header__write--quiet):hover {
+	background: color-mix(in srgb, var(--btn-tint-hover) var(--glass-tint), transparent);
 }
 
 html.glass-panels .panel {
