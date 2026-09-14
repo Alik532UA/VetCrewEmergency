@@ -9,7 +9,10 @@
 	import { t } from '$lib/i18n';
 	import { splitLocale } from '$lib/i18n/locales';
 	import { settings, type Locale, type SiteStyle, type Theme } from '$lib/services/settings.svelte';
-	import { LOCALE_OPTIONS, STYLE_OPTIONS, THEME_OPTIONS } from './menuOptions';
+	import { LOCALE_OPTIONS, LOOK_OPTIONS, STYLE_OPTIONS, THEME_OPTIONS } from './menuOptions';
+
+	/** Ключ прапорця вигляду — той самий перелік, що в `menuOptions`. */
+	type LookKey = (typeof LOOK_OPTIONS)[number]['key'];
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import DropdownMenu from '$lib/components/ui/DropdownMenu.svelte';
 
@@ -72,6 +75,7 @@
 	const THEME_PREFIX = 'theme-';
 	const STYLE_PREFIX = 'style-';
 	const LANG_PREFIX = 'lang-';
+	const LOOK_PREFIX = 'look-';
 
 	/*
 	 * Close on any outside click. In an $effect so the listener leaves with the component
@@ -151,6 +155,15 @@
 				group: t('settings.style'),
 				active: settings.style === style.id
 			})),
+			...LOOK_OPTIONS.map((look) => ({
+				id: `${LOOK_PREFIX}${look.key}`,
+				label: t(look.labelKey),
+				group: t('settings.look'),
+				// `toggle` міняє роль пункта на `menuitemcheckbox`: увімкнений перемикач
+				// і обрана тема інакше оголошувалися б читалці однаково.
+				toggle: true,
+				active: settings[look.key]
+			})),
 			...LOCALE_OPTIONS.map((locale) => ({
 				id: `${LANG_PREFIX}${locale.id}`,
 				label: locale.label,
@@ -168,6 +181,13 @@
 				settings.setStyle(id.slice(STYLE_PREFIX.length) as SiteStyle);
 			else if (id.startsWith(LANG_PREFIX))
 				settings.setLocale(id.slice(LANG_PREFIX.length) as Locale);
+			else if (id.startsWith(LOOK_PREFIX)) {
+				settings.toggleLook(id.slice(LOOK_PREFIX.length) as LookKey);
+				// Меню лишається відкритим: чотири перемикачі вмикають, дивлячись на
+				// сторінку, і закриття після кожного означало б чотири відкривання
+				// підряд, щоб порівняти.
+				return;
+			}
 			openMenu = null;
 		}}
 		onPreview={(id) =>
@@ -182,6 +202,16 @@
 			{#if item.id.startsWith(THEME_PREFIX)}
 				<Icon
 					name={THEME_OPTIONS.find((x) => `${THEME_PREFIX}${x.id}` === item.id)?.icon ?? 'moon'}
+					size="1.1rem"
+				/>
+			{:else if item.id.startsWith(LOOK_PREFIX)}
+				<!--
+					Позначка «увімкнено» — підсвітка пункта, як і скрізь у цьому меню; сама
+					іконка називає, ЩО саме перемикають. Читалці стан каже `aria-checked`,
+					а не колір.
+				-->
+				<Icon
+					name={LOOK_OPTIONS.find((x) => `${LOOK_PREFIX}${x.key}` === item.id)?.icon ?? 'view'}
 					size="1.1rem"
 				/>
 			{:else if item.id.startsWith(STYLE_PREFIX)}

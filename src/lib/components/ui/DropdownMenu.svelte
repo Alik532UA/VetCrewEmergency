@@ -20,6 +20,15 @@
 		href?: string;
 		hreflang?: string;
 		active: boolean;
+		/**
+		 * Пункт не обирає з-поміж інших, а вмикає й вимикає сам себе.
+		 *
+		 * Міняє не вигляд, а РОЛЬ: `menuitemcheckbox` замість `menuitem`, і разом з
+		 * нею `aria-checked`. Без цього читалка оголошувала б увімкнений перемикач
+		 * так само, як обрану тему, — «вибрано», — і сказати, що його можна вимкнути,
+		 * було б нічим.
+		 */
+		toggle?: boolean;
 	}
 
 	interface Props {
@@ -94,7 +103,11 @@
 	 */
 	function handleKeydown(event: KeyboardEvent) {
 		const menu = event.currentTarget as HTMLElement;
-		const entries = [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')];
+		// Обидві ролі: перемикачі стоять у тому самому переліку, і стрілка мусить
+		// проходити крізь них, а не спинятися на межі груп.
+		const entries = [
+			...menu.querySelectorAll<HTMLElement>('[role="menuitem"], [role="menuitemcheckbox"]')
+		];
 		const index = entries.indexOf(document.activeElement as HTMLElement);
 
 		switch (event.key) {
@@ -124,7 +137,7 @@
 
 	/** Moves focus into the menu as it opens, so the arrow keys have somewhere to start. */
 	function focusFirstItem(node: HTMLElement) {
-		node.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+		node.querySelector<HTMLElement>('[role="menuitem"], [role="menuitemcheckbox"]')?.focus();
 	}
 
 	let anchorElement: HTMLElement | undefined = $state();
@@ -246,10 +259,19 @@
 					<button
 						class="dropdown__item"
 						class:dropdown__item--active={item.active}
-						onclick={() => onselect(item.id)}
+						onclick={(event) => {
+							// Перемикач лишає меню відкритим — але закриває меню слухач на
+							// `window`, той самий, що ловить клік повз нього. Решта пунктів
+							// закривається й так, тож досі це нікому не заважало; тут же клік
+							// зачиняв би меню всупереч наміру, і перемикачі довелося б
+							// відкривати по одному.
+							if (item.toggle) event.stopPropagation();
+							onselect(item.id);
+						}}
 						onpointerenter={(e) => previewOn(item.id, e)}
 						onpointerleave={previewOff}
-						role="menuitem"
+						role={item.toggle ? 'menuitemcheckbox' : 'menuitem'}
+						aria-checked={item.toggle ? item.active : undefined}
 						data-menu-key={item.id}
 						data-testid="{testId}-option-{item.id}-btn"
 					>

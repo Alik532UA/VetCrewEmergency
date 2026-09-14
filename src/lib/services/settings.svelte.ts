@@ -25,6 +25,35 @@ class Settings {
 	style = $state<SiteStyle>('playful');
 	favorites = $state<string[]>([]);
 
+	/*
+	 * ВИГЛЯД, ЩО ПЕРЕМИКАЄТЬСЯ ВРУЧНУ.
+	 *
+	 * Чотири незалежні прапорці, а не п'ятий «стиль»: стиль — це цілісний набір
+	 * рішень, і кожна нова пара значень подвоювала б їхню кількість. Тут же людина
+	 * вимикає рівно те, що їй заважає, і решта лишається як була.
+	 *
+	 * Типові значення — те, як сайт виглядає СЬОГОДНІ: рамки й маячки є, скла
+	 * немає. Так перше відкриття нічим не відрізняється від попереднього, а
+	 * перемикач лишається вибором, а не зміною за людину.
+	 */
+
+	/** Облямівки по всьому сайту. */
+	borders = $state(true);
+	/** Скляна заливка кнопок «телефонувати» і «написати». */
+	glassButtons = $state(false);
+	/** Скляна заливка панелей, на яких лежать розділи. */
+	glassPanels = $state(false);
+	/** Проблискові маячки на парах кнопок. */
+	beacons = $state(true);
+
+	/** Прапорець → ключ сховища → клас на `<html>`. Один перелік на всі три ролі. */
+	static readonly LOOKS = [
+		{ key: 'borders', css: 'no-borders', on: false },
+		{ key: 'glassButtons', css: 'glass-buttons', on: true },
+		{ key: 'glassPanels', css: 'glass-panels', on: true },
+		{ key: 'beacons', css: 'no-beacons', on: false }
+	] as const;
+
 	private themes: Theme[] = ['dark', 'light'];
 	private styles: SiteStyle[] = ['modern', 'minimal', 'playful'];
 
@@ -71,6 +100,16 @@ class Settings {
 				this.style = savedStyle;
 			}
 
+			/*
+			 * Вигляд. Читається порівнянням із рядком, а не `Boolean(...)`: у сховищі
+			 * лежить `'true'`/`'false'`, і будь-який непорожній рядок — зокрема
+			 * `'false'` — у булеве перетворення приходить істиною.
+			 */
+			for (const look of Settings.LOOKS) {
+				const saved = storage.get(look.key);
+				if (saved === 'true' || saved === 'false') this[look.key] = saved === 'true';
+			}
+
 			// Favorites
 			const savedFavs = storage.getJSON<string[]>('favorites');
 			if (savedFavs) {
@@ -113,7 +152,30 @@ class Settings {
 					storage.setJSON('favorites', $state.snapshot(this.favorites));
 				}
 			});
+
+			/*
+			 * Вигляд — і в сховище, і на `<html>`, одним ефектом.
+			 *
+			 * Клас вішається за ВІДХИЛЕННЯМ від типового (`no-borders`, `glass-panels`),
+			 * а не за станом: сторінка без жодного класу виглядає рівно так, як
+			 * виглядала до появи цих перемикачів, і перший кадр до гідрації не
+			 * доводиться нічим лагодити.
+			 */
+			$effect(() => {
+				if (!browser) return;
+				for (const look of Settings.LOOKS) {
+					const value = this[look.key];
+					storage.set(look.key, String(value));
+					document.documentElement.classList.toggle(look.css, value === look.on);
+				}
+			});
 		});
+	}
+
+	/** Перемикає один із чотирьох прапорців вигляду. */
+	toggleLook(key: (typeof Settings.LOOKS)[number]['key']) {
+		this[key] = !this[key];
+		logService.info('ui', `Look ${key}: ${this[key]}`);
 	}
 
 	toggleTheme() {

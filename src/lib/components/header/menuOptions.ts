@@ -35,6 +35,26 @@ export const STYLE_OPTIONS: {
 	{ id: 'modern', labelKey: 'style.modern', icon: 'sparkles' }
 ];
 
+/**
+ * Що саме можна вимкнути у вигляді сайту.
+ *
+ * Не «стиль»: стиль — це цілісний набір рішень, і кожна нова пара значень
+ * подвоювала б їхню кількість. Тут людина вимикає рівно те, що їй заважає.
+ *
+ * `key` збігається з назвою прапорця в `settings.svelte.ts` — переліку в двох
+ * місцях немає, звідси ж береться й ключ сховища, і клас на `<html>`.
+ */
+export const LOOK_OPTIONS: {
+	key: 'borders' | 'glassButtons' | 'glassPanels' | 'beacons';
+	labelKey: TranslationKey;
+	icon: 'view' | 'sparkles' | 'box' | 'siren';
+}[] = [
+	{ key: 'borders', labelKey: 'look.borders', icon: 'view' },
+	{ key: 'glassButtons', labelKey: 'look.glassButtons', icon: 'sparkles' },
+	{ key: 'glassPanels', labelKey: 'look.glassPanels', icon: 'box' },
+	{ key: 'beacons', labelKey: 'look.beacons', icon: 'siren' }
+];
+
 export const THEME_OPTIONS: {
 	id: Theme;
 	labelKey: TranslationKey;
