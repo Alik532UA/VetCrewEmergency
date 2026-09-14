@@ -229,7 +229,7 @@
 	 * мовчала, у середині її тиші відстрілювалася друга, і пара блимала без упину.
 	 */
 	.hero__report {
-		--beacon-glow: var(--beacon-blue);
+		--beacon-glow: color-mix(in srgb, var(--beacon-blue), transparent var(--beacon-fade));
 		animation-name: beacon-b;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);

@@ -62,7 +62,7 @@
 		</div>
 
 		<div class="footer__col footer__col--actions" use:twin>
-			<HotlineButton testid="footer-hotline-btn" />
+			<HotlineButton testid="footer-hotline-btn" beacon />
 			<a
 				class="footer__report"
 				href={REPORT_URL}
@@ -213,6 +213,9 @@
 		flex-direction: column;
 		align-items: stretch;
 		gap: 0.75rem;
+		/* Те саме приглушення, що й у шапці: підвал читають уже спокійно, дочитавши
+		   сторінку, і повна сила світла тут була б криком навздогін. */
+		--beacon-fade: 50%;
 	}
 
 	.footer__col--actions :global(.hotline),
@@ -243,6 +246,16 @@
 
 	.footer__report:hover {
 		background: var(--color-tertiary-light);
+	}
+
+	/* Синій вогонь пари підвалу. Червоний бере кнопка над нею — розклад обох в
+	   одному циклі (`@keyframes` в `app.css`), тож світять по черзі, не разом. */
+	.footer__report {
+		--beacon-glow: color-mix(in srgb, var(--beacon-blue), transparent var(--beacon-fade));
+		animation-name: beacon-b;
+		animation-duration: calc(var(--beacon-flash) * 92);
+		animation-timing-function: steps(1, end);
+		animation-iteration-count: infinite;
 	}
 
 	.footer__report span {

@@ -115,7 +115,7 @@
 	   «повідомити» тією ж тривалістю й без затримки — розклад у них спільний
 	   (`@keyframes` в `app.css`). */
 	.hotline--beacon {
-		--beacon-glow: var(--beacon-red);
+		--beacon-glow: color-mix(in srgb, var(--beacon-red), transparent var(--beacon-fade));
 		/* Довгою формою, а не скороченням: `calc()` у скороченні `animation`
 		   розбирають не всі рушії, і помилка там ковтає ВСІ інші її частини. */
 		animation-name: beacon-a;

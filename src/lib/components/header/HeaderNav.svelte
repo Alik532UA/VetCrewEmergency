@@ -101,6 +101,9 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+		/* Удвічі слабше за перший екран: кнопки тут дрібні й стоять упритул до
+		   пунктів меню, і повна сила світла читалася б як несправність смуги. */
+		--beacon-fade: 50%;
 	}
 
 	.header__write {
@@ -140,7 +143,7 @@
 	/* Синій вогонь пари. Червоний бере кнопка поруч — розклад обох в одному циклі
 	   (`@keyframes` в `app.css`). */
 	.header__write--beacon {
-		--beacon-glow: var(--beacon-blue);
+		--beacon-glow: color-mix(in srgb, var(--beacon-blue), transparent var(--beacon-fade));
 		animation-name: beacon-b;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
