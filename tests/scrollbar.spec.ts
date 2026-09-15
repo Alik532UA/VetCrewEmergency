@@ -1,4 +1,4 @@
-import { devices, expect, test, type Page } from '@playwright/test';
+import { devices, expect, test, type Page, blockAnalytics } from './fixtures';
 
 /**
  * The four scrollbar modes (SCROLLBAR-v8 § 11).
@@ -477,6 +477,7 @@ test.describe('магніт бере лише те, що йому належит
 			hasTouch: true,
 			isMobile: true
 		});
+		await blockAnalytics(context);
 		const touch = await context.newPage();
 		await touch.goto('/');
 		await expect(touch.locator('html')).toHaveClass(/has-snap-scroll/);

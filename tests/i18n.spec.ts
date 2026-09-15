@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 /**
  * Перемикання мови мусить лишити читача на тій сторінці, яку він читав, а кожне

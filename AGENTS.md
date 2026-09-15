@@ -101,7 +101,7 @@
 ```
 npm run check        # svelte-check, має бути 0 помилок
 npm run lint         # prettier --check + eslint, має бути 0 помилок
-npm run check:discovery # чи раннери досі беруть усі 50 + 9 файлів перевірок
+npm run check:discovery # чи раннери досі беруть усі 51 + 9 файлів перевірок
 npm test             # юніт-інваріанти (Vitest)
 npm run check:i18n   # паритет ключів у чотирьох мовах
 npm run build        # збірка

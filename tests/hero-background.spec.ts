@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, blockAnalytics } from './fixtures';
 
 /**
  * Де шапка зустрічає сторінку.
@@ -105,6 +105,7 @@ test.describe('the header meets the page', () => {
 		// The fade hides the layer behind [data-js], so a scripting failure must not be a
 		// page with no background at all — the same guard AnimalCard.svelte needs.
 		const context = await browser.newContext({ javaScriptEnabled: false });
+		await blockAnalytics(context);
 		const page = await context.newPage();
 		await page.goto('/');
 
