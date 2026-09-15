@@ -124,7 +124,7 @@ export const ADDRESS = {
 } as const;
 
 /** Image used for link previews when a page has nothing more specific. */
-export const DEFAULT_OG_IMAGE = '/images/logo/vetcrew.webp';
+export const DEFAULT_OG_IMAGE = '/images/og-default-1200x630.jpg';
 
 /** Absolute URL from a site-root-relative path, i.e. one that does *not* include the base. */
 export const absoluteFromRoot = (path: string): string =>
