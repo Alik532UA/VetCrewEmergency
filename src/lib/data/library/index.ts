@@ -15,6 +15,18 @@ import { marten_in_city } from './marten-in-city';
 import { ferret_escaped } from './ferret-escaped';
 import { ferret_found } from './ferret-found';
 import { transport_mustelid } from './transport-mustelid';
+import { fox_kit } from './fox-kit';
+import { fox_in_city } from './fox-in-city';
+import { fox_mange } from './fox-mange';
+import { turtle_road } from './turtle-road';
+import { snake_encounter } from './snake-encounter';
+import { amphibian_found } from './amphibian-found';
+import { dolphin_stranded } from './dolphin-stranded';
+import { oiled_bird } from './oiled-bird';
+import { hedgehog_winter } from './hedgehog-winter';
+import { bat_indoors } from './bat-indoors';
+import { ungulate_entangled } from './ungulate-entangled';
+import { leveret_mowing } from './leveret-mowing';
 import type { ArticleGroup, LibraryArticle } from './types';
 
 export type { ArticleGroup, LibraryArticle, Localized } from './types';
@@ -50,7 +62,27 @@ export const LIBRARY: readonly LibraryArticle[] = [
 	marten_in_city,
 	ferret_escaped,
 	ferret_found,
-	transport_mustelid
+	transport_mustelid,
+	/*
+	 * Групи, яких у бібліотеці не було зовсім: лисиці, рептилії, морські мешканці —
+	 * і доповнення до тих, що мали по одній статті.
+	 *
+	 * Тільки короткі поля, без довгих текстів. Довгий текст — це фахове знання
+	 * організації, і писати його за неї означало б поставити на сайт поради, за які
+	 * ніхто зсередини не відповідає.
+	 */
+	fox_kit,
+	fox_in_city,
+	fox_mange,
+	turtle_road,
+	snake_encounter,
+	amphibian_found,
+	dolphin_stranded,
+	oiled_bird,
+	hedgehog_winter,
+	bat_indoors,
+	ungulate_entangled,
+	leveret_mowing
 ];
 
 /** Ті чотири, що показані на головній. */
