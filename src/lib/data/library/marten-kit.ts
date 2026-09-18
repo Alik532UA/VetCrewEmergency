@@ -1,3 +1,5 @@
+import rawBody from './bodies/marten-kit.json';
+import { asBody } from './types';
 import type { LibraryArticle } from './types';
 
 export const marten_kit: LibraryArticle = {
@@ -33,9 +35,11 @@ export const marten_kit: LibraryArticle = {
 			en: 'If any of the signs above are present, or you simply are not sure what you are looking at. Martens, weasels, polecats and pet ferrets are confused constantly — send a photo.'
 		}
 	},
+	body: asBody(rawBody),
 	story: {
 		uk: 'Куниця, що заплуталася в антидроновій сітці на фронті: попереду була складна операція та довге відновлення.',
 		en: 'A marten tangled in anti-drone netting at the front: a complex surgery and a long recovery lay ahead.'
 	},
-	related: ['fawn', 'bat', 'hare']
+	// Перелік із самого матеріалу: автор писав ці статті як пов'язані.
+	related: ['mustelids-id', 'why-not-take-kits', 'marten-in-city']
 };

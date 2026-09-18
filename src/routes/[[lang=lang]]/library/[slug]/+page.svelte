@@ -49,6 +49,34 @@
 		</section>
 	{/each}
 
+	{#if a.body}
+		<!--
+			Повний текст — ПІД чотирма блоками.
+
+			Порядок тут і є суттю сторінки: відповідь за хвилину лишається першою, а
+			розгорнутий текст читає той, хто вже вирішив, що робити. `{@html}` немає
+			навмисно — у даних лежить текст, а не розмітка, тож джерело не може
+			принести сюди нічого, що сторінка виконає.
+		-->
+		<section class="body">
+			{#each a.body as block, i (i)}
+				{#if block.kind === 'heading'}
+					<h2 class="body__heading">{block.text[lang]}</h2>
+				{:else if block.kind === 'note'}
+					<p class="body__note">{block.text[lang]}</p>
+				{:else if block.kind === 'list'}
+					<ul class="body__list">
+						{#each block.items as item, j (j)}
+							<li>{item[lang]}</li>
+						{/each}
+					</ul>
+				{:else}
+					<p>{block.text[lang]}</p>
+				{/if}
+			{/each}
+		</section>
+	{/if}
+
 	<section class="block">
 		<h2>{t('library.story')}</h2>
 		<p>{a.story[lang]}</p>
@@ -102,6 +130,42 @@
 </article>
 
 <style>
+	/*
+	 * Довгий текст статті. Ширину обмежує сам блок, а не сторінка: решта сторінки —
+	 * короткі відповіді на всю ширину, і тягнути рядок на 110 символів там нема чого,
+	 * а тут є.
+	 */
+	.body {
+		max-width: 46rem;
+		margin-top: var(--space-xl);
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+
+	.body__heading {
+		margin-top: var(--space-md);
+		font-size: 1.25rem;
+	}
+
+	.body__list {
+		margin: 0;
+		padding-left: 1.2rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.45rem;
+	}
+
+	/* «⚠️ Важливо» й «Пам'ятайте»: у джерелі вони виділені, і зливати їх зі звичайними
+	   абзацами означало б загубити наголос, який автор поставив свідомо. */
+	.body__note {
+		padding: 0.9rem 1.1rem;
+		border-left: var(--border-width) solid var(--color-accent);
+		border-radius: var(--radius-sm);
+		background: var(--color-bg-surface);
+		font-weight: 600;
+	}
+
 	.page {
 		max-width: 46rem;
 		margin: 0 auto;

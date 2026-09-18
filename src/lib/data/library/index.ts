@@ -8,6 +8,13 @@ import { bat } from './bat';
 import { swan_line } from './swan-line';
 import { window_strike } from './window-strike';
 import { hare } from './hare';
+import { mustelids_id } from './mustelids-id';
+import { why_not_take_kits } from './why-not-take-kits';
+import { mustelids_near_us } from './mustelids-near-us';
+import { marten_in_city } from './marten-in-city';
+import { ferret_escaped } from './ferret-escaped';
+import { ferret_found } from './ferret-found';
+import { transport_mustelid } from './transport-mustelid';
 import type { LibraryArticle } from './types';
 
 export type { LibraryArticle, Localized } from './types';
@@ -28,7 +35,22 @@ export const LIBRARY: readonly LibraryArticle[] = [
 	bat,
 	swan_line,
 	window_strike,
-	hare
+	hare,
+	/*
+	 * Матеріал про куницевих, поданий одним блоком (2026-09-18).
+	 *
+	 * Стоїть у кінці, а не врозкид: `LIBRARY_FEATURED` бере перші чотири, і будь-яка
+	 * вставка на початок мовчки змінила б те, що показує головна.
+	 *
+	 * Усі сім тимчасово одномовні — див. коментар у будь-якому з файлів.
+	 */
+	mustelids_id,
+	why_not_take_kits,
+	mustelids_near_us,
+	marten_in_city,
+	ferret_escaped,
+	ferret_found,
+	transport_mustelid
 ];
 
 /** Ті чотири, що показані на головній. */
