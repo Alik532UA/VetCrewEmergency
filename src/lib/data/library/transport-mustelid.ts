@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const transport_mustelid: LibraryArticle = {
 	slug: 'transport-mustelid',
+	group: 'mustelids',
 	emoji: '📦',
 	title: {
 		uk: '…вам потрібно перевезти куницевого до фахівців?',

@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const marten_in_city: LibraryArticle = {
 	slug: 'marten-in-city',
+	group: 'mustelids',
 	emoji: '🏙️',
 	title: {
 		uk: '…ви зустріли куницю в місті?',

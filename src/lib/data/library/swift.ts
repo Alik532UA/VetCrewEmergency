@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const swift: LibraryArticle = {
 	slug: 'swift',
+	group: 'birds',
 	emoji: '🐦',
 	title: {
 		uk: '…ви знайшли серпокрильця на землі?',

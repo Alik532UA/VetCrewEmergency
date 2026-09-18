@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const owlet: LibraryArticle = {
 	slug: 'owlet',
+	group: 'birds',
 	emoji: '🦉',
 	title: {
 		uk: '…ви знайшли самотнє совеня?',

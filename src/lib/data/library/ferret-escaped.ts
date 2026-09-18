@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const ferret_escaped: LibraryArticle = {
 	slug: 'ferret-escaped',
+	group: 'mustelids',
 	emoji: '🏃',
 	title: {
 		uk: '…у вас утік свійський тхір?',

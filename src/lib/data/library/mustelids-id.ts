@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const mustelids_id: LibraryArticle = {
 	slug: 'mustelids-id',
+	group: 'mustelids',
 	emoji: '🦦',
 	title: {
 		uk: '…ви не знаєте, кого зустріли: куниця, ласка чи тхір?',

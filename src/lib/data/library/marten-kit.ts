@@ -4,6 +4,7 @@ import type { LibraryArticle } from './types';
 
 export const marten_kit: LibraryArticle = {
 	slug: 'marten-kit',
+	group: 'mustelids',
 	emoji: '🦡',
 	title: {
 		uk: '…ви знайшли дитинча куниці, ласки або перегузні?',

@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const nestling: LibraryArticle = {
 	slug: 'nestling',
+	group: 'birds',
 	emoji: '🐣',
 	title: {
 		uk: '…ви знайшли пташеня?',

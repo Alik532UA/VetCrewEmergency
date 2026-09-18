@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const mustelids_near_us: LibraryArticle = {
 	slug: 'mustelids-near-us',
+	group: 'mustelids',
 	emoji: '🏘️',
 	title: {
 		uk: '…дикі тварини з’явилися біля вашої домівки?',

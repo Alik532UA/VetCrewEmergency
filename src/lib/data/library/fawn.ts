@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const fawn: LibraryArticle = {
 	slug: 'fawn',
+	group: 'ungulates',
 	emoji: '🦌',
 	title: {
 		uk: '…ви знайшли оленятко, козуленя чи лосеня?',

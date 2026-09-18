@@ -15,9 +15,9 @@ import { marten_in_city } from './marten-in-city';
 import { ferret_escaped } from './ferret-escaped';
 import { ferret_found } from './ferret-found';
 import { transport_mustelid } from './transport-mustelid';
-import type { LibraryArticle } from './types';
+import type { ArticleGroup, LibraryArticle } from './types';
 
-export type { LibraryArticle, Localized } from './types';
+export type { ArticleGroup, LibraryArticle, Localized } from './types';
 
 /**
  * Бібліотека «Що робити, якщо…» — порядок тут і є порядком на сторінці.
@@ -58,3 +58,51 @@ export const LIBRARY_FEATURED = LIBRARY.slice(0, 4);
 
 export const findArticle = (slug: string): LibraryArticle | undefined =>
 	LIBRARY.find((a) => a.slug === slug);
+
+/**
+ * Порядок груп на сторінці — і він не алфавітний.
+ *
+ * Спершу ті, кого приносять найчастіше: птахи й їжаки — це більшість дзвінків
+ * будь-якої рятувальної служби. Далі решта видів, і наприкінці `any` — те, що
+ * читають, уже знаючи, кого зустріли.
+ *
+ * Перелік тут, а не в компоненті: сторінка бібліотеки й майбутні фільтри мусять
+ * брати один порядок, інакше вони розійдуться на першій же новій групі.
+ */
+export const GROUP_ORDER: readonly ArticleGroup[] = [
+	'birds',
+	'hedgehogs',
+	'bats',
+	'mustelids',
+	'foxes',
+	'ungulates',
+	'hares',
+	'reptiles',
+	'marine',
+	'any'
+];
+
+/** Значок групи. Поруч із назвою в смузі переходів — щоб група впізнавалася оком. */
+export const GROUP_EMOJI: Record<ArticleGroup, string> = {
+	birds: '🐦',
+	hedgehogs: '🦔',
+	bats: '🦇',
+	mustelids: '🦡',
+	foxes: '🦊',
+	ungulates: '🦌',
+	hares: '🐇',
+	reptiles: '🐢',
+	marine: '🐬',
+	any: '📋'
+};
+
+/**
+ * Статті, згруповані в порядку `GROUP_ORDER`. Порожні групи не потрапляють сюди
+ * взагалі: смуга переходів із назвою, за якою нічого немає, — це обіцянка, якої
+ * сторінка не тримає.
+ */
+export const LIBRARY_BY_GROUP: readonly { group: ArticleGroup; items: LibraryArticle[] }[] =
+	GROUP_ORDER.map((group) => ({
+		group,
+		items: LIBRARY.filter((a) => a.group === group)
+	})).filter((g) => g.items.length > 0);

@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const swan_line: LibraryArticle = {
 	slug: 'swan-line',
+	group: 'birds',
 	emoji: '🦢',
 	title: {
 		uk: '…лебідь заплутався у волосіні?',

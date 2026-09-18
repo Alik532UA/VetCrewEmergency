@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const hedgehog: LibraryArticle = {
 	slug: 'hedgehog',
+	group: 'hedgehogs',
 	emoji: '🦔',
 	title: {
 		uk: '…ви знайшли їжака?',

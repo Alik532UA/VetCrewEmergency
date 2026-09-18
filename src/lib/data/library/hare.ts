@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const hare: LibraryArticle = {
 	slug: 'hare',
+	group: 'hares',
 	emoji: '🐇',
 	title: {
 		uk: '…ви знайшли зайченя?',

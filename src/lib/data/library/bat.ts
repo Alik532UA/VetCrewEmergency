@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const bat: LibraryArticle = {
 	slug: 'bat',
+	group: 'bats',
 	emoji: '🦇',
 	title: {
 		uk: '…ви знайшли кажана?',

@@ -51,8 +51,8 @@ export const libraryChecks: readonly BetaCheck[] = [
 		id: 'library_5',
 		category: { uk: 'Перелік', en: 'The list' },
 		text: {
-			uk: 'Відкрийте «Вся бібліотека». У переліку мусять бути ВСІ статті, а не лише ті чотири, що на головній.',
-			en: 'Open “The whole library”. The list must contain ALL the articles, not only the four shown on the home page.'
+			uk: 'Відкрийте «Вся бібліотека». Угорі мусить бути смуга груп тварин із числом статей у кожній; натиск на групу прокручує до неї, а не ховає решту. У переліку мусять бути ВСІ статті, а не лише ті чотири, що на головній.',
+			en: 'Open “The whole library”. A bar of animal groups with a count for each must sit at the top; pressing a group scrolls to it rather than hiding the rest. Every article must be in the list, not only the four on the home page.'
 		},
 		testid: 'library-list',
 		coverage: 'manual'

@@ -2,6 +2,7 @@ import type { LibraryArticle } from './types';
 
 export const window_strike: LibraryArticle = {
 	slug: 'window-strike',
+	group: 'birds',
 	emoji: '🪟',
 	title: {
 		uk: '…птах врізався у вікно?',

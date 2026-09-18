@@ -13,6 +13,7 @@ import type { LibraryArticle } from './types';
 
 export const why_not_take_kits: LibraryArticle = {
 	slug: 'why-not-take-kits',
+	group: 'mustelids',
 	emoji: '🌿',
 	title: {
 		uk: '…ви думаєте забрати дитинча куницевих із природи?',
