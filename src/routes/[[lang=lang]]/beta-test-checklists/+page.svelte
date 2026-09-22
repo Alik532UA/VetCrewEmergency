@@ -8,6 +8,7 @@
 	import { BETA_UI, pick } from '$lib/data/beta/ui';
 	import PageMeta from '$lib/components/PageMeta.svelte';
 	import { copyText } from '$lib/utils/copyText';
+	import { localePath } from '$lib/utils/withBase';
 
 	/** Ukrainian for a Ukrainian reader, English for everyone else — see ui.ts. */
 	const locale = $derived(page.data.locale as string);
@@ -36,6 +37,24 @@
 	/** Numbering runs 1..n across the whole tab, not per level. */
 	const offsetOf = (index: number) =>
 		byLevel.slice(0, index).reduce((sum, level) => sum + level.checks.length, 0);
+
+	/**
+	 * Маршрути вкладки, які МОЖНА відкрити посиланням (§ 8.4).
+	 *
+	 * Динамічні сегменти (`/library/[slug]`) відкинуто: конкретної статті тут
+	 * нема з чого взяти, а посилання, яке веде в 404, гірше за його відсутність.
+	 * Канон називає цей випадок прямо: підставляти «перший, що трапиться» не
+	 * можна — саме так сусідній проєкт отримав посилання, яке працювало лише
+	 * тому, що не-кореневий маршрут у ньому був один.
+	 */
+	const screens = $derived(tab.routes.filter((route) => !route.includes('[')));
+
+	/**
+	 * Адреса → дискримінатор локатора: `/library` → `library`, корінь → `root`.
+	 * Косих рисок у локаторах немає (TESTID-AND-NAMING § 1.2), а значення
+	 * однозначно виходить із самої адреси, тож другим іменем це не стає.
+	 */
+	const screenTid = (route: string) => route.replace(/^\/|\/$/g, '').replace(/\//g, '-') || 'root';
 
 	/**
 	 * The timer that clears the «copied» label (§ 7.5).
@@ -91,8 +110,47 @@
 			<strong data-testid="beta-progress-value"
 				>{betaProgress.markedOnThisVersion} / {betaProgress.total}</strong
 			>
-			<span class="beta__version">v{__APP_VERSION__}</span>
+			<!--
+				Версія була видима й доти — не було ЛОКАТОРА (§ 8.5.1,
+				`BETA-VERSION-VISIBLE`). Це не формальність: підказка «позначено на
+				іншій версії» на пункті має сенс лише поряд із числом поточної
+				збірки, а перевірити, що число нікуди не поділося, без імені
+				неможливо.
+			-->
+			<span class="beta__version" data-testid="beta-version-text">v{__APP_VERSION__}</span>
+
+			<!--
+				ВИХІД ЗІ СТОРІНКИ (§ 8.4). Тестувальник приходить за прямим
+				посиланням: сторінка навмисно поза меню (§ 4), тож ні пункта меню,
+				ні історії вкладки в нього немає.
+			-->
+			<a class="beta__link" href={localePath('/')} data-testid="beta-home-link">
+				{pick(BETA_UI.back, locale)}
+			</a>
 		</p>
+
+		<!--
+			КУДИ ЙТИ ПО ЦЮ ВКЛАДКУ (§ 8.4, `BETA-SCREEN-LINKS`).
+
+			Перелік маршрутів вкладки лежав у даних невикористаним: його читав лише
+			інваріант § 5.1. Показаний той САМИЙ перелік, тож розійтися з дійсністю
+			непоміченим він не може — на відміну від окремого списку «корисних
+			посилань», який поповнити забувають.
+		-->
+		{#if screens.length > 0}
+			<p class="beta__screens">
+				<span>{pick(BETA_UI.screens, locale)}</span>
+				{#each screens as route (route)}
+					<a
+						class="beta__link"
+						href={localePath(route)}
+						data-testid="beta-screen-{screenTid(route)}-link"
+					>
+						{route}
+					</a>
+				{/each}
+			</p>
+		{/if}
 
 		<nav class="beta__tabs" aria-label={pick(BETA_UI.title, locale)}>
 			{#each BETA_TABS as item (item.id)}
@@ -220,6 +278,24 @@
 
 	.beta__progress {
 		color: var(--color-text);
+	}
+
+	.beta__screens {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-sm);
+	}
+
+	/*
+	 * 44 px на дотик (ACCESSIBILITY): для тексту в рядку її дає саме
+	 * `min-height` разом із `inline-flex`, а не `padding`.
+	 */
+	.beta__link {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: var(--color-link);
 	}
 
 	.beta__version {

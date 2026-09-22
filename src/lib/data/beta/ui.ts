@@ -74,6 +74,7 @@ export const BETA_UI = {
 	},
 	tabProgress: { uk: 'позначено у вкладці', en: 'marked on this tab' },
 	back: { uk: 'На головну', en: 'Home' },
+	screens: { uk: 'Де це дивитися:', en: 'Where to look:' },
 	nothingMarked: {
 		uk: 'Жодного пункта ще не позначено.',
 		en: 'Nothing has been marked yet.'
