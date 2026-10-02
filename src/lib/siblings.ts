@@ -69,8 +69,8 @@ export interface Sibling {
 
 export const SIBLINGS = {
 	VetCrewEmergency: {
-		origin: 'https://alik532ua.github.io',
-		base: '/VetCrewEmergency',
+		origin: 'https://vet-crew-emergency.org',
+		base: '',
 		locales: ['uk', 'en'],
 		defaultLocale: 'uk',
 		transport: 'path',

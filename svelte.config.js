@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 
 // GitHub Pages project sites live under /<repo>/, user sites and custom domains under /.
 // The value comes from the deploy workflow; locally and for root hosting it stays empty.
-const rawBase = process.env.BASE_PATH ?? '/VetCrewEmergency';
+const rawBase = process.env.BASE_PATH ?? '';
 
 /*
  * Checked here rather than left to SvelteKit, and narrowed for the type checker in

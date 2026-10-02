@@ -19,7 +19,7 @@ import { DEFAULT_LOCALE, LOCALES, PREFIXED_LOCALES } from './i18n/locales';
  * `npm run check`, `npm run lint`, `npm run check:build` and 349 unit tests were all
  * green over a live site whose home page canonical answered 301.
  *
- * Since the move to emergency.vetcrew.com.ua the root IS the deployed shape, and the prefixed
+ * Since the move to vet-crew-emergency.org the root IS the deployed shape, and the prefixed
  * one became the half nothing exercises by default — the fallback branch of the
  * workflow, which is what runs the day the domain lapses. Neither is safe to drop, so
  * `localeUrl()` still takes the origin and base as arguments and both are named here.
@@ -34,7 +34,7 @@ import { DEFAULT_LOCALE, LOCALES, PREFIXED_LOCALES } from './i18n/locales';
  * The base a project-site deploy derives from the repository name: the workflow's
  * fallback branch, and no longer the address this site is published at.
  */
-const PROJECT_SITE_BASE = SITE_BASE;
+const PROJECT_SITE_BASE = '/VetCrewEmergency';
 
 const prefixedUrl = (path: string, locale = DEFAULT_LOCALE) =>
 	localeUrl(SITE_ORIGIN, PROJECT_SITE_BASE, path, locale);

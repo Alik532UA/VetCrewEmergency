@@ -10,8 +10,8 @@ const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 // address rather than `whatever the host is locally`: nothing sets SITE_ORIGIN outside
 // the deploy job, so this string is what every test and every local build sees, and
 // `siblings.test.ts` checks the sibling registry's own entry against it.
-const siteOrigin = process.env.SITE_ORIGIN ?? 'https://alik532ua.github.io';
-const basePath = process.env.BASE_PATH ?? '/VetCrewEmergency';
+const siteOrigin = process.env.SITE_ORIGIN ?? 'https://vet-crew-emergency.org';
+const basePath = process.env.BASE_PATH ?? '';
 
 export default defineConfig({
 	plugins: [sveltekit()],

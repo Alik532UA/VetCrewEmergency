@@ -152,7 +152,7 @@ jobs:
         env:
           # The domain configured in Settings → Pages. Empty falls back to the
           # repository-derived address.
-          CUSTOM_DOMAIN:
+          CUSTOM_DOMAIN: vet-crew-emergency.org
         run: |
           if [ -n "$CUSTOM_DOMAIN" ]; then
             echo "base=" >> "$GITHUB_OUTPUT"

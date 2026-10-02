@@ -56,7 +56,7 @@ describe('the sibling registry describes this site correctly', () => {
 	 *
 	 * This used to compare against package.json alone, which was right only while the
 	 * fallback branch was the one that ran. It would have stayed green through the entire
-	 * move to emergency.vetcrew.com.ua, with every sibling site still sending its readers to
+	 * move to vet-crew-emergency.org, with every sibling site still sending its readers to
 	 * alik532ua.github.io/VetCrewEmergency — a link that works, in the sense that a 404 page
 	 * loads.
 	 *
