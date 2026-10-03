@@ -281,12 +281,12 @@ describe('the report', () => {
 		const { betaProgress } = await load({
 			common_1: { vote: 'ok', version: __APP_VERSION__ },
 			common_2: { vote: 'fail', version: __APP_VERSION__ },
-			common_3: { vote: 'weird', version: __APP_VERSION__ }
+			common_3: { vote: 'unclear', version: __APP_VERSION__ }
 		});
 		const report = betaProgress.report();
 
-		expect(report.indexOf('НЕ ПРАЦЮЄ')).toBeLessThan(report.indexOf('ПРАЦЮЄ, АЛЕ ДИВНО'));
-		expect(report.indexOf('ПРАЦЮЄ, АЛЕ ДИВНО')).toBeLessThan(report.lastIndexOf('[ПРАЦЮЄ]'));
+		expect(report.indexOf('НЕ ПРАЦЮЄ')).toBeLessThan(report.indexOf('НЕ ЗРОЗУМІЛО'));
+		expect(report.indexOf('НЕ ЗРОЗУМІЛО')).toBeLessThan(report.lastIndexOf('[ПРАЦЮЄ]'));
 	});
 
 	it('labels a mark that came from another build', async () => {

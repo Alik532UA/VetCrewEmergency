@@ -77,24 +77,24 @@
 		gap: var(--space-sm);
 		padding: var(--space-lg);
 		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border, rgba(128, 128, 128, 0.3));
+		border: 1px solid var(--color-border);
 		background: var(--control-surface);
 	}
 
 	.row.row--ok {
-		border-color: var(--vote-ok, #22c55e);
+		border-color: #22c55e;
 		border-width: 2px;
 	}
 	.row.row--fail {
-		border-color: var(--vote-fail, #ef4444);
+		border-color: #ef4444;
 		border-width: 2px;
 	}
 	.row.row--unclear {
-		border-color: var(--vote-unclear, #eab308);
+		border-color: #eab308;
 		border-width: 2px;
 	}
 	.row.row--skip {
-		border-color: var(--vote-skip, #3b82f6);
+		border-color: #3b82f6;
 		border-width: 2px;
 	}
 
@@ -159,19 +159,19 @@
 	}
 
 	.row__vote--ok {
-		background: color-mix(in srgb, var(--vote-ok) 8%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-ok) 8%, var(--color-bg-card));
 		color: var(--color-text);
 	}
 	.row__vote--fail {
-		background: color-mix(in srgb, var(--vote-fail) 8%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-fail) 8%, var(--color-bg-card));
 		color: var(--color-text);
 	}
 	.row__vote--unclear {
-		background: color-mix(in srgb, var(--vote-unclear) 8%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-unclear) 8%, var(--color-bg-card));
 		color: var(--color-text);
 	}
 	.row__vote--skip {
-		background: color-mix(in srgb, var(--vote-skip) 8%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-skip) 8%, var(--color-bg-card));
 		color: var(--color-text);
 	}
 
@@ -182,22 +182,22 @@
 
 	.row__vote--chosen.row__vote--ok {
 		border-color: var(--vote-ok);
-		background: color-mix(in srgb, var(--vote-ok) 18%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-ok) 18%, var(--color-bg-card));
 		color: var(--vote-ok);
 	}
 	.row__vote--chosen.row__vote--fail {
 		border-color: var(--vote-fail);
-		background: color-mix(in srgb, var(--vote-fail) 18%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-fail) 18%, var(--color-bg-card));
 		color: var(--vote-fail);
 	}
 	.row__vote--chosen.row__vote--unclear {
 		border-color: var(--vote-unclear);
-		background: color-mix(in srgb, var(--vote-unclear) 18%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-unclear) 18%, var(--color-bg-card));
 		color: var(--vote-unclear);
 	}
 	.row__vote--chosen.row__vote--skip {
 		border-color: var(--vote-skip);
-		background: color-mix(in srgb, var(--vote-skip) 18%, var(--color-bg-card, #ffffff));
+		background: color-mix(in srgb, var(--vote-skip) 18%, var(--color-bg-card));
 		color: var(--vote-skip);
 	}
 

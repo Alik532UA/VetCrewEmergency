@@ -319,10 +319,10 @@
 	.beta__screens .beta__link {
 		justify-content: center;
 		min-width: 44px;
-		padding: 0 var(--space-sm, 0.5rem);
-		border: 1px solid var(--color-border, rgba(128, 128, 128, 0.4));
-		border-radius: var(--radius-sm, 6px);
-		background: var(--control-surface, rgba(128, 128, 128, 0.08));
+		padding: 0 var(--space-sm);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-sm);
+		background: var(--control-surface);
 		text-decoration: none;
 		font-family: monospace;
 		font-size: 0.85rem;
