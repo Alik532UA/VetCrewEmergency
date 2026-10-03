@@ -14,6 +14,24 @@
 	const locale = $derived(page.data.locale as string);
 
 	let activeTab = $state(BETA_TABS[0].id);
+
+	function selectTab(id: string) {
+		activeTab = id;
+		if (typeof window !== 'undefined') {
+			const url = new URL(window.location.href);
+			url.searchParams.set('tab', id);
+			window.history.replaceState(window.history.state, '', url.href);
+		}
+	}
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		const param = new URL(window.location.href).searchParams.get('tab');
+		if (param && BETA_TABS.some((t) => t.id === param)) {
+			activeTab = param;
+		}
+	});
+
 	let copied = $state(false);
 	let fallback = $state('');
 
@@ -138,7 +156,7 @@
 			посилань», який поповнити забувають.
 		-->
 		{#if screens.length > 0}
-			<p class="beta__screens">
+			<p class="beta__screens" data-sveltekit-preload-data="off">
 				<span>{pick(BETA_UI.screens, locale)}</span>
 				{#each screens as route (route)}
 					<a
@@ -160,7 +178,7 @@
 					class="beta__tab"
 					class:beta__tab--active={item.id === activeTab}
 					aria-current={item.id === activeTab ? 'true' : undefined}
-					onclick={() => (activeTab = item.id)}
+					onclick={() => selectTab(item.id)}
 					data-testid="beta-tab-{item.id}-btn"
 				>
 					{pick(item.title, locale)}
@@ -296,6 +314,23 @@
 		align-items: center;
 		min-height: 44px;
 		color: var(--color-link);
+	}
+
+	.beta__screens .beta__link {
+		justify-content: center;
+		min-width: 44px;
+		padding: 0 var(--space-sm, 0.5rem);
+		border: 1px solid var(--color-border, rgba(128, 128, 128, 0.4));
+		border-radius: var(--radius-sm, 6px);
+		background: var(--control-surface, rgba(128, 128, 128, 0.08));
+		text-decoration: none;
+		font-family: monospace;
+		font-size: 0.85rem;
+		cursor: pointer;
+	}
+
+	.beta__screens .beta__link:hover {
+		border-color: currentColor;
 	}
 
 	.beta__version {

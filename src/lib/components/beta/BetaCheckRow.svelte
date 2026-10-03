@@ -12,7 +12,7 @@
 
 	let { check, number, locale }: Props = $props();
 
-	const VOTES: Vote[] = ['fail', 'weird', 'ok'];
+	const VOTES: Vote[] = ['ok', 'fail', 'unclear', 'skip'];
 
 	const mark = $derived(betaProgress.marks[check.id]);
 	const stale = $derived(betaProgress.isStale(check.id));
@@ -30,7 +30,14 @@
 	const tid = $derived(check.id.replace(/_/g, '-'));
 </script>
 
-<li class="row" data-testid="beta-check-{tid}-item">
+<li
+	class="row"
+	class:row--ok={mark?.vote === 'ok'}
+	class:row--fail={mark?.vote === 'fail'}
+	class:row--unclear={mark?.vote === 'unclear'}
+	class:row--skip={mark?.vote === 'skip'}
+	data-testid="beta-check-{tid}-item"
+>
 	<p class="row__category" data-testid="beta-check-{tid}-category-text">
 		{number}. {pick(check.category, locale)}
 		{#if check.negative}
@@ -70,7 +77,25 @@
 		gap: var(--space-sm);
 		padding: var(--space-lg);
 		border-radius: var(--radius-md);
+		border: 1px solid var(--color-border, rgba(128, 128, 128, 0.3));
 		background: var(--control-surface);
+	}
+
+	.row.row--ok {
+		border-color: var(--vote-ok, #22c55e);
+		border-width: 2px;
+	}
+	.row.row--fail {
+		border-color: var(--vote-fail, #ef4444);
+		border-width: 2px;
+	}
+	.row.row--unclear {
+		border-color: var(--vote-unclear, #eab308);
+		border-width: 2px;
+	}
+	.row.row--skip {
+		border-color: var(--vote-skip, #3b82f6);
+		border-width: 2px;
 	}
 
 	.row__category {
@@ -113,12 +138,15 @@
 	 * separate hues (ACCESSIBILITY-v8 § 6, WCAG 1.4.1).
 	 */
 	.row__vote {
+		--vote-ok: #22c55e;
+		--vote-fail: #ef4444;
+		--vote-unclear: #eab308;
+		--vote-skip: #3b82f6;
 		min-height: 44px;
+		min-width: 44px;
 		padding: 0 var(--space-md);
-		border: 2px solid var(--color-border);
+		border: 1px solid var(--color-border);
 		border-radius: var(--radius-sm);
-		background: var(--color-bg-card);
-		color: var(--color-text);
 		cursor: pointer;
 		font-size: 0.9rem;
 		transition:
@@ -130,21 +158,47 @@
 		border-color: var(--color-primary);
 	}
 
+	.row__vote--ok {
+		background: color-mix(in srgb, var(--vote-ok) 8%, var(--color-bg-card, #ffffff));
+		color: var(--color-text);
+	}
+	.row__vote--fail {
+		background: color-mix(in srgb, var(--vote-fail) 8%, var(--color-bg-card, #ffffff));
+		color: var(--color-text);
+	}
+	.row__vote--unclear {
+		background: color-mix(in srgb, var(--vote-unclear) 8%, var(--color-bg-card, #ffffff));
+		color: var(--color-text);
+	}
+	.row__vote--skip {
+		background: color-mix(in srgb, var(--vote-skip) 8%, var(--color-bg-card, #ffffff));
+		color: var(--color-text);
+	}
+
 	.row__vote--chosen {
 		border-width: 4px;
 		font-weight: 800;
-		border-color: var(--color-primary);
-		background: var(--color-bg-warm);
 	}
 
+	.row__vote--chosen.row__vote--ok {
+		border-color: var(--vote-ok);
+		background: color-mix(in srgb, var(--vote-ok) 18%, var(--color-bg-card, #ffffff));
+		color: var(--vote-ok);
+	}
 	.row__vote--chosen.row__vote--fail {
-		border-style: solid;
-		text-decoration: underline;
-		text-decoration-thickness: 2px;
+		border-color: var(--vote-fail);
+		background: color-mix(in srgb, var(--vote-fail) 18%, var(--color-bg-card, #ffffff));
+		color: var(--vote-fail);
 	}
-
-	.row__vote--chosen.row__vote--weird {
-		border-style: dashed;
+	.row__vote--chosen.row__vote--unclear {
+		border-color: var(--vote-unclear);
+		background: color-mix(in srgb, var(--vote-unclear) 18%, var(--color-bg-card, #ffffff));
+		color: var(--vote-unclear);
+	}
+	.row__vote--chosen.row__vote--skip {
+		border-color: var(--vote-skip);
+		background: color-mix(in srgb, var(--vote-skip) 18%, var(--color-bg-card, #ffffff));
+		color: var(--vote-skip);
 	}
 
 	/* A mark from an older build reads as provisional rather than done. */

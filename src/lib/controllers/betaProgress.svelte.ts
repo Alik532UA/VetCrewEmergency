@@ -2,7 +2,7 @@ import { ALL_BETA_CHECKS, BETA_TABS } from '$lib/data/beta/tabs';
 import type { BetaCheck } from '$lib/data/beta/types';
 import { storage } from '$lib/services/storage';
 
-export type Vote = 'fail' | 'weird' | 'ok';
+export type Vote = 'ok' | 'fail' | 'unclear' | 'skip';
 
 /**
  * One answer, and the version it was given on (BETA-CHECKLIST-v8 § 3.1).
@@ -26,13 +26,7 @@ const STORAGE_KEY = 'beta_marks';
  * database, for data nobody reads yet. Cheap to reverse — aggregation can be glued on
  * later without rewriting the page.
  */
-const VOTES: readonly Vote[] = ['fail', 'weird', 'ok'];
-
-function isMark(value: unknown): value is Mark {
-	if (typeof value !== 'object' || value === null) return false;
-	const m = value as Record<string, unknown>;
-	return VOTES.includes(m.vote as Vote) && typeof m.version === 'string';
-}
+const VOTES: readonly Vote[] = ['ok', 'fail', 'unclear', 'skip'];
 
 /**
  * What comes back from storage is UNTRUSTED INPUT (§ 8.6, `BETA-MARKS-UNTRUSTED`).
@@ -50,7 +44,14 @@ function readMarks(): Record<string, Mark> {
 	const known = new Set(ALL_BETA_CHECKS.map((check) => check.id));
 	const out: Record<string, Mark> = {};
 	for (const [id, value] of Object.entries(raw as Record<string, unknown>)) {
-		if (known.has(id) && isMark(value)) out[id] = value;
+		if (!known.has(id)) continue;
+		if (typeof value === 'object' && value !== null) {
+			const m = value as Record<string, unknown>;
+			const vote = m.vote === 'weird' ? 'unclear' : m.vote;
+			if (VOTES.includes(vote as Vote) && typeof m.version === 'string') {
+				out[id] = { vote: vote as Vote, version: m.version };
+			}
+		}
 	}
 	return out;
 }
@@ -171,11 +172,12 @@ class BetaProgress {
 	 * about the TEST, and it devalues every green run until someone looks at it.
 	 */
 	report(): string {
-		const order: Vote[] = ['fail', 'weird', 'ok'];
+		const order: Vote[] = ['fail', 'unclear', 'ok', 'skip'];
 		const label: Record<Vote, string> = {
 			fail: 'НЕ ПРАЦЮЄ',
-			weird: 'ПРАЦЮЄ, АЛЕ ДИВНО',
-			ok: 'ПРАЦЮЄ'
+			unclear: 'НЕ ЗРОЗУМІЛО',
+			ok: 'ПРАЦЮЄ',
+			skip: 'ПРОПУЩЕНО'
 		};
 
 		// A plain object rather than a Map: `svelte/prefer-svelte-reactivity` does not
@@ -201,7 +203,8 @@ class BetaProgress {
 		const lines: string[] = [];
 		for (const vote of order) {
 			for (const [id, mark] of Object.entries(this.marks)) {
-				if (mark.vote !== vote) continue;
+				const actualVote = mark.vote === ('weird' as unknown) ? 'unclear' : mark.vote;
+				if (actualVote !== vote) continue;
 				const entry = byId[id];
 				if (!entry) continue;
 
