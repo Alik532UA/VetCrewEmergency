@@ -147,29 +147,6 @@
 			</a>
 		</p>
 
-		<!--
-			КУДИ ЙТИ ПО ЦЮ ВКЛАДКУ (§ 8.4, `BETA-SCREEN-LINKS`).
-
-			Перелік маршрутів вкладки лежав у даних невикористаним: його читав лише
-			інваріант § 5.1. Показаний той САМИЙ перелік, тож розійтися з дійсністю
-			непоміченим він не може — на відміну від окремого списку «корисних
-			посилань», який поповнити забувають.
-		-->
-		{#if screens.length > 0}
-			<p class="beta__screens" data-sveltekit-preload-data="off">
-				<span>{pick(BETA_UI.screens, locale)}</span>
-				{#each screens as route (route)}
-					<a
-						class="beta__link"
-						href={localePath(route)}
-						data-testid="beta-screen-{screenTid(route)}-link"
-					>
-						{route}
-					</a>
-				{/each}
-			</p>
-		{/if}
-
 		<nav class="beta__tabs" aria-label={pick(BETA_UI.title, locale)}>
 			{#each BETA_TABS as item (item.id)}
 				{@const tabProgress = betaProgress.progressOf(item.checks)}
@@ -192,6 +169,29 @@
 				</button>
 			{/each}
 		</nav>
+
+		<!--
+			КУДИ ЙТИ ПО ЦЮ ВКЛАДКУ (§ 8.4, `BETA-SCREEN-LINKS`).
+
+			Перелік маршрутів вкладки лежав у даних невикористаним: його читав лише
+			інваріант § 5.1. Показаний той САМИЙ перелік, тож розійтися з дійсністю
+			непоміченим він не може — на відміну від окремого списку «корисних
+			посилань», який поповнити забувають.
+		-->
+		{#if screens.length > 0}
+			<p class="beta__screens" data-sveltekit-preload-data="off">
+				<span>{pick(BETA_UI.screens, locale)}</span>
+				{#each screens as route (route)}
+					<a
+						class="beta__link"
+						href={localePath(route)}
+						data-testid="beta-screen-{screenTid(route)}-link"
+					>
+						{route}
+					</a>
+				{/each}
+			</p>
+		{/if}
 
 		<div class="beta__levels">
 			{#each byLevel as level, index (level.coverage)}
