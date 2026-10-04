@@ -234,17 +234,17 @@ export const SOCIALS = [
 	{
 		id: 'instagram',
 		url: 'https://www.instagram.com/vet.crew/',
-		icon: '/images/social_media/instagram-se-512-50.png'
+		icon: '/images/social_media/social_media_instagram_se512.svg'
 	},
 	{
 		id: 'facebook',
 		url: 'https://www.facebook.com/vet.crew/',
-		icon: '/images/social_media/facebook-se-512-50.png'
+		icon: '/images/social_media/social_media_facebook_se512.svg'
 	},
 	{
 		id: 'tiktok',
 		url: 'https://www.tiktok.com/@vet.crew',
-		icon: '/images/social_media/TikTok-se-512-50.png'
+		icon: '/images/social_media/social_media_tiktok_se512.svg'
 	},
 	{
 		id: 'x',
