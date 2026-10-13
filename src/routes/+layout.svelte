@@ -273,11 +273,11 @@
 
 	// Global error reporting. In an $effect so the listeners come and go with the layout.
 	$effect(() => {
-		const handleRejection = (event: PromiseRejectionEvent) => {
+		const handleRejection = (event: PromiseRejectionEvent) =>
 			logService.error('app', `Unhandled Promise Rejection: ${event.reason}`);
-		};
 
 		const handleError = (event: ErrorEvent) => {
+			if (event.message?.includes('ResizeObserver loop')) return;
 			logService.error(
 				'app',
 				`Global Error: ${event.message} at ${event.filename}:${event.lineno}`

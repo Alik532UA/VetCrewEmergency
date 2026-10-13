@@ -251,7 +251,7 @@
 		init();
 
 		// Ширина копії міняється від вікна (картки переносяться) і від вмісту.
-		const observer = new ResizeObserver(measure);
+		const observer = new ResizeObserver(() => requestAnimationFrame(measure));
 		if (unit) observer.observe(unit);
 		if (viewport) observer.observe(viewport);
 

@@ -176,7 +176,7 @@
 
 		// The page height changes for more reasons than a resize: card images arrive,
 		// a filter empties the list, the carousel appears once it is shuffled.
-		const observer = new ResizeObserver(measure);
+		const observer = new ResizeObserver(() => requestAnimationFrame(measure));
 		observer.observe(document.documentElement);
 
 		return () => {

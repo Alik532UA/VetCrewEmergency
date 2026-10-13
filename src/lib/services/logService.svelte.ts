@@ -156,6 +156,7 @@ class LogService {
 	}
 
 	private addEntry(level: LogLevel, category: LogCategory, message: string, data?: unknown) {
+		if (message && message.includes('ResizeObserver loop')) return;
 		const entry: LogEntry = {
 			timestamp: new Date().toISOString(),
 			level,

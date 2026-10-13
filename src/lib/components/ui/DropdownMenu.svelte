@@ -216,7 +216,7 @@
 		// width. The second is watched on the menu rather than on the items that fill
 		// it — what decides the placement is how wide it came out, and that changes with
 		// the locale's labels as readily as with the length of the list.
-		const observer = new ResizeObserver(place);
+		const observer = new ResizeObserver(() => requestAnimationFrame(place));
 		observer.observe(menuElement);
 		window.addEventListener('resize', place);
 
