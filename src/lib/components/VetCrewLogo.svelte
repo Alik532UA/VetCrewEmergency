@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
-	import { LogoPhysics, pawPad, textVetCrew } from './vetCrewLogoPhysics.svelte';
+	import { LogoPhysics, pawPad, textVetCrew, textEmergency } from './vetCrewLogoPhysics.svelte';
 
 	interface Props {
 		compact?: boolean;
@@ -121,6 +121,10 @@
 				>
 					<path id="text-vet-crew" fill="var(--logo-vet-crew)" d={textVetCrew.d} />
 				</g>
+
+				<g transform="translate(0, {physics.textEmergencyTransform.currY.toFixed(2)})">
+					<path id="text-emergency" fill="var(--logo-emergency)" d={textEmergency.d} />
+				</g>
 			</g>
 		</svg>
 	</div>
@@ -131,6 +135,7 @@
 		--logo-bg-circle: #598f3a;
 		--logo-paw: #ffb327;
 		--logo-vet-crew: #ffffff;
+		--logo-emergency: #ffb327;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -146,6 +151,7 @@
 		--logo-bg-circle: #13371b;
 		--logo-paw: #ffffff;
 		--logo-vet-crew: #ffb327;
+		--logo-emergency: #ffb327;
 	}
 
 	.logo-stage {

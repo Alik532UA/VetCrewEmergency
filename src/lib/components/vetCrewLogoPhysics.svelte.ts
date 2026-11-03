@@ -33,6 +33,7 @@ export const pawToes = [
 
 export const pawPad = logoPaths['paw-pad'];
 export const textVetCrew = logoPaths['text-vet-crew'];
+export const textEmergency = logoPaths['text-emergency'];
 
 export class LogoPhysics {
 	smoothTiltX = $state(0);
@@ -74,6 +75,17 @@ export class LogoPhysics {
 	});
 
 	textVetCrewTransform = $state<AnimTransform>({
+		currX: 0,
+		currY: 0,
+		currRot: 0,
+		currScale: 1,
+		targetX: 0,
+		targetY: 0,
+		targetRot: 0,
+		targetScale: 1
+	});
+
+	textEmergencyTransform = $state<AnimTransform>({
 		currX: 0,
 		currY: 0,
 		currRot: 0,
@@ -190,6 +202,10 @@ export class LogoPhysics {
 				this.textVetCrewTransform.targetY = Math.sin(time * 0.0018 + textVetCrew.phase) * 2.0;
 				this.textVetCrewTransform.currY +=
 					(this.textVetCrewTransform.targetY - this.textVetCrewTransform.currY) * 0.08;
+
+				this.textEmergencyTransform.targetY = Math.sin(time * 0.0016 + textEmergency.phase) * 1.5;
+				this.textEmergencyTransform.currY +=
+					(this.textEmergencyTransform.targetY - this.textEmergencyTransform.currY) * 0.08;
 			} else {
 				const breathTiltX = Math.sin(idleT * 0.6) * 1.8;
 				const breathTiltY = Math.cos(idleT * 0.45) * 1.8;
@@ -239,6 +255,11 @@ export class LogoPhysics {
 				this.textVetCrewTransform.targetY = textIdle;
 				this.textVetCrewTransform.currY +=
 					(this.textVetCrewTransform.targetY - this.textVetCrewTransform.currY) * 0.1;
+
+				const emergencyIdle = Math.sin(time * 0.0016 + textEmergency.phase) * 1.5;
+				this.textEmergencyTransform.targetY = emergencyIdle;
+				this.textEmergencyTransform.currY +=
+					(this.textEmergencyTransform.targetY - this.textEmergencyTransform.currY) * 0.08;
 			}
 
 			this.smoothTiltX += (targetTiltX - this.smoothTiltX) * 0.08;
