@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import { settings } from '$lib/services/settings.svelte';
 	import { canFullscreen, toggleFullscreen, isFullscreenActive } from '$lib/services/fullscreen';
 	import HiddenPanelIcon from './HiddenPanelIcon.svelte';
+	import HiddenPanelTooltip from './HiddenPanelTooltip.svelte';
 
 	interface Props {
 		isVisible?: boolean;
@@ -15,13 +15,12 @@
 	let isFullscreen = $state(false);
 	let isDark = $derived(settings.theme === 'dark');
 	let isUk = $derived(settings.locale === 'uk');
-
 	let isHovered = $state(false);
 	let isFocused = $state(false);
 	let showTooltip = $derived(isHovered || isFocused || isPinned);
 
 	let devText = $derived(
-		isUk ? 'Сайт знаходиться у процесі наповнення' : 'Website content is currently in progress'
+		isUk ? 'Цей сайт знаходиться в процесі розробки' : 'Website content is currently in progress'
 	);
 	let devLabel = $derived(isUk ? 'У розробці' : 'In dev');
 	let fsLabel = $derived(
@@ -48,14 +47,11 @@
 				isPinned = false;
 			}
 		};
-		['fullscreenchange', 'webkitfullscreenchange'].forEach((e) =>
-			document.addEventListener(e, onFs)
-		);
+		const evts = ['fullscreenchange', 'webkitfullscreenchange'];
+		evts.forEach((e) => document.addEventListener(e, onFs));
 		document.addEventListener('click', onDoc);
 		return () => {
-			['fullscreenchange', 'webkitfullscreenchange'].forEach((e) =>
-				document.removeEventListener(e, onFs)
-			);
+			evts.forEach((e) => document.removeEventListener(e, onFs));
 			document.removeEventListener('click', onDoc);
 		};
 	});
@@ -67,7 +63,7 @@
 	aria-label="Додаткові налаштування"
 	aria-hidden={!isVisible}
 >
-	<div class="dev-panel-container action-item-wrap">
+	<div class="dev-panel-container action-item-wrap" class:is-active={showTooltip}>
 		<button
 			type="button"
 			class="action-item dev-item"
@@ -87,11 +83,7 @@
 			<span class="action-title dev-title">{devLabel}</span>
 		</button>
 
-		{#if showTooltip}
-			<div class="dev-capsule-tooltip" role="status" transition:fade={{ duration: 160 }}>
-				<span class="dev-capsule-text">{devText}</span>
-			</div>
-		{/if}
+		<HiddenPanelTooltip show={showTooltip} text={devText} />
 	</div>
 
 	<div class="hidden-panel-content">
@@ -176,6 +168,25 @@
 	}
 	.dev-panel-container {
 		padding: 0.65rem 0.85rem;
+		transition:
+			border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	.dev-panel-container:hover,
+	.dev-panel-container.is-active {
+		border-color: rgba(255, 179, 39, 0.5);
+		box-shadow:
+			0 0 16px rgba(255, 179, 39, 0.25),
+			0 16px 40px -10px rgba(0, 0, 0, 0.5);
+		transform: translateY(-2px);
+	}
+	:global([data-theme='light']) .dev-panel-container:hover,
+	:global([data-theme='light']) .dev-panel-container.is-active {
+		border-color: rgba(180, 83, 9, 0.4);
+		box-shadow:
+			0 0 14px rgba(217, 119, 6, 0.2),
+			0 16px 40px -10px rgba(19, 55, 27, 0.12);
 	}
 	.hidden-panel-content {
 		gap: 0.35rem;
@@ -242,15 +253,19 @@
 		letter-spacing: 0.03em;
 		white-space: nowrap;
 	}
-	.dev-item {
+	.dev-item,
+	.dev-item:hover,
+	.dev-item.is-active {
 		color: #ffb327;
+		background: transparent !important;
+		border: 1px solid transparent !important;
+		transform: none !important;
 	}
 	:global([data-theme='light']) .dev-item {
 		color: #92400e;
 	}
-	:global([data-theme='light']) .dev-panel-container {
-		border-color: rgba(180, 83, 9, 0.3);
-		background: rgba(254, 243, 199, 0.45);
+	.dev-title {
+		line-height: 1.25;
 	}
 	.dev-icon-box {
 		filter: drop-shadow(0 0 6px rgba(255, 179, 39, 0.5));
@@ -266,46 +281,6 @@
 	:global([data-theme='light']) .dev-item:hover .dev-icon-box,
 	:global([data-theme='light']) .dev-item.is-active .dev-icon-box {
 		filter: drop-shadow(0 2px 6px rgba(146, 64, 14, 0.35));
-	}
-	.dev-item.is-active {
-		background: rgba(255, 179, 39, 0.1);
-		border-color: rgba(255, 179, 39, 0.35);
-		transform: translateY(-2px);
-	}
-	:global([data-theme='light']) .dev-item.is-active {
-		background: rgba(245, 158, 11, 0.15);
-		border-color: rgba(180, 83, 9, 0.4);
-	}
-	.dev-capsule-tooltip {
-		position: absolute;
-		bottom: calc(100% + 14px);
-		left: 50%;
-		transform: translateX(-50%);
-		padding: 0.55rem 1.15rem;
-		background: rgba(12, 22, 14, 0.94);
-		backdrop-filter: blur(20px) saturate(180%);
-		border: 1px solid rgba(255, 179, 39, 0.85);
-		border-radius: 10px;
-		box-shadow:
-			0 0 14px rgba(255, 179, 39, 0.25),
-			0 8px 24px rgba(0, 0, 0, 0.55);
-		z-index: 100;
-		pointer-events: none;
-		white-space: nowrap;
-	}
-	:global([data-theme='light']) .dev-capsule-tooltip {
-		background: rgba(255, 255, 255, 0.96);
-		border-color: #d97706;
-	}
-	.dev-capsule-text {
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: #ffffff;
-		letter-spacing: 0.015em;
-		line-height: 1.25;
-	}
-	:global([data-theme='light']) .dev-capsule-text {
-		color: #101e14;
 	}
 	@media (max-width: 640px) {
 		.hidden-panel-wrapper {
