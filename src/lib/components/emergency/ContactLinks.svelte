@@ -230,9 +230,25 @@
 		.is-expanded .contact-links {
 			grid-template-columns: repeat(2, 120px);
 		}
+		.link-item {
+			padding: 4px 2px;
+			container-type: inline-size;
+		}
 		.is-expanded .contact-icon {
 			width: 60px;
 			height: 60px;
+		}
+		.link-sublabel,
+		.is-expanded .link-sublabel {
+			font-size: clamp(0.55rem, 2.8vw, 0.85rem);
+			font-size: clamp(0.55rem, 9.4cqw, 0.85rem);
+			letter-spacing: -0.015em;
+			margin-top: 6px;
+			width: 100%;
+			text-align: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: clip;
 		}
 	}
 </style>
