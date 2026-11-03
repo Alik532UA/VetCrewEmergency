@@ -144,7 +144,7 @@
 		bottom: 1.5rem;
 		left: 0;
 		right: 0;
-		z-index: 40;
+		z-index: 70;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -245,18 +245,36 @@
 	.dev-item {
 		color: #ffb327;
 	}
+	:global([data-theme='light']) .dev-item {
+		color: #92400e;
+	}
+	:global([data-theme='light']) .dev-panel-container {
+		border-color: rgba(180, 83, 9, 0.3);
+		background: rgba(254, 243, 199, 0.45);
+	}
 	.dev-icon-box {
 		filter: drop-shadow(0 0 6px rgba(255, 179, 39, 0.5));
+	}
+	:global([data-theme='light']) .dev-icon-box {
+		filter: drop-shadow(0 1px 2px rgba(146, 64, 14, 0.2));
 	}
 	.dev-item:hover .dev-icon-box,
 	.dev-item.is-active .dev-icon-box {
 		transform: scale(1.14);
 		filter: drop-shadow(0 0 10px rgba(255, 179, 39, 0.9));
 	}
+	:global([data-theme='light']) .dev-item:hover .dev-icon-box,
+	:global([data-theme='light']) .dev-item.is-active .dev-icon-box {
+		filter: drop-shadow(0 2px 6px rgba(146, 64, 14, 0.35));
+	}
 	.dev-item.is-active {
 		background: rgba(255, 179, 39, 0.1);
 		border-color: rgba(255, 179, 39, 0.35);
 		transform: translateY(-2px);
+	}
+	:global([data-theme='light']) .dev-item.is-active {
+		background: rgba(245, 158, 11, 0.15);
+		border-color: rgba(180, 83, 9, 0.4);
 	}
 	.dev-capsule-tooltip {
 		position: absolute;
@@ -271,13 +289,13 @@
 		box-shadow:
 			0 0 14px rgba(255, 179, 39, 0.25),
 			0 8px 24px rgba(0, 0, 0, 0.55);
-		z-index: 60;
+		z-index: 100;
 		pointer-events: none;
 		white-space: nowrap;
 	}
 	:global([data-theme='light']) .dev-capsule-tooltip {
 		background: rgba(255, 255, 255, 0.96);
-		border-color: #ffb327;
+		border-color: #d97706;
 	}
 	.dev-capsule-text {
 		font-size: 0.85rem;
