@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { withBase, localePath } from '$lib/utils/withBase';
 	import { page } from '$app/state';
 	import { base } from '$app/paths';
 	import { acceptsShortcut } from '$lib/services/keyboard';
-	import { createKeySequence } from '$lib/services/keySequence';
-	import { storage } from '$lib/services/storage';
 	import { t } from '$lib/i18n';
 	import { splitLocale } from '$lib/i18n/locales';
 	import {
@@ -56,26 +53,7 @@
 	 */
 	let openMenu = $state<'settings' | null>(null);
 
-	/**
-	 * ПРИХОВАНО ДО ЗАПУСКУ (рішення автора, 2026-09-13).
-	 *
-	 * За замовчуванням приховано, але можна відобразити (або знову приховати),
-	 * натиснувши клавішу `h` 7 разів підряд.
-	 */
-	let visible = $state(browser && storage.session.get('header_controls_visible') === '1');
-
-	const headerSequence = createKeySequence({
-		code: 'KeyH', // home / header controls toggle gesture
-		threshold: 7,
-		onComplete: () => {
-			visible = !visible;
-			storage.session.set('header_controls_visible', visible ? '1' : '0');
-		}
-	});
-
-	$effect(() => {
-		return () => headerSequence.reset();
-	});
+	let visible = $state(true);
 
 	/**
 	 * Один список на три групи, тож ідентифікатори мусять бути унікальні між ними.
@@ -118,8 +96,6 @@
 	 * are service gestures, not something to offer a visitor.
 	 */
 	function handleShortcut(event: KeyboardEvent) {
-		headerSequence.handle(event);
-
 		if (!acceptsShortcut(event)) return;
 
 		// One `else return` rather than a `preventDefault` per branch: that way the key is

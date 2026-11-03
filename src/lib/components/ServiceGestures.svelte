@@ -5,6 +5,7 @@
 	import { createKeySequence } from '$lib/services/keySequence';
 	import { logService } from '$lib/services/logService.svelte';
 	import { hardReset, RESET_PRESSES_DEV, RESET_PRESSES_PROD } from '$lib/services/resetService';
+	import { viewMode } from '$lib/controllers/viewMode.svelte';
 
 	/**
 	 * The two service gestures: a run of `V` presses reveals the badge, a run of `R`
@@ -41,18 +42,29 @@
 		onComplete: () => void hardReset(!dev)
 	});
 
+	/**
+	 * Перемикання між повною версією сайту та презентаційною заглушкою
+	 * за серією з 7 натискань `KeyH`.
+	 */
+	const modeSequence = createKeySequence({
+		code: 'KeyH', // home / stub viewMode gesture
+		threshold: 7,
+		onComplete: () => {
+			viewMode.toggle(true);
+		}
+	});
+
 	function handleKeydown(event: KeyboardEvent) {
-		// Both runs see EVERY key, including the one that just completed the other: a
-		// different key resetting the counter is what makes a run a run. Their guards
-		// (auto-repeat, text entry, the window between presses, modifiers) live in
-		// `keySequence`.
+		// All runs see EVERY key: a different key resetting the counter is what makes a run a run.
 		versionSequence.handle(event);
 		resetSequence.handle(event);
+		modeSequence.handle(event);
 	}
 
 	onDestroy(() => {
 		versionSequence.reset();
 		resetSequence.reset();
+		modeSequence.reset();
 	});
 </script>
 

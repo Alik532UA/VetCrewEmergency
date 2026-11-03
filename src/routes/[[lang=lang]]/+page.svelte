@@ -15,6 +15,8 @@
 	import StoriesStrip from '$lib/components/emergency/StoriesStrip.svelte';
 	import DirectionCards from '$lib/components/emergency/DirectionCards.svelte';
 	import SupportPanel from '$lib/components/emergency/SupportPanel.svelte';
+	import EmergencyStub from '$lib/components/emergency/EmergencyStub.svelte';
+	import { viewMode } from '$lib/controllers/viewMode.svelte';
 
 	/**
 	 * Головна — одна довга сторінка з дев'яти розділів, у порядку зі
@@ -43,109 +45,118 @@
 	description={t('meta.home.description')}
 />
 
-<!-- 1 — перший екран -->
-<Hero />
+{#if viewMode.isStub}
+	<EmergencyStub />
+{:else}
+	<!-- 1 — перший екран -->
+	<Hero />
 
-<!-- 2 — коли до нас можна звертатися.
+	<!-- 2 — коли до нас можна звертатися.
 	 Без видимого заголовка, як у референсі: чотири картки стоять одразу під
 	 героєм і читаються як його продовження. Ім'я розділу все одно потрібне —
 	 воно приходить з `aria-label`, бо прихованого заголовка в цьому проєкті
 	 нема чим зробити (утиліти `visually-hidden` не існує). -->
-<section class="band band--tight" id="when" aria-label={t('when.title')} data-testid="when-section">
-	<!-- Продовження кольору першого екрана, що тане в тлі сторінки. Див. `.seam` нижче. -->
-	<div class="seam" aria-hidden="true"></div>
-	<WhenToCall />
-</section>
+	<section
+		class="band band--tight"
+		id="when"
+		aria-label={t('when.title')}
+		data-testid="when-section"
+	>
+		<!-- Продовження кольору першого екрана, що тане в тлі сторінки. Див. `.seam` нижче. -->
+		<div class="seam" aria-hidden="true"></div>
+		<WhenToCall />
+	</section>
 
-<!-- 3 — як відбувається порятунок -->
-<section class="band" id="how" aria-labelledby="how-title">
-	<div class="panel">
-		<SectionHead id="how-title" title={t('how.title')} center />
-		<div class="band__body"><StepCircles /></div>
-	</div>
-</section>
+	<!-- 3 — як відбувається порятунок -->
+	<section class="band" id="how" aria-labelledby="how-title">
+		<div class="panel">
+			<SectionHead id="how-title" title={t('how.title')} center />
+			<div class="band__body"><StepCircles /></div>
+		</div>
+	</section>
 
-<!-- 4 — бібліотека -->
-<section class="band" id="library" aria-labelledby="library-title">
-	<div class="panel">
-		<SectionHead id="library-title" title={t('library.title')} subtitle={t('library.subtitle')} />
-		<ul class="cards" data-testid="library-featured-list">
-			{#each LIBRARY as a (a.slug)}
-				<li class="card">
-					<div class="card__head">
-						<span class="card__emoji" aria-hidden="true">{a.emoji}</span>
-						<h3>{a.title[lang]}</h3>
-					</div>
-					<p class="card__teaser">{a.teaser[lang]}</p>
-					<a
-						class="card__link"
-						href={localePath(`/library/${a.slug}`, lang)}
-						data-testid="library-{a.slug}-link"
-					>
-						{t('library.action')}
-						<Icon name="arrow-right" size="1rem" />
-					</a>
-				</li>
-			{/each}
-		</ul>
-		<a class="band__all" href={localePath('/library', lang)}>
-			{t('library.all')}
-			<Icon name="arrow-right" size="1rem" />
-		</a>
-	</div>
-</section>
+	<!-- 4 — бібліотека -->
+	<section class="band" id="library" aria-labelledby="library-title">
+		<div class="panel">
+			<SectionHead id="library-title" title={t('library.title')} subtitle={t('library.subtitle')} />
+			<ul class="cards" data-testid="library-featured-list">
+				{#each LIBRARY as a (a.slug)}
+					<li class="card">
+						<div class="card__head">
+							<span class="card__emoji" aria-hidden="true">{a.emoji}</span>
+							<h3>{a.title[lang]}</h3>
+						</div>
+						<p class="card__teaser">{a.teaser[lang]}</p>
+						<a
+							class="card__link"
+							href={localePath(`/library/${a.slug}`, lang)}
+							data-testid="library-{a.slug}-link"
+						>
+							{t('library.action')}
+							<Icon name="arrow-right" size="1rem" />
+						</a>
+					</li>
+				{/each}
+			</ul>
+			<a class="band__all" href={localePath('/library', lang)}>
+				{t('library.all')}
+				<Icon name="arrow-right" size="1rem" />
+			</a>
+		</div>
+	</section>
 
-<!-- 5 — про нас -->
-<section class="band" id="about" aria-labelledby="about-title">
-	<AboutPanel id="about-title" />
-</section>
+	<!-- 5 — про нас -->
+	<section class="band" id="about" aria-labelledby="about-title">
+		<AboutPanel id="about-title" />
+	</section>
 
-<!-- 6 — шлях тварини -->
-<section class="band" id="journey" aria-labelledby="journey-title">
-	<div class="panel">
-		<SectionHead id="journey-title" title={t('journey.title')} center />
-		<div class="band__body"><HelpChain /></div>
-	</div>
-</section>
+	<!-- 6 — шлях тварини -->
+	<section class="band" id="journey" aria-labelledby="journey-title">
+		<div class="panel">
+			<SectionHead id="journey-title" title={t('journey.title')} center />
+			<div class="band__body"><HelpChain /></div>
+		</div>
+	</section>
 
-<!-- 7 — кому допомагаємо -->
-<section class="band" id="species" aria-labelledby="species-title">
-	<div class="panel">
-		<SectionHead id="species-title" title={t('hero.species')} />
-		<div class="band__body"><SpeciesRow /></div>
-	</div>
-</section>
+	<!-- 7 — кому допомагаємо -->
+	<section class="band" id="species" aria-labelledby="species-title">
+		<div class="panel">
+			<SectionHead id="species-title" title={t('hero.species')} />
+			<div class="band__body"><SpeciesRow /></div>
+		</div>
+	</section>
 
-<!-- 8 — історії порятунку -->
-<section class="band" id="stories" aria-labelledby="stories-title">
-	<div class="panel">
-		<SectionHead id="stories-title" title={t('stories.title')} subtitle={t('stories.counter')} />
-		<p class="band__lead">{t('stories.lead')}</p>
-		<div class="bleed"><StoriesStrip /></div>
-		<a class="band__all" href={localePath('/stories', lang)}>
-			{t('stories.all')}
-			<Icon name="arrow-right" size="1rem" />
-		</a>
-	</div>
-</section>
+	<!-- 8 — історії порятунку -->
+	<section class="band" id="stories" aria-labelledby="stories-title">
+		<div class="panel">
+			<SectionHead id="stories-title" title={t('stories.title')} subtitle={t('stories.counter')} />
+			<p class="band__lead">{t('stories.lead')}</p>
+			<div class="bleed"><StoriesStrip /></div>
+			<a class="band__all" href={localePath('/stories', lang)}>
+				{t('stories.all')}
+				<Icon name="arrow-right" size="1rem" />
+			</a>
+		</div>
+	</section>
 
-<!-- 9 — наші напрямки -->
-<section class="band" id="directions" aria-labelledby="directions-title">
-	<div class="panel">
-		<SectionHead
-			id="directions-title"
-			title={t('directions.title')}
-			subtitle={t('directions.subtitle')}
-		/>
-		<p class="band__lead">{t('directions.lead')}</p>
-		<div class="band__body"><DirectionCards /></div>
-	</div>
-</section>
+	<!-- 9 — наші напрямки -->
+	<section class="band" id="directions" aria-labelledby="directions-title">
+		<div class="panel">
+			<SectionHead
+				id="directions-title"
+				title={t('directions.title')}
+				subtitle={t('directions.subtitle')}
+			/>
+			<p class="band__lead">{t('directions.lead')}</p>
+			<div class="band__body"><DirectionCards /></div>
+		</div>
+	</section>
 
-<!-- 10 — підтримка проєкту -->
-<section class="band" id="support" aria-labelledby="support-title">
-	<SupportPanel id="support-title" />
-</section>
+	<!-- 10 — підтримка проєкту -->
+	<section class="band" id="support" aria-labelledby="support-title">
+		<SupportPanel id="support-title" />
+	</section>
+{/if}
 
 <style>
 	/*

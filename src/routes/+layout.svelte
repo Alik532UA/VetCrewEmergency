@@ -17,6 +17,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import LogCopyButton from '$lib/components/LogCopyButton.svelte';
 	import ServiceGestures from '$lib/components/ServiceGestures.svelte';
+	import { viewMode } from '$lib/controllers/viewMode.svelte';
 	import Toast from '$lib/components/ui/Toast.svelte';
 	import PageScrollbar from '$lib/components/ui/PageScrollbar.svelte';
 	import Minimap from '$lib/components/ui/Minimap.svelte';
@@ -29,6 +30,7 @@
 	// The locale-free path of the current page, e.g. /adopt/cat for both /adopt/cat
 	// and /uk/adopt/cat. Resolved in the load so it is available before anything renders.
 	const route = $derived(data);
+	const showStub = $derived(viewMode.isStub && (route.path === '/' || route.path === ''));
 
 	/**
 	 * The ages on the cards were worked out during `npm run build`, because every page
@@ -255,9 +257,7 @@
 		return () => window.removeEventListener('scroll', onScroll);
 	});
 
-	function scrollToTop() {
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
+	const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
 	// View Transitions support
 	onNavigate((navigation) => {
@@ -276,12 +276,10 @@
 		const handleRejection = (event: PromiseRejectionEvent) =>
 			logService.error('app', `Unhandled Promise Rejection: ${event.reason}`);
 
-		const handleError = (event: ErrorEvent) => {
-			if (event.message?.includes('ResizeObserver loop')) return;
-			logService.error(
-				'app',
-				`Global Error: ${event.message} at ${event.filename}:${event.lineno}`
-			);
+		const handleError = (e: ErrorEvent) => {
+			if (!e.message?.includes('ResizeObserver loop')) {
+				logService.error('app', `Global Error: ${e.message} at ${e.filename}:${e.lineno}`);
+			}
 		};
 
 		window.addEventListener('unhandledrejection', handleRejection);
@@ -363,16 +361,17 @@
 	 keyboard users to the home page instead of this page's content. -->
 <a href="#main-content" class="skip-link">{t('a11y.skipToContent')}</a>
 
-<Header />
+{#if !showStub}
+	<Header />
+	<div
+		class="site-bg"
+		class:site-bg--loaded={bgLoaded}
+		style="--bg-height: {bgHeight}px; --bg-shift: {bgShift}px;"
+	></div>
+{/if}
 
-<div
-	class="site-bg"
-	class:site-bg--loaded={bgLoaded}
-	style="--bg-height: {bgHeight}px; --bg-shift: {bgShift}px;"
-></div>
-
-<div class="app-shell">
-	<main class="main" id="main-content">
+<div class="app-shell" class:app-shell--stub={showStub}>
+	<main class="main" class:main--stub={showStub} id="main-content">
 		<svelte:boundary onerror={(error) => logService.error('app', `Render error: ${error}`)}>
 			{@render children()}
 
@@ -383,36 +382,31 @@
 					<div class="container boundary__inner">
 						<h1>{t('error.server.title')}</h1>
 						<p>{t('error.generic')}</p>
-						<button class="btn btn--primary" onclick={reset} data-testid="boundary-retry-btn">
-							{t('error.retry')}
-						</button>
+						<button class="btn btn--primary" onclick={reset} data-testid="boundary-retry-btn"
+							>{t('error.retry')}</button
+						>
 					</div>
 				</section>
 			{/snippet}
 		</svelte:boundary>
 	</main>
 
-	<Footer />
+	{#if !showStub}
+		<Footer />
+	{/if}
 </div>
 
-<button
-	class="back-to-top control-shape"
-	class:back-to-top--visible={showBackToTop}
-	style="--footer-lift: {footerLift}px;"
-	onclick={scrollToTop}
-	aria-label={t('a11y.backToTop')}
-	data-testid="back-to-top-btn"
->
-	<Icon name="arrow-up" size="1.5rem" />
-</button>
-
-<PageScrollbar />
-<Minimap />
-
-<!-- At the root, not inside the bars: the minimap has overflow: hidden and would clip
-	 it, and the menu is shared by all four modes — after a switch the component that
-	 opened it disappears and would take the menu with it. -->
-<ScrollbarContextMenu />
+{#if !showStub}
+	<button
+		class="back-to-top control-shape"
+		class:back-to-top--visible={showBackToTop}
+		style="--footer-lift: {footerLift}px;"
+		onclick={scrollToTop}
+		aria-label={t('a11y.backToTop')}
+		data-testid="back-to-top-btn"><Icon name="arrow-up" size="1.5rem" /></button
+	>
+	<PageScrollbar /><Minimap /><ScrollbarContextMenu />
+{/if}
 
 <Toast />
 
@@ -421,9 +415,7 @@
 	than inside the badge because in production the badge is not on screen until the `V`
 	run has already fired.
 -->
-<ServiceGestures />
-
-<LogCopyButton />
+<ServiceGestures /><LogCopyButton />
 
 <style>
 	.app-shell {
@@ -562,6 +554,10 @@
 		padding-top: 72px;
 	}
 
+	.main--stub {
+		padding-top: 0;
+	}
+
 	/*
 	 * The hero colour the header's active tab flows into, on whatever section a page
 	 * opens with.
@@ -582,7 +578,7 @@
 	 * and the band is what the tab needs somewhere to land — on the home page most of all,
 	 * because there the active item is the wordmark and the tab is at the far left.
 	 */
-	.main > :global(:first-child) {
+	.main:not(.main--stub) > :global(:first-child) {
 		background-color: var(--color-band);
 	}
 
@@ -601,10 +597,7 @@
 		animation-duration: 0.3s;
 	}
 
-	:global([data-style='modern']) {
-		view-transition-name: root;
-	}
-
+	:global([data-style='modern']),
 	:global([data-style='playful']) {
 		view-transition-name: root;
 	}
