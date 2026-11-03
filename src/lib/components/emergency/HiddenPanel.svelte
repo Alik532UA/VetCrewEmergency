@@ -116,7 +116,7 @@
 			aria-keyshortcuts="l"
 		>
 			<span class="action-icon-box">
-				<HiddenPanelIcon name="globe" />
+				<HiddenPanelIcon name="translate" />
 			</span>
 			<span class="action-title">{settings.locale.toUpperCase()}</span>
 		</button>
