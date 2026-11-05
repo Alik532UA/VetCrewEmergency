@@ -89,3 +89,34 @@ test('кожна мова оголошує решту', async ({ page }) => {
 	// Абсолютні: відносний `hreflang` пошуковий робот просто не бере.
 	expect(alternates.every((a) => a.href?.startsWith('https://'))).toBe(true);
 });
+
+test('перемикання мови на презентаційній заглушці (кнопка та гаряча клавіша L)', async ({
+	page
+}) => {
+	await page.addInitScript(() => {
+		try {
+			localStorage.setItem('vetcrewemergency_view_mode', 'stub');
+		} catch {
+			/* private mode fallback */
+		}
+	});
+	await page.goto('/');
+
+	// Натиск 3 відкриває панель додаткових налаштувань (State 3)
+	await page.keyboard.press('Digit3');
+	const langBtn = page.getByTestId('stub-lang-toggle-btn');
+	await expect(langBtn).toBeVisible();
+	await expect(langBtn).toContainText('UK');
+
+	// Клік перемикає на англійську мову
+	await langBtn.click();
+	await expect(page).toHaveURL(/\/en$/);
+	await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+	await expect(langBtn).toContainText('EN');
+
+	// Гаряча клавіша L перемикає назад на українську
+	await page.keyboard.press('KeyL');
+	await expect(page).toHaveURL(/\/$/);
+	await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
+	await expect(langBtn).toContainText('UK');
+});

@@ -1,5 +1,10 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { base } from '$app/paths';
+	import { localePath } from '$lib/utils/withBase';
+	import { splitLocale } from '$lib/i18n/locales';
 	import { acceptsShortcut } from '$lib/services/keyboard';
 	import { settings } from '$lib/services/settings.svelte';
 	import { toggleFullscreen } from '$lib/services/fullscreen';
@@ -62,6 +67,17 @@
 		}
 	}
 
+	function toggleLanguage() {
+		const nextLocale = settings.locale === 'uk' ? 'en' : 'uk';
+		settings.setLocale(nextLocale);
+		const pathname =
+			base && page.url.pathname.startsWith(base)
+				? page.url.pathname.slice(base.length)
+				: page.url.pathname;
+		const target = `${localePath(splitLocale(pathname).path, nextLocale)}${page.url.search}`;
+		void goto(target);
+	}
+
 	function isKey(e: KeyboardEvent, letter: string): boolean {
 		return e.code === `Key${letter.toUpperCase()}` || e.key.toLowerCase() === letter.toLowerCase();
 	}
@@ -101,7 +117,8 @@
 			return;
 		}
 		if (isKey(e, 'l')) {
-			settings.setLocale(settings.locale === 'uk' ? 'en' : 'uk');
+			e.preventDefault();
+			toggleLanguage();
 			return;
 		}
 		if (isKey(e, 'f')) {
@@ -199,7 +216,11 @@
 	<ContactLinks isExpanded={scrollState === 2} isShiftedUp={scrollState === 3} />
 
 	<!-- Hidden Actions Panel ONLY in State 3 (Theme, Lang, Dev Info, Fullscreen) -->
-	<HiddenPanel isVisible={scrollState === 3} bind:isPinned={isDevPinned} />
+	<HiddenPanel
+		isVisible={scrollState === 3}
+		bind:isPinned={isDevPinned}
+		ontogglelanguage={toggleLanguage}
+	/>
 
 	<!-- 3-State Cyclic Scroll Indicator on Right Edge -->
 	<ScrollIndicator state={scrollState} onGoToState={goToState} />

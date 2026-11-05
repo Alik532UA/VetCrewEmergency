@@ -42,4 +42,3 @@ describe('debugMenu service', () => {
 		expect(debugMenu.stubOpen).toBe(false);
 	});
 });
-

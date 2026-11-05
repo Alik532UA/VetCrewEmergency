@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { untrack } from 'svelte';
 import { storage } from '$lib/services/storage';
 import { logService } from '$lib/services/logService.svelte';
 
@@ -311,7 +312,9 @@ class Settings {
 
 	/** Applies the language of the current route without touching the stored preference. */
 	applyRouteLocale(locale: Locale) {
-		if (this.locale !== locale) this.locale = locale;
+		untrack(() => {
+			if (this.locale !== locale) this.locale = locale;
+		});
 	}
 
 	setStyle(style: SiteStyle) {

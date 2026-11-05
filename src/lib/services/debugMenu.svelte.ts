@@ -35,4 +35,3 @@ class DebugMenuService {
 }
 
 export const debugMenu = new DebugMenuService();
-

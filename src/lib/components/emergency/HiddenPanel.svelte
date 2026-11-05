@@ -7,9 +7,10 @@
 	interface Props {
 		isVisible?: boolean;
 		isPinned?: boolean;
+		ontogglelanguage?: () => void;
 	}
 
-	let { isVisible = false, isPinned = $bindable(false) }: Props = $props();
+	let { isVisible = false, isPinned = $bindable(false), ontogglelanguage }: Props = $props();
 
 	let isSupported = $state(true);
 	let isFullscreen = $state(false);
@@ -60,7 +61,7 @@
 <nav
 	class="hidden-panel-wrapper"
 	class:is-visible={isVisible}
-	aria-label="Додаткові налаштування"
+	aria-label={isUk ? 'Додаткові налаштування' : 'Additional settings'}
 	aria-hidden={!isVisible}
 >
 	<div class="dev-panel-container action-item-wrap" class:is-active={showTooltip}>
@@ -76,6 +77,7 @@
 			aria-label={devLabel}
 			aria-expanded={showTooltip}
 			aria-keyshortcuts="i"
+			data-testid="stub-dev-info-btn"
 		>
 			<span class="action-icon-box dev-icon-box">
 				<HiddenPanelIcon name="info" />
@@ -93,6 +95,7 @@
 			onclick={() => settings.toggleTheme()}
 			aria-label={isUk ? 'Тема' : 'Theme'}
 			aria-keyshortcuts="t"
+			data-testid="stub-theme-toggle-btn"
 		>
 			<span class="action-icon-box">
 				<HiddenPanelIcon name={isDark ? 'sun' : 'moon'} />
@@ -103,9 +106,10 @@
 		<button
 			type="button"
 			class="action-item lang-toggle-item"
-			onclick={() => settings.setLocale(settings.locale === 'uk' ? 'en' : 'uk')}
+			onclick={ontogglelanguage}
 			aria-label={isUk ? 'Мова: Українська' : 'Language: English'}
 			aria-keyshortcuts="l"
+			data-testid="stub-lang-toggle-btn"
 		>
 			<span class="action-icon-box">
 				<HiddenPanelIcon name="translate" />
@@ -120,6 +124,7 @@
 				onclick={toggleFullscreen}
 				aria-label={fsLabel}
 				aria-keyshortcuts="f"
+				data-testid="stub-fullscreen-btn"
 			>
 				<span class="action-icon-box">
 					<HiddenPanelIcon name={isFullscreen ? 'exit-fullscreen' : 'enter-fullscreen'} />
