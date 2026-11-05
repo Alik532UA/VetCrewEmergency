@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { settings } from '$lib/services/settings.svelte';
+	import { beaconRuns } from '$lib/utils/twinActions.svelte';
 	import { HOTLINE, REPORT_URL } from '$lib/config';
 
 	interface Props {
@@ -9,6 +10,8 @@
 
 	let { isExpanded = false, isShiftedUp = false }: Props = $props();
 	let isUk = $derived(settings.locale === 'uk');
+	const lit = $derived(settings.beacons !== 'off');
+	const runs = $derived(beaconRuns(settings.beacons, 1));
 
 	const channels = $derived([
 		{
@@ -17,8 +20,8 @@
 			url: `tel:${HOTLINE.tel}`,
 			sublabel: isUk ? 'Подзвонити' : 'Call',
 			tooltip: HOTLINE.display,
-			brandColor: '#598f3a',
-			brandGlow: 'rgba(89, 143, 58, 0.65)'
+			brandColor: 'var(--beacon-red)',
+			brandGlow: 'color-mix(in srgb, var(--beacon-red), transparent 35%)'
 		},
 		{
 			id: 'telegram',
@@ -26,13 +29,18 @@
 			url: REPORT_URL,
 			sublabel: isUk ? 'Написати' : 'Telegram',
 			tooltip: '@alik532',
-			brandColor: '#29a9ea',
-			brandGlow: 'rgba(41, 169, 234, 0.65)'
+			brandColor: 'var(--beacon-blue)',
+			brandGlow: 'color-mix(in srgb, var(--beacon-blue), transparent 35%)'
 		}
 	]);
 </script>
 
-<div class="contact-container" class:is-expanded={isExpanded} class:is-shifted-up={isShiftedUp}>
+<div
+	class="contact-container"
+	class:is-expanded={isExpanded}
+	class:is-shifted-up={isShiftedUp}
+	style="--beacon-runs: {runs};"
+>
 	<nav class="contact-links" aria-label="Vet Crew Actions">
 		{#each channels as item (item.id)}
 			<a
@@ -43,7 +51,11 @@
 				style="--brand-color: {item.brandColor}; --brand-glow: {item.brandGlow};"
 				aria-label={item.name}
 			>
-				<div class="icon-wrap">
+				<div
+					class="icon-wrap"
+					class:beacon-a={lit && item.id === 'phone'}
+					class:beacon-b={lit && item.id === 'telegram'}
+				>
 					<svg
 						class="contact-icon"
 						viewBox="0 0 24 24"
@@ -115,18 +127,58 @@
 		outline: none;
 	}
 
+	.channel-phone {
+		--beacon-glow: color-mix(in srgb, var(--beacon-red), transparent var(--beacon-fade));
+	}
+
+	.channel-telegram {
+		--beacon-glow: color-mix(in srgb, var(--beacon-blue), transparent var(--beacon-fade));
+	}
+
 	.icon-wrap {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		border-radius: 50%;
+		padding: 6px;
 		color: #4a634e;
 		transition:
 			transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-			color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+			color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	:global([data-theme='dark']) .icon-wrap {
 		color: #a3b8a6;
+	}
+
+	.beacon-a {
+		animation-name: beacon-a;
+		animation-duration: calc(var(--beacon-flash) * 92);
+		animation-timing-function: steps(1, end);
+		animation-iteration-count: var(--beacon-runs);
+	}
+
+	.beacon-b {
+		animation-name: beacon-b;
+		animation-duration: calc(var(--beacon-flash) * 92);
+		animation-timing-function: steps(1, end);
+		animation-iteration-count: var(--beacon-runs);
+	}
+
+	.contact-links:has(.link-item:hover) .icon-wrap,
+	.contact-links:has(.link-item:focus-visible) .icon-wrap {
+		animation-play-state: paused;
+	}
+
+	.link-item:hover .icon-wrap,
+	.link-item:focus-visible .icon-wrap {
+		color: var(--brand-color);
+		transform: translateY(-4px) scale(1.14);
+		animation-play-state: paused;
+		box-shadow:
+			0 0 0.85rem 0.25rem var(--beacon-glow),
+			inset 0 0 0.9rem 0.15rem var(--beacon-glow) !important;
 	}
 
 	.contact-icon {
@@ -146,9 +198,14 @@
 		height: 84px;
 	}
 
+	.link-item:hover .contact-icon,
+	.link-item:focus-visible .contact-icon {
+		filter: drop-shadow(0 0 18px var(--brand-glow));
+	}
+
 	.link-sublabel {
 		display: block;
-		margin-top: 10px;
+		margin-top: 6px;
 		font-size: 0.92rem;
 		font-weight: 600;
 		letter-spacing: 0.02em;
@@ -173,15 +230,6 @@
 		opacity: 1;
 		max-height: 28px;
 		transform: translateY(0);
-	}
-
-	.link-item:hover .icon-wrap {
-		color: var(--brand-color);
-		transform: translateY(-4px) scale(1.14);
-	}
-
-	.link-item:hover .contact-icon {
-		filter: drop-shadow(0 0 22px var(--brand-glow));
 	}
 
 	.tooltip {
@@ -214,7 +262,8 @@
 		display: none;
 	}
 
-	.link-item:hover .tooltip {
+	.link-item:hover .tooltip,
+	.link-item:focus-visible .tooltip {
 		opacity: 1;
 		transform: translateY(0) scale(1);
 		border-color: var(--brand-color);
@@ -243,7 +292,7 @@
 			font-size: clamp(0.55rem, 2.8vw, 0.85rem);
 			font-size: clamp(0.55rem, 9.4cqw, 0.85rem);
 			letter-spacing: -0.015em;
-			margin-top: 6px;
+			margin-top: 4px;
 			width: 100%;
 			text-align: center;
 			white-space: nowrap;
