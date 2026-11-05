@@ -23,6 +23,7 @@
 		transform: translateX(-50%);
 		padding: 0.55rem 1.15rem;
 		background: rgba(12, 22, 14, 0.94);
+		-webkit-backdrop-filter: blur(20px) saturate(180%);
 		backdrop-filter: blur(20px) saturate(180%);
 		border: 1px solid rgba(255, 179, 39, 0.85);
 		border-radius: 10px;

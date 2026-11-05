@@ -35,8 +35,8 @@
 		gap: 0.85rem;
 		padding: 0.6rem 0.4rem;
 		background: rgba(255, 255, 255, 0.76);
-		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
 		border-radius: 9999px;
 		border: 1px solid rgba(19, 55, 27, 0.12);
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);

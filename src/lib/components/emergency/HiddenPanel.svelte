@@ -159,6 +159,7 @@
 		align-items: center;
 		justify-content: center;
 		background: rgba(255, 255, 255, 0.76);
+		-webkit-backdrop-filter: blur(20px) saturate(180%);
 		backdrop-filter: blur(20px) saturate(180%);
 		border: 1px solid rgba(19, 55, 27, 0.12);
 		border-radius: 9999px;
