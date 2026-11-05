@@ -115,6 +115,7 @@ test('перемикання мови на презентаційній загл
 	await expect(langBtn).toContainText('EN');
 
 	// Гаряча клавіша L перемикає назад на українську
+	await page.locator('body').click({ position: { x: 10, y: 10 } });
 	await page.keyboard.press('KeyL');
 	await expect(page).toHaveURL(/\/$/);
 	await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
