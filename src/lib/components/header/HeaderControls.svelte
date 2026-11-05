@@ -5,6 +5,7 @@
 	import { acceptsShortcut } from '$lib/services/keyboard';
 	import { t } from '$lib/i18n';
 	import { splitLocale } from '$lib/i18n/locales';
+	import { debugMenu } from '$lib/services/debugMenu.svelte';
 	import {
 		settings,
 		type BeaconMode,
@@ -51,7 +52,7 @@
 	 * `boolean`: `DropdownMenu` приймає `open`/`onToggle` саме такою парою, і
 	 * перейменування на `settingsOpen` дало б другу назву тому самому.
 	 */
-	let openMenu = $state<'settings' | null>(null);
+	let openMenu = $derived(debugMenu.portalOpen ? 'settings' : null);
 
 	let visible = $state(true);
 
@@ -76,7 +77,7 @@
 	 * whatever closed that menu was itself a click, so it reaches this listener too.
 	 */
 	$effect(() => {
-		const close = () => (openMenu = null);
+		const close = () => debugMenu.closePortal();
 		window.addEventListener('click', close);
 		return () => window.removeEventListener('click', close);
 	});
@@ -101,10 +102,10 @@
 		// One `else return` rather than a `preventDefault` per branch: that way the key is
 		// only ever swallowed once something has happened (HOTKEYS-v8 § 2.4). `Escape` with
 		// nothing open falls through here, which is what lets it keep its usual meaning.
-		if (event.code === 'Escape' && openMenu !== null) openMenu = null;
+		if (event.code === 'Escape' && debugMenu.portalOpen) debugMenu.closePortal();
 		else if (event.code === 'KeyT') settings.toggleTheme();
 		// `L` — вибір locale; окремого меню мов більше немає, мова живе в налаштуваннях.
-		else if (event.code === 'KeyL') openMenu = openMenu === 'settings' ? null : 'settings';
+		else if (event.code === 'KeyL') debugMenu.togglePortal();
 		else return;
 
 		event.preventDefault();
@@ -169,7 +170,7 @@
 			}))
 		]}
 		open={openMenu === 'settings'}
-		onToggle={(next) => (openMenu = next ? 'settings' : null)}
+		onToggle={(next) => (next ? (debugMenu.portalOpen = true) : debugMenu.closePortal())}
 		onselect={(id) => {
 			if (id.startsWith(THEME_PREFIX)) settings.setTheme(id.slice(THEME_PREFIX.length) as Theme);
 			else if (id.startsWith(STYLE_PREFIX))
@@ -186,7 +187,7 @@
 				// підряд, щоб порівняти.
 				return;
 			}
-			openMenu = null;
+			debugMenu.closePortal();
 		}}
 		onPreview={(id) =>
 			settings.previewTheme(

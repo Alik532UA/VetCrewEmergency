@@ -6,6 +6,7 @@
 	import { logService } from '$lib/services/logService.svelte';
 	import { hardReset, RESET_PRESSES_DEV, RESET_PRESSES_PROD } from '$lib/services/resetService';
 	import { viewMode } from '$lib/controllers/viewMode.svelte';
+	import { debugMenu } from '$lib/services/debugMenu.svelte';
 
 	/**
 	 * The two service gestures: a run of `V` presses reveals the badge, a run of `R`
@@ -54,17 +55,31 @@
 		}
 	});
 
+	/**
+	 * Виклик debug меню (налаштувань у порталі / dev-панелі у заглушці)
+	 * за серією з 7 натискань `KeyD`.
+	 */
+	const debugSequence = createKeySequence({
+		code: 'KeyD', // debug menu sequence gesture
+		threshold: 7,
+		onComplete: () => {
+			debugMenu.toggle();
+		}
+	});
+
 	function handleKeydown(event: KeyboardEvent) {
 		// All runs see EVERY key: a different key resetting the counter is what makes a run a run.
 		versionSequence.handle(event);
 		resetSequence.handle(event);
 		modeSequence.handle(event);
+		debugSequence.handle(event);
 	}
 
 	onDestroy(() => {
 		versionSequence.reset();
 		resetSequence.reset();
 		modeSequence.reset();
+		debugSequence.reset();
 	});
 </script>
 

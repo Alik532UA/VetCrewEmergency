@@ -8,6 +8,7 @@
 	import HiddenPanel from './HiddenPanel.svelte';
 	import ScrollIndicator from './ScrollIndicator.svelte';
 	import { viewMode } from '$lib/controllers/viewMode.svelte';
+	import { debugMenu } from '$lib/services/debugMenu.svelte';
 
 	// 3 Scroll States (matching VetCrewHospital / VetCrewMain architecture):
 	// 1: Centered logo, minimal buttons
@@ -16,16 +17,34 @@
 	let scrollState = $state<1 | 2 | 3>(2);
 	let isDevPinned = $state(false);
 
+	$effect(() => {
+		if (debugMenu.stubOpen) {
+			scrollState = 3;
+			isDevPinned = true;
+		} else if (scrollState === 3 && isDevPinned) {
+			isDevPinned = false;
+			scrollState = 2;
+		}
+	});
+
 	function stepScroll(direction: number) {
 		if (direction > 0) {
 			scrollState = scrollState === 3 ? 1 : ((scrollState + 1) as 1 | 2 | 3);
 		} else {
 			scrollState = scrollState === 1 ? 3 : ((scrollState - 1) as 1 | 2 | 3);
 		}
+		if (scrollState !== 3) {
+			isDevPinned = false;
+			debugMenu.closeStub();
+		}
 	}
 
 	function goToState(state: 1 | 2 | 3) {
 		scrollState = state;
+		if (state !== 3) {
+			isDevPinned = false;
+			debugMenu.closeStub();
+		}
 	}
 
 	function handleLogoTap() {
@@ -36,8 +55,10 @@
 		if (scrollState !== 3) {
 			scrollState = 3;
 			isDevPinned = true;
+			debugMenu.stubOpen = true;
 		} else {
 			isDevPinned = !isDevPinned;
+			debugMenu.stubOpen = isDevPinned;
 		}
 	}
 
@@ -49,8 +70,9 @@
 		if (!acceptsShortcut(e)) return;
 
 		if (e.code === 'Escape') {
-			if (isDevPinned) {
+			if (isDevPinned || debugMenu.stubOpen) {
 				isDevPinned = false;
+				debugMenu.closeStub();
 				return;
 			}
 			if (scrollState !== 1) {

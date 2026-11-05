@@ -9,13 +9,14 @@
  * | `L` | ✅ language menu | same file; switching language is NAVIGATION (`localePath`), so the key opens the list rather than stepping to "the next language" and reloading up to three times |
  * | `V` | ✅ service badge | `components/LogCopyButton.svelte` |
  * | `R` | ✅ emergency reset | same file; `services/resetService.ts` |
+ * | `D` | ✅ debug menu gesture | `components/ServiceGestures.svelte`; 7 presses opens settings dropdown on portal or dev info on stub |
+ * | `H` | ✅ home / viewMode | `components/ServiceGestures.svelte` (7 presses switches portal/stub) and `EmergencyStub.svelte` (1 press: home) |
  * | `Esc` | ✅ close the open header menu | `HeaderControls` |
  * | `←` `→` | ✅ carousel | `ui/Carousel.svelte`, scoped to the focused carousel |
  * | `M` | ⏭️ SKIPPED | no sound: no `audio` element and no sound service exist; the "sounds" in the animal data are text descriptions |
  * | `B` | ⏭️ SKIPPED | no dynamic backgrounds. The header does offer a site STYLE (playful/modern), but that is not a background, and giving `B` a different meaning here than in the sibling projects is exactly what the canonical map exists to prevent |
  * | `C` | ⏭️ SKIPPED | no clock on screen. `services/clock.svelte.ts` exists but supplies today's date for age arithmetic, not a visible clock |
  * | `F` | ⏭️ SKIPPED | no fullscreen — neither a control nor a `requestFullscreen` call |
- * | `H` | ⏭️ SKIPPED | "home" is the header logo link; there are no tab-like sections to step through |
  * | `PgUp`/`PgDn`, `1`–`9` | ⏭️ SKIPPED | the page does not move in sections |
  *
  * Skipped means the feature is absent, not that the key was forgotten. When the

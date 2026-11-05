@@ -162,6 +162,7 @@ describe('§ 1.1 — a letter means the same thing in every project on this orig
 		KeyF: /fullscreen/i,
 		KeyH: /home/i,
 		KeyC: /clock/i,
+		KeyD: /debug/i,
 		// Reserved for the service gestures (§ 4). An ordinary action on either would
 		// either swallow the gesture or fire alongside it.
 		KeyV: /debug|version|badge|sequence/i,
