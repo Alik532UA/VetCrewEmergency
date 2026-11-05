@@ -447,6 +447,54 @@
 	}
 }
 
+/*
+ * Контурний маячок іконки (без круглого фону):
+ * Сяйво йде чітко по контуру ліній SVG (через drop-shadow), утворюючи світловий
+ * бордер навколо форми самої іконки, зберігаючи спільний 92-кроковий цикл.
+ */
+@keyframes beacon-icon-a {
+	0.0%,
+	2.1739%,
+	8.6957%,
+	10.8696%,
+	17.3913%,
+	19.5652% {
+		color: var(--beacon-red);
+		filter: drop-shadow(0 0 1.5px var(--beacon-glow)) drop-shadow(0 0 5px var(--beacon-glow))
+			drop-shadow(0 0 12px var(--beacon-glow));
+	}
+	1.087%,
+	3.2609%,
+	9.7826%,
+	11.9565%,
+	18.4783%,
+	20.6522%,
+	100% {
+		color: inherit;
+		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.12));
+	}
+}
+
+@keyframes beacon-icon-b {
+	4.3478%,
+	6.5217%,
+	13.0435%,
+	15.2174% {
+		color: var(--beacon-blue);
+		filter: drop-shadow(0 0 1.5px var(--beacon-glow)) drop-shadow(0 0 5px var(--beacon-glow))
+			drop-shadow(0 0 12px var(--beacon-glow));
+	}
+	0.0%,
+	5.4348%,
+	7.6087%,
+	14.1304%,
+	16.3043%,
+	100% {
+		color: inherit;
+		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.12));
+	}
+}
+
 .panel {
 	padding: clamp(1.25rem, 3vw, 2.25rem);
 	border: var(--border-width-soft) solid var(--color-border);

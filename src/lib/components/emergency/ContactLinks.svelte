@@ -20,8 +20,7 @@
 			url: `tel:${HOTLINE.tel}`,
 			sublabel: isUk ? 'Подзвонити' : 'Call',
 			tooltip: HOTLINE.display,
-			brandColor: 'var(--beacon-red)',
-			brandGlow: 'color-mix(in srgb, var(--beacon-red), transparent 35%)'
+			brandColor: 'var(--beacon-red)'
 		},
 		{
 			id: 'telegram',
@@ -29,8 +28,7 @@
 			url: REPORT_URL,
 			sublabel: isUk ? 'Написати' : 'Telegram',
 			tooltip: '@alik532',
-			brandColor: 'var(--beacon-blue)',
-			brandGlow: 'color-mix(in srgb, var(--beacon-blue), transparent 35%)'
+			brandColor: 'var(--beacon-blue)'
 		}
 	]);
 </script>
@@ -48,16 +46,14 @@
 				target={item.id === 'telegram' ? '_blank' : undefined}
 				rel={item.id === 'telegram' ? 'noopener noreferrer' : undefined}
 				class="link-item channel-{item.id}"
-				style="--brand-color: {item.brandColor}; --brand-glow: {item.brandGlow};"
+				style="--brand-color: {item.brandColor};"
 				aria-label={item.name}
 			>
-				<div
-					class="icon-wrap"
-					class:beacon-a={lit && item.id === 'phone'}
-					class:beacon-b={lit && item.id === 'telegram'}
-				>
+				<div class="icon-wrap">
 					<svg
 						class="contact-icon"
+						class:beacon-icon-a={lit && item.id === 'phone'}
+						class:beacon-icon-b={lit && item.id === 'telegram'}
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
@@ -139,46 +135,46 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: 50%;
-		padding: 6px;
 		color: #4a634e;
 		transition:
 			transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-			color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-			box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+			color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
 	:global([data-theme='dark']) .icon-wrap {
 		color: #a3b8a6;
 	}
 
-	.beacon-a {
-		animation-name: beacon-a;
+	.beacon-icon-a {
+		animation-name: beacon-icon-a;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
 		animation-iteration-count: var(--beacon-runs);
 	}
 
-	.beacon-b {
-		animation-name: beacon-b;
+	.beacon-icon-b {
+		animation-name: beacon-icon-b;
 		animation-duration: calc(var(--beacon-flash) * 92);
 		animation-timing-function: steps(1, end);
 		animation-iteration-count: var(--beacon-runs);
 	}
 
-	.contact-links:has(.link-item:hover) .icon-wrap,
-	.contact-links:has(.link-item:focus-visible) .icon-wrap {
+	.contact-links:has(.link-item:hover) .contact-icon,
+	.contact-links:has(.link-item:focus-visible) .contact-icon {
 		animation-play-state: paused;
 	}
 
 	.link-item:hover .icon-wrap,
 	.link-item:focus-visible .icon-wrap {
-		color: var(--brand-color);
 		transform: translateY(-4px) scale(1.14);
+	}
+
+	.link-item:hover .contact-icon,
+	.link-item:focus-visible .contact-icon {
+		color: var(--brand-color);
 		animation-play-state: paused;
-		box-shadow:
-			0 0 0.85rem 0.25rem var(--beacon-glow),
-			inset 0 0 0.9rem 0.15rem var(--beacon-glow) !important;
+		filter: drop-shadow(0 0 1.5px var(--beacon-glow)) drop-shadow(0 0 6px var(--beacon-glow))
+			drop-shadow(0 0 14px var(--beacon-glow)) !important;
 	}
 
 	.contact-icon {
@@ -189,7 +185,8 @@
 			width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
 			height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
 			transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-			filter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+			filter 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+			color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 		filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.12));
 	}
 
@@ -198,14 +195,9 @@
 		height: 84px;
 	}
 
-	.link-item:hover .contact-icon,
-	.link-item:focus-visible .contact-icon {
-		filter: drop-shadow(0 0 18px var(--brand-glow));
-	}
-
 	.link-sublabel {
 		display: block;
-		margin-top: 6px;
+		margin-top: 10px;
 		font-size: 0.92rem;
 		font-weight: 600;
 		letter-spacing: 0.02em;
@@ -292,7 +284,7 @@
 			font-size: clamp(0.55rem, 2.8vw, 0.85rem);
 			font-size: clamp(0.55rem, 9.4cqw, 0.85rem);
 			letter-spacing: -0.015em;
-			margin-top: 4px;
+			margin-top: 6px;
 			width: 100%;
 			text-align: center;
 			white-space: nowrap;
