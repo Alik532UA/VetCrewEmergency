@@ -12,6 +12,24 @@
 
 ---
 
+## 0. AI Executive Summary & Navigation Index (Швидкий довідник для агентів)
+
+> [!NOTE]
+> Цей розділ створено для швидкої навігації автономних AI-агентів (LLM) без потреби парсити весь 1700-рядковий історичний канон.
+
+| Параметр / Інваріант | Значення | Локація у коді / Примітка |
+| :--- | :--- | :--- |
+| **Стек** | SvelteKit 2 + Svelte 5 (Runes) + TypeScript + Tailwind | [package.json](package.json) |
+| **Хостинг та домен** | `https://vet-crew-emergency.org/` | GitHub Pages (`adapter-static`), fallback `404.html` |
+| **Префікс сховища** | `vetcrewemergency_` | Суворий фасад у `src/lib/services/storage.ts` |
+| **Маршрутизація та i18n** | 4 мови (`uk`, `en`, `de`, `nl`) | `src/routes/[[lang=lang]]/`, валідатор `check:i18n` |
+| **Захист CSP** | `mode: 'hash'`, sha256 інлайн-скриптів | `svelte.config.js`, `src/csp-hash.test.ts` |
+| **Безпека XSS** | Заборона сирого `{@html}` без санітизації | `src/security.test.ts` |
+| **Error Boundary** | `<svelte:boundary>` + `hooks.client.ts` | Захист від застарілих чанків деплою (`reloadOnce`) |
+| **Тестування та гейти** | 63 тести (Vitest + Playwright) | `npm test` (coverage), `npm run test:e2e`, `check:bundle` |
+
+---
+
 ## 1. Профіль і хостинг
 
 | Параметр         | Значення                                                                                                                                                                                                                                                                  |
