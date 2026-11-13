@@ -128,12 +128,6 @@ export const REPORT_URL = 'https://t.me/alik532';
  */
 export const VETCREW_SITE = 'https://sites.google.com/view/vetcrew';
 
-/** Фізична адреса — зі специфікації. */
-export const ADDRESS = {
-	uk: 'Одеська обл., м. Одеса, вул. Майстрова 4',
-	en: 'Maistrova St. 4, Odesa, Odesa Oblast, Ukraine'
-} as const;
-
 /** Image used for link previews when a page has nothing more specific. */
 export const DEFAULT_OG_IMAGE = '/images/og-default-1200x630.jpg';
 

@@ -2,14 +2,7 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { t } from '$lib/i18n';
 	import { withBase } from '$lib/utils/withBase';
-	import {
-		SIDE_PROJECTS,
-		CONTACT_EMAIL,
-		ADDRESS,
-		SOCIALS,
-		REPORT_URL,
-		VETCREW_SITE
-	} from '$lib/config';
+	import { SIDE_PROJECTS, CONTACT_EMAIL, SOCIALS, REPORT_URL, VETCREW_SITE } from '$lib/config';
 	import { siblingUrl } from '$lib/siblings';
 	import { settings } from '$lib/services/settings.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
@@ -30,7 +23,6 @@
 	 * і це не недогляд: людина, яка дочитала до низу, не мусить вертатися нагору по номер
 	 * або щоб надіслати фото й координати.
 	 */
-	const lang = $derived(settings.locale);
 </script>
 
 <footer class="footer">
@@ -81,7 +73,6 @@
 						{CONTACT_EMAIL.rescue}
 					</a>
 				</li>
-				<li><Icon name="map-pin" size="1rem" /> {ADDRESS[lang]}</li>
 			</ul>
 		</div>
 

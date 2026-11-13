@@ -1,13 +1,10 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
-	import { CONTACT_EMAIL, ADDRESS } from '$lib/config';
-	import { settings } from '$lib/services/settings.svelte';
+	import { CONTACT_EMAIL } from '$lib/config';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import PageMeta from '$lib/components/PageMeta.svelte';
 	import HotlineButton from '$lib/components/emergency/HotlineButton.svelte';
 	import { handleEmailClick } from '$lib/utils/emailAction';
-
-	const lang = $derived(settings.locale);
 
 	const features = [
 		{ title: 'about.f1.title', text: 'about.f1.text' },
@@ -41,7 +38,6 @@
 
 	<h2 class="contacts__title">{t('footer.contacts')}</h2>
 	<ul class="contacts" data-testid="about-contacts-list">
-		<li><Icon name="map-pin" size="1rem" /> {ADDRESS[lang]}</li>
 		<li>
 			<Icon name="email" size="1rem" />
 			<a

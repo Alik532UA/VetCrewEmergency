@@ -55,8 +55,8 @@ export const reportChecks: readonly BetaCheck[] = [
 		id: 'report_5',
 		category: { uk: 'Про нас', en: 'About' },
 		text: {
-			uk: 'На сторінці «Про нас» перевірте адресу й пошту. Вони мусять збігатися з тими, що в підвалі головної.',
-			en: 'On the “About” page check the address and the email. They must match the ones in the home page footer.'
+			uk: 'На сторінці «Про нас» перевірте контактну пошту. Вона мусить збігатися з тією, що в підвалі головної.',
+			en: 'On the “About” page check the contact email. It must match the one in the home page footer.'
 		},
 		coverage: 'testable'
 	}
