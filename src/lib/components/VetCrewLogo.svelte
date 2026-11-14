@@ -132,9 +132,9 @@
 
 <style>
 	.logo-container {
-		--logo-bg-circle: #598f3a;
-		--logo-paw: #ffb327;
-		--logo-vet-crew: #ffffff;
+		--logo-bg-circle: #13371b;
+		--logo-paw: #ffffff;
+		--logo-vet-crew: #ffb327;
 		--logo-emergency: #ffb327;
 		display: flex;
 		align-items: center;
@@ -145,13 +145,6 @@
 		transition:
 			transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
 			filter 0.5s ease;
-	}
-
-	:global([data-theme='dark']) .logo-container {
-		--logo-bg-circle: #13371b;
-		--logo-paw: #ffffff;
-		--logo-vet-crew: #ffb327;
-		--logo-emergency: #ffb327;
 	}
 
 	.logo-stage {
