@@ -1,32 +1,40 @@
 ---
 Назва: Персональний шар канону — VetCrewEmergency
-Версія канону: v8
-Оновлено: 2026-08-27
+Канон: selection_criteria/v10 та product_criteria/v10
+Дата оновлення: 2026-11-15
 ---
 
 # PROJECT-CONTEXT
 
-Персональний шар до [канону v8](../sveltekit-canon/selection_criteria/v8/README.md).
-Тут живе те, що не є частиною пакета: параметри цього проєкту та свідомі відхилення
-від правил. Крок 2 алгоритму канону читає саме цей файл.
+Персональний шар до канону v10.
+Тут зафіксовано параметри цього проєкту, архітектурні інваріанти, свідомі відхилення
+від правил та матрицю автоматичних перевірок.
 
 ---
 
 ## 0. AI Executive Summary & Navigation Index (Швидкий довідник для агентів)
 
 > [!NOTE]
-> Цей розділ створено для швидкої навігації автономних AI-агентів (LLM) без потреби парсити весь 1700-рядковий історичний канон.
+> Цей розділ є головним вказівником для автономних AI-агентів (LLM). Використовуйте його як Single Source of Truth для миттєвої навігації без потреби парсити весь детальний інженерний контекст.
 
 | Параметр / Інваріант      | Значення                                               | Локація у коді / Примітка                                 |
 | :------------------------ | :----------------------------------------------------- | :-------------------------------------------------------- |
-| **Стек**                  | SvelteKit 2 + Svelte 5 (Runes) + TypeScript + Tailwind | [package.json](package.json)                              |
+| **Стек**                  | SvelteKit 2 + Svelte 5 (виключно Runes) + TypeScript + Tailwind | [package.json](package.json)                     |
 | **Хостинг та домен**      | `https://vet-crew-emergency.org/`                      | GitHub Pages (`adapter-static`), fallback `404.html`      |
-| **Префікс сховища**       | `vetcrewemergency_`                                    | Суворий фасад у `src/lib/services/storage.ts`             |
-| **Маршрутизація та i18n** | 4 мови (`uk`, `en`, `de`, `nl`)                        | `src/routes/[[lang=lang]]/`, валідатор `check:i18n`       |
+| **Префікс сховища**       | `vetcrewemergency_` (dev: `vetcrewemergency-dev_`)     | Суворий фасад у `src/lib/services/storage.ts`             |
+| **Маршрутизація та i18n** | 4 мови (`uk`, `en`, `de`, `nl`), типова без префікса    | `src/routes/[[lang=lang]]/`, валідатор `check:i18n`       |
 | **Захист CSP**            | `mode: 'hash'`, sha256 інлайн-скриптів                 | `svelte.config.js`, `src/csp-hash.test.ts`                |
 | **Безпека XSS**           | Заборона сирого `{@html}` без санітизації              | `src/security.test.ts`                                    |
 | **Error Boundary**        | `<svelte:boundary>` + `hooks.client.ts`                | Захист від застарілих чанків деплою (`reloadOnce`)        |
-| **Тестування та гейти**   | 63 тести (Vitest + Playwright)                         | `npm test` (coverage), `npm run test:e2e`, `check:bundle` |
+| **Тестування та гейти**   | 54 тест-файли (320+ Vitest) + 10 Playwright e2e suites | `npm test` (coverage), `npm run test:e2e`, `check:bundle` |
+| **CI/CD Автоматизація**   | Deploy + Budgets + Lighthouse CI                       | `.github/workflows/` (Least Privilege `contents: read`)   |
+
+### Швидкий покажчик ключових рішень:
+- **Аналітика**: GA4 (`G-7YQDFQNMT2`), вимкнена в dev та при prerender (§ 4.1).
+- **Смуга прокрутки та мінімапа**: 4 режими, нативний за замовчуванням (§ 4.13).
+- **Гарячі клавіші**: `T` (тема), `L` (мова), `Esc` (закрити), `V`/`R` (службові) (§ 4.23).
+- **Аудит доступності**: WCAG 2.2 AA гейти, адаптивність 320px, перевірка розмірів цілей (§ 4.21, § 4.39).
+- **Stale-Build захист**: `updated.check()` + перевірка `_app/version.json` (§ 4.30).
 
 ---
 
@@ -66,7 +74,7 @@
 `HOLD-SCROLL`, `HOTKEYS`), і два, яких він не застосовує.
 
 **Пакетів тепер два, і це змінює не назви, а порядок читання.** v9 винесла сім
-продуктових файлів у [`product_criteria/v1`](../sveltekit-canon/product_criteria/v1/README.md)
+продуктових файлів у [`product_criteria/v1`](../../sveltekit-canon/product_criteria/v1/README.md)
 з власною версією й власним `canon.json`: вони не стандарт, а рішення автора, і
 чужий проєкт має право не читати їх узагалі. Умова, за якої їх читають, —
 **запис у цьому файлі про те, що проєкт належить до тієї родини сайтів.**

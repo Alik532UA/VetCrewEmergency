@@ -1,4 +1,4 @@
-# Документація проєкту VetCrewEmergency
+﻿# Документація проєкту VetCrewEmergency
 
 ## Призначення
 
@@ -12,7 +12,7 @@
 
 ## Життєвий цикл документів
 
-За правилом [DOCUMENTATION-v10](../sveltekit-canon/selection_criteria/v10/ops/DOCUMENTATION-v10.md):
+За правилом [DOCUMENTATION-v10](../../sveltekit-canon/selection_criteria/v10/ops/DOCUMENTATION-v10.md):
 
 - Чинні документи зберігаються як `active` в категорійних підтеках.
 - Застарілі документи архівуються у `archive/`.
