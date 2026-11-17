@@ -17,19 +17,20 @@
 > [!NOTE]
 > Цей розділ є головним вказівником для автономних AI-агентів (LLM). Використовуйте його як Single Source of Truth для миттєвої навігації без потреби парсити весь детальний інженерний контекст.
 
-| Параметр / Інваріант      | Значення                                               | Локація у коді / Примітка                                 |
-| :------------------------ | :----------------------------------------------------- | :-------------------------------------------------------- |
-| **Стек**                  | SvelteKit 2 + Svelte 5 (виключно Runes) + TypeScript + Tailwind | [package.json](package.json)                     |
-| **Хостинг та домен**      | `https://vet-crew-emergency.org/`                      | GitHub Pages (`adapter-static`), fallback `404.html`      |
-| **Префікс сховища**       | `vetcrewemergency_` (dev: `vetcrewemergency-dev_`)     | Суворий фасад у `src/lib/services/storage.ts`             |
-| **Маршрутизація та i18n** | 4 мови (`uk`, `en`, `de`, `nl`), типова без префікса    | `src/routes/[[lang=lang]]/`, валідатор `check:i18n`       |
-| **Захист CSP**            | `mode: 'hash'`, sha256 інлайн-скриптів                 | `svelte.config.js`, `src/csp-hash.test.ts`                |
-| **Безпека XSS**           | Заборона сирого `{@html}` без санітизації              | `src/security.test.ts`                                    |
-| **Error Boundary**        | `<svelte:boundary>` + `hooks.client.ts`                | Захист від застарілих чанків деплою (`reloadOnce`)        |
-| **Тестування та гейти**   | 54 тест-файли (320+ Vitest) + 10 Playwright e2e suites | `npm test` (coverage), `npm run test:e2e`, `check:bundle` |
-| **CI/CD Автоматизація**   | Deploy + Budgets + Lighthouse CI                       | `.github/workflows/` (Least Privilege `contents: read`)   |
+| Параметр / Інваріант      | Значення                                                        | Локація у коді / Примітка                                 |
+| :------------------------ | :-------------------------------------------------------------- | :-------------------------------------------------------- |
+| **Стек**                  | SvelteKit 2 + Svelte 5 (виключно Runes) + TypeScript + Tailwind | [package.json](package.json)                              |
+| **Хостинг та домен**      | `https://vet-crew-emergency.org/`                               | GitHub Pages (`adapter-static`), fallback `404.html`      |
+| **Префікс сховища**       | `vetcrewemergency_` (dev: `vetcrewemergency-dev_`)              | Суворий фасад у `src/lib/services/storage.ts`             |
+| **Маршрутизація та i18n** | 4 мови (`uk`, `en`, `de`, `nl`), типова без префікса            | `src/routes/[[lang=lang]]/`, валідатор `check:i18n`       |
+| **Захист CSP**            | `mode: 'hash'`, sha256 інлайн-скриптів                          | `svelte.config.js`, `src/csp-hash.test.ts`                |
+| **Безпека XSS**           | Заборона сирого `{@html}` без санітизації                       | `src/security.test.ts`                                    |
+| **Error Boundary**        | `<svelte:boundary>` + `hooks.client.ts`                         | Захист від застарілих чанків деплою (`reloadOnce`)        |
+| **Тестування та гейти**   | 54 тест-файли (320+ Vitest) + 10 Playwright e2e suites          | `npm test` (coverage), `npm run test:e2e`, `check:bundle` |
+| **CI/CD Автоматизація**   | Deploy + Budgets + Lighthouse CI                                | `.github/workflows/` (Least Privilege `contents: read`)   |
 
 ### Швидкий покажчик ключових рішень:
+
 - **Аналітика**: GA4 (`G-7YQDFQNMT2`), вимкнена в dev та при prerender (§ 4.1).
 - **Смуга прокрутки та мінімапа**: 4 режими, нативний за замовчуванням (§ 4.13).
 - **Гарячі клавіші**: `T` (тема), `L` (мова), `Esc` (закрити), `V`/`R` (службові) (§ 4.23).
