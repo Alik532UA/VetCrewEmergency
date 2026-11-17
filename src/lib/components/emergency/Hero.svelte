@@ -311,7 +311,7 @@
 		.hero {
 			display: grid;
 			align-items: center;
-			min-height: min(44rem, 82vh);
+			min-height: min(44rem, 82dvh);
 		}
 
 		.hero__inner {
